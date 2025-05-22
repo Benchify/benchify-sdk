@@ -42,15 +42,15 @@ If you’d like to use the repository from source, you can either install from g
 To install via git:
 
 ```sh
-$ npm install git+ssh://git@github.com:stainless-sdks/benchify-typescript.git
+$ npm install git+ssh://git@github.com:Benchify/benchify-sdk.git
 ```
 
 Alternatively, to link a local copy of the repo:
 
 ```sh
 # Clone
-$ git clone https://www.github.com/stainless-sdks/benchify-typescript
-$ cd benchify-typescript
+$ git clone https://www.github.com/Benchify/benchify-sdk
+$ cd benchify-sdk
 
 # With yarn
 $ yarn link
