@@ -20,7 +20,7 @@ import { APIPromise } from './core/api-promise';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
-import { Fixer, FixerSubmitParams, FixerSubmitResponse } from './resources/fixer';
+import { Fixer, FixerRequestBase, FixerSubmitParams, FixerSubmitResponse } from './resources/fixer';
 import { readEnv } from './internal/utils/env';
 import { formatRequestDetails, loggerFor } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
@@ -28,8 +28,9 @@ import { isEmptyObj } from './internal/utils/values';
 export interface ClientOptions {
   /**
    * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
+   *
    */
-  apiKey?: string | undefined;
+  bearerToken?: string | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
@@ -102,7 +103,7 @@ export interface ClientOptions {
  * API Client for interfacing with the Benchify API.
  */
 export class Benchify {
-  apiKey: string;
+  bearerToken: string;
 
   baseURL: string;
   maxRetries: number;
@@ -119,7 +120,7 @@ export class Benchify {
   /**
    * API Client for interfacing with the Benchify API.
    *
-   * @param {string | undefined} [opts.apiKey=process.env['BENCHIFY_API_KEY'] ?? undefined]
+   * @param {string | undefined} [opts.bearerToken=process.env['BENCHIFY_BEARER_TOKEN'] ?? undefined]
    * @param {string} [opts.baseURL=process.env['BENCHIFY_BASE_URL'] ?? https://api.benchify.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
@@ -130,17 +131,17 @@ export class Benchify {
    */
   constructor({
     baseURL = readEnv('BENCHIFY_BASE_URL'),
-    apiKey = readEnv('BENCHIFY_API_KEY'),
+    bearerToken = readEnv('BENCHIFY_BEARER_TOKEN'),
     ...opts
   }: ClientOptions = {}) {
-    if (apiKey === undefined) {
+    if (bearerToken === undefined) {
       throw new Errors.BenchifyError(
-        "The BENCHIFY_API_KEY environment variable is missing or empty; either provide it, or instantiate the Benchify client with an apiKey option, like new Benchify({ apiKey: 'My API Key' }).",
+        "The BENCHIFY_BEARER_TOKEN environment variable is missing or empty; either provide it, or instantiate the Benchify client with an bearerToken option, like new Benchify({ bearerToken: 'My Bearer Token' }).",
       );
     }
 
     const options: ClientOptions = {
-      apiKey,
+      bearerToken,
       ...opts,
       baseURL: baseURL || `https://api.benchify.com`,
     };
@@ -162,7 +163,7 @@ export class Benchify {
 
     this._options = options;
 
-    this.apiKey = apiKey;
+    this.bearerToken = bearerToken;
   }
 
   /**
@@ -177,7 +178,7 @@ export class Benchify {
       logger: this.logger,
       logLevel: this.logLevel,
       fetchOptions: this.fetchOptions,
-      apiKey: this.apiKey,
+      bearerToken: this.bearerToken,
       ...options,
     });
   }
@@ -191,7 +192,7 @@ export class Benchify {
   }
 
   protected authHeaders(opts: FinalRequestOptions): NullableHeaders | undefined {
-    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
+    return buildHeaders([{ Authorization: `Bearer ${this.bearerToken}` }]);
   }
 
   /**
@@ -699,6 +700,7 @@ export declare namespace Benchify {
 
   export {
     Fixer as Fixer,
+    type FixerRequestBase as FixerRequestBase,
     type FixerSubmitResponse as FixerSubmitResponse,
     type FixerSubmitParams as FixerSubmitParams,
   };

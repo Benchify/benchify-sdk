@@ -26,11 +26,15 @@ The full API of this library can be found in [api.md](api.md).
 import Benchify from 'benchify';
 
 const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+  bearerToken: process.env['BENCHIFY_BEARER_TOKEN'], // This is the default and can be omitted
 });
 
 async function main() {
-  const response = await client.fixer.submit({ buildCmd: 'npm run build' });
+  const response = await client.fixer.submit({
+    buildCmd: 'npm run build',
+    jobName: 'fix-my-code',
+    repoUrl: '$REPO_URL',
+  });
 
   console.log(response.build_output);
 }
@@ -47,11 +51,15 @@ This library includes TypeScript definitions for all request params and response
 import Benchify from 'benchify';
 
 const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+  bearerToken: process.env['BENCHIFY_BEARER_TOKEN'], // This is the default and can be omitted
 });
 
 async function main() {
-  const params: Benchify.FixerSubmitParams = { buildCmd: 'npm run build' };
+  const params: Benchify.FixerSubmitParams = {
+    buildCmd: 'npm run build',
+    jobName: 'fix-my-code',
+    repoUrl: '$REPO_URL',
+  };
   const response: Benchify.FixerSubmitResponse = await client.fixer.submit(params);
 }
 
@@ -69,15 +77,17 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const response = await client.fixer.submit({ buildCmd: 'npm run build' }).catch(async (err) => {
-    if (err instanceof Benchify.APIError) {
-      console.log(err.status); // 400
-      console.log(err.name); // BadRequestError
-      console.log(err.headers); // {server: 'nginx', ...}
-    } else {
-      throw err;
-    }
-  });
+  const response = await client.fixer
+    .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
+    .catch(async (err) => {
+      if (err instanceof Benchify.APIError) {
+        console.log(err.status); // 400
+        console.log(err.name); // BadRequestError
+        console.log(err.headers); // {server: 'nginx', ...}
+      } else {
+        throw err;
+      }
+    });
 }
 
 main();
@@ -112,7 +122,7 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.submit({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' }, {
   maxRetries: 5,
 });
 ```
@@ -129,7 +139,7 @@ const client = new Benchify({
 });
 
 // Override per-request:
-await client.fixer.submit({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' }, {
   timeout: 5 * 1000,
 });
 ```
@@ -152,12 +162,14 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Benchify();
 
-const response = await client.fixer.submit({ buildCmd: 'npm run build' }).asResponse();
+const response = await client.fixer
+  .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
+  .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .submit({ buildCmd: 'npm run build' })
+  .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
 console.log(response.build_output);
