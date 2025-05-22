@@ -6,20 +6,32 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Fixer extends APIResource {
   /**
-   * Submit a repository for fixing
+   * Submit a repository or set of files for fixing
    *
    * @example
    * ```ts
    * const response = await client.fixer.submit({
    *   buildCmd: 'npm run build',
-   *   jobName: 'fix-simple-demo',
-   *   repoUrl: '$REPO_URL',
+   *   jobName: 'fix-from-repo',
+   *   repoUrl: 'https://github.com/example/repo.git',
    * });
    * ```
    */
   submit(body: FixerSubmitParams, options?: RequestOptions): APIPromise<FixerSubmitResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
+}
+
+export interface FixerRequestBase {
+  /**
+   * The command required to build the project.
+   */
+  buildCmd: string;
+
+  /**
+   * A user-defined name for the fix job.
+   */
+  jobName: string;
 }
 
 export interface FixerSubmitResponse {
@@ -40,43 +52,63 @@ export interface FixerSubmitResponse {
   diff?: string;
 }
 
-export interface FixerSubmitParams {
-  /**
-   * The command required to build the project.
-   */
-  buildCmd: string;
+export type FixerSubmitParams = FixerSubmitParams.FixerRequestRepo | FixerSubmitParams.FixerRequestFiles;
 
-  /**
-   * List of files to be fixed. Use this instead of repoUrl when submitting
-   * individual files.
-   */
-  files?: Array<FixerSubmitParams.File>;
-
-  /**
-   * A user-defined name for the fix job.
-   */
-  jobName?: string;
-
-  /**
-   * Publicly accessible URL to a .git repo, zip, tar, or tar.gz archive.
-   */
-  repoUrl?: string;
-}
-
-export namespace FixerSubmitParams {
-  export interface File {
+export declare namespace FixerSubmitParams {
+  export interface FixerRequestRepo {
     /**
-     * Contents of the file
+     * The command required to build the project.
      */
-    contents: string;
+    buildCmd: string;
 
     /**
-     * Path to the file within the project
+     * A user-defined name for the fix job.
      */
-    path: string;
+    jobName: string;
+
+    /**
+     * Publicly accessible URL to a .git repo, zip, tar, or tar.gz archive.
+     */
+    repoUrl: string;
+  }
+
+  export interface FixerRequestFiles {
+    /**
+     * The command required to build the project.
+     */
+    buildCmd: string;
+
+    /**
+     * List of files to be fixed. Use this instead of repoUrl when submitting
+     * individual files.
+     */
+    files: Array<FixerRequestFiles.File>;
+
+    /**
+     * A user-defined name for the fix job.
+     */
+    jobName: string;
+  }
+
+  export namespace FixerRequestFiles {
+    export interface File {
+      /**
+       * Contents of the file
+       */
+      contents: string;
+
+      /**
+       * Path to the file within the project
+       */
+      path: string;
+    }
   }
 }
 
 export declare namespace Fixer {
-  export { type FixerSubmitResponse as FixerSubmitResponse, type FixerSubmitParams as FixerSubmitParams };
+  export {
+    type FixerRequestBase as FixerRequestBase,
+    type FixerSubmitResponse as FixerSubmitResponse,
+    type FixerSubmitParams as FixerSubmitParams,
+  };
 }

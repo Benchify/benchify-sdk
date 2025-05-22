@@ -2,6 +2,7 @@
 
 Types:
 
+- <code><a href="./src/resources/fixer.ts">FixerRequestBase</a></code>
 - <code><a href="./src/resources/fixer.ts">FixerSubmitResponse</a></code>
 
 Methods:
