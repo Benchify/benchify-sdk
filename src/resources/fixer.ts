@@ -6,12 +6,11 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Fixer extends APIResource {
   /**
-   * Submit a repository for fixing
+   * Analyzes code and automatically fixes build issues
    *
    * @example
    * ```ts
    * const response = await client.fixer.submit({
-   *   buildCmd: 'npm run build',
    *   files: [
    *     {
    *       path: 'package.json',
@@ -71,43 +70,21 @@ export namespace FixerSubmitResponse {
 
 export interface FixerSubmitParams {
   /**
-   * The command required to build the project.
+   * Array of file objects with path and contents
    */
-  buildCmd: string;
-
-  /**
-   * List of files to be fixed. Use this instead of repoUrl when submitting
-   * individual files.
-   */
-  files?: Array<FixerSubmitParams.File>;
+  files: Array<FixerSubmitParams.File>;
 
   /**
    * Benchify will apply all static fixes by default. If you want to only apply
    * certain fixes, pass in the flags you want to apply.
    */
   fixes?: FixerSubmitParams.Fixes;
-
-  /**
-   * A user-defined name for the fix job.
-   */
-  jobName?: string;
-
-  /**
-   * Publicly accessible URL to a .git repo, zip, tar, or tar.gz archive.
-   */
-  repoUrl?: string;
 }
 
 export namespace FixerSubmitParams {
   export interface File {
-    /**
-     * Contents of the file
-     */
     contents: string;
 
-    /**
-     * Path to the file within the project
-     */
     path: string;
   }
 
