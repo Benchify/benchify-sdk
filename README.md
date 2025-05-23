@@ -25,12 +25,21 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Benchify from 'benchify';
 
-const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
-});
+const client = new Benchify();
 
 async function main() {
-  const response = await client.fixer.submit({ buildCmd: 'npm run build' });
+  const response = await client.fixer.submit({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  });
 
   console.log(response.data);
 }
@@ -46,12 +55,21 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Benchify from 'benchify';
 
-const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
-});
+const client = new Benchify();
 
 async function main() {
-  const params: Benchify.FixerSubmitParams = { buildCmd: 'npm run build' };
+  const params: Benchify.FixerSubmitParams = {
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  };
   const response: Benchify.FixerSubmitResponse = await client.fixer.submit(params);
 }
 
@@ -69,15 +87,28 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const response = await client.fixer.submit({ buildCmd: 'npm run build' }).catch(async (err) => {
-    if (err instanceof Benchify.APIError) {
-      console.log(err.status); // 400
-      console.log(err.name); // BadRequestError
-      console.log(err.headers); // {server: 'nginx', ...}
-    } else {
-      throw err;
-    }
-  });
+  const response = await client.fixer
+    .submit({
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+          path: 'src/index.tsx',
+        },
+      ],
+    })
+    .catch(async (err) => {
+      if (err instanceof Benchify.APIError) {
+        console.log(err.status); // 400
+        console.log(err.name); // BadRequestError
+        console.log(err.headers); // {server: 'nginx', ...}
+      } else {
+        throw err;
+      }
+    });
 }
 
 main();
@@ -108,11 +139,12 @@ You can use the `maxRetries` option to configure or disable this:
 ```js
 // Configure the default for all requests:
 const client = new Benchify({
+  apiKey: 'My API Key',
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await client.fixer.submit({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   maxRetries: 5,
 });
 ```
@@ -125,11 +157,12 @@ Requests time out after 1 minute by default. You can configure this with a `time
 ```ts
 // Configure the default for all requests:
 const client = new Benchify({
+  apiKey: 'My API Key',
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.fixer.submit({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -152,12 +185,36 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Benchify();
 
-const response = await client.fixer.submit({ buildCmd: 'npm run build' }).asResponse();
+const response = await client.fixer
+  .submit({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  })
+  .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .submit({ buildCmd: 'npm run build' })
+  .submit({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
 console.log(response.data);
