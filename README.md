@@ -4,14 +4,14 @@
 
 This library provides convenient access to the Benchify REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [benchify.com](https://benchify.com/support). The full API of this library can be found in [api.md](api.md).
+The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
 ## Installation
 
 ```sh
-npm install git+ssh://git@github.com:Benchify/benchify-sdk.git
+npm install git+ssh://git@github.com:stainless-sdks/benchify-typescript.git
 ```
 
 > [!NOTE]
@@ -25,10 +25,12 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 async function main() {
-  const response = await client.fixer.run({ buildCmd: 'npm run build' });
+  const response = await client.fixer.submit({ buildCmd: 'npm run build' });
 
   console.log(response.data);
 }
@@ -44,11 +46,13 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 async function main() {
-  const params: Benchify.FixerRunParams = { buildCmd: 'npm run build' };
-  const response: Benchify.FixerRunResponse = await client.fixer.run(params);
+  const params: Benchify.FixerSubmitParams = { buildCmd: 'npm run build' };
+  const response: Benchify.FixerSubmitResponse = await client.fixer.submit(params);
 }
 
 main();
@@ -65,7 +69,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const response = await client.fixer.run({ buildCmd: 'npm run build' }).catch(async (err) => {
+  const response = await client.fixer.submit({ buildCmd: 'npm run build' }).catch(async (err) => {
     if (err instanceof Benchify.APIError) {
       console.log(err.status); // 400
       console.log(err.name); // BadRequestError
@@ -104,12 +108,11 @@ You can use the `maxRetries` option to configure or disable this:
 ```js
 // Configure the default for all requests:
 const client = new Benchify({
-  apiKey: 'My API Key',
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await client.fixer.run({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ buildCmd: 'npm run build' }, {
   maxRetries: 5,
 });
 ```
@@ -122,12 +125,11 @@ Requests time out after 1 minute by default. You can configure this with a `time
 ```ts
 // Configure the default for all requests:
 const client = new Benchify({
-  apiKey: 'My API Key',
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.fixer.run({ buildCmd: 'npm run build' }, {
+await client.fixer.submit({ buildCmd: 'npm run build' }, {
   timeout: 5 * 1000,
 });
 ```
@@ -150,12 +152,12 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Benchify();
 
-const response = await client.fixer.run({ buildCmd: 'npm run build' }).asResponse();
+const response = await client.fixer.submit({ buildCmd: 'npm run build' }).asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .run({ buildCmd: 'npm run build' })
+  .submit({ buildCmd: 'npm run build' })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
 console.log(response.data);
@@ -349,7 +351,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/Benchify/benchify-sdk/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/benchify-typescript/issues) with questions, bugs, or suggestions.
 
 ## Requirements
 

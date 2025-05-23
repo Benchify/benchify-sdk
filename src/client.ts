@@ -20,14 +20,14 @@ import { APIPromise } from './core/api-promise';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
-import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { Fixer, FixerSubmitParams, FixerSubmitResponse } from './resources/fixer';
 import { readEnv } from './internal/utils/env';
 import { formatRequestDetails, loggerFor } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Benchify API Key. Obtain a key from the [Benchify web portal](https://app.benchify.com) under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
+   * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
    */
   apiKey?: string | undefined;
 
@@ -188,6 +188,10 @@ export class Benchify {
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
     return;
+  }
+
+  protected authHeaders(opts: FinalRequestOptions): NullableHeaders | undefined {
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
@@ -620,6 +624,7 @@ export class Benchify {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
+      this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -692,5 +697,9 @@ Benchify.Fixer = Fixer;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
-  export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
+  export {
+    Fixer as Fixer,
+    type FixerSubmitResponse as FixerSubmitResponse,
+    type FixerSubmitParams as FixerSubmitParams,
+  };
 }
