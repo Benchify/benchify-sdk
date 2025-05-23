@@ -10,18 +10,7 @@ const client = new Benchify({
 describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
   test.skip('run: only required params', async () => {
-    const responsePromise = client.fixer.run({
-      files: [
-        {
-          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-          path: 'package.json',
-        },
-        {
-          contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-          path: 'src/index.tsx',
-        },
-      ],
-    });
+    const responsePromise = client.fixer.run({ buildCmd: 'npm run build' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -34,6 +23,7 @@ describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
   test.skip('run: required and optional params', async () => {
     const response = await client.fixer.run({
+      buildCmd: 'npm run build',
       files: [
         {
           contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
@@ -45,6 +35,8 @@ describe('resource fixer', () => {
         },
       ],
       fixes: { css: true, imports: true, stringLiterals: true, tsSuggestions: true },
+      jobName: 'fix-my-code',
+      repoUrl: '$REPO_URL',
     });
   });
 });
