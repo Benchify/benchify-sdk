@@ -20,17 +20,16 @@ import { APIPromise } from './core/api-promise';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
-import { Fixer, FixerRequestBase, FixerSubmitParams, FixerSubmitResponse } from './resources/fixer';
+import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
 import { readEnv } from './internal/utils/env';
 import { formatRequestDetails, loggerFor } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
-   *
+   * Benchify API Key. Obtain a key from the [Benchify web portal](https://app.benchify.com) under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
    */
-  bearerToken?: string | undefined;
+  apiKey?: string | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
@@ -103,7 +102,7 @@ export interface ClientOptions {
  * API Client for interfacing with the Benchify API.
  */
 export class Benchify {
-  bearerToken: string;
+  apiKey: string;
 
   baseURL: string;
   maxRetries: number;
@@ -120,7 +119,7 @@ export class Benchify {
   /**
    * API Client for interfacing with the Benchify API.
    *
-   * @param {string | undefined} [opts.bearerToken=process.env['BENCHIFY_BEARER_TOKEN'] ?? undefined]
+   * @param {string | undefined} [opts.apiKey=process.env['BENCHIFY_API_KEY'] ?? undefined]
    * @param {string} [opts.baseURL=process.env['BENCHIFY_BASE_URL'] ?? https://api.benchify.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
@@ -131,17 +130,17 @@ export class Benchify {
    */
   constructor({
     baseURL = readEnv('BENCHIFY_BASE_URL'),
-    bearerToken = readEnv('BENCHIFY_BEARER_TOKEN'),
+    apiKey = readEnv('BENCHIFY_API_KEY'),
     ...opts
   }: ClientOptions = {}) {
-    if (bearerToken === undefined) {
+    if (apiKey === undefined) {
       throw new Errors.BenchifyError(
-        "The BENCHIFY_BEARER_TOKEN environment variable is missing or empty; either provide it, or instantiate the Benchify client with an bearerToken option, like new Benchify({ bearerToken: 'My Bearer Token' }).",
+        "The BENCHIFY_API_KEY environment variable is missing or empty; either provide it, or instantiate the Benchify client with an apiKey option, like new Benchify({ apiKey: 'My API Key' }).",
       );
     }
 
     const options: ClientOptions = {
-      bearerToken,
+      apiKey,
       ...opts,
       baseURL: baseURL || `https://api.benchify.com`,
     };
@@ -163,7 +162,7 @@ export class Benchify {
 
     this._options = options;
 
-    this.bearerToken = bearerToken;
+    this.apiKey = apiKey;
   }
 
   /**
@@ -178,7 +177,7 @@ export class Benchify {
       logger: this.logger,
       logLevel: this.logLevel,
       fetchOptions: this.fetchOptions,
-      bearerToken: this.bearerToken,
+      apiKey: this.apiKey,
       ...options,
     });
   }
@@ -192,7 +191,7 @@ export class Benchify {
   }
 
   protected authHeaders(opts: FinalRequestOptions): NullableHeaders | undefined {
-    return buildHeaders([{ Authorization: `Bearer ${this.bearerToken}` }]);
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
@@ -698,10 +697,5 @@ Benchify.Fixer = Fixer;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
-  export {
-    Fixer as Fixer,
-    type FixerRequestBase as FixerRequestBase,
-    type FixerSubmitResponse as FixerSubmitResponse,
-    type FixerSubmitParams as FixerSubmitParams,
-  };
+  export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 }

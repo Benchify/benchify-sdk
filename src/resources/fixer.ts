@@ -6,109 +6,119 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Fixer extends APIResource {
   /**
-   * Submit a repository or set of files for fixing
+   * Analyzes code and automatically fixes build issues
    *
    * @example
    * ```ts
-   * const response = await client.fixer.submit({
-   *   buildCmd: 'npm run build',
-   *   jobName: 'fix-from-repo',
-   *   repoUrl: 'https://github.com/example/repo.git',
+   * const response = await client.fixer.run({
+   *   files: [
+   *     {
+   *       path: 'package.json',
+   *       contents:
+   *         '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+   *     },
+   *     {
+   *       path: 'src/index.tsx',
+   *       contents:
+   *         "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+   *     },
+   *   ],
+   *   fixes: {
+   *     imports: true,
+   *     stringLiterals: true,
+   *     tsSuggestions: true,
+   *   },
    * });
    * ```
    */
-  submit(body: FixerSubmitParams, options?: RequestOptions): APIPromise<FixerSubmitResponse> {
+  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
 
-export interface FixerRequestBase {
-  /**
-   * The command required to build the project.
-   */
-  buildCmd: string;
+export interface FixerRunResponse {
+  data?: FixerRunResponse.Data;
 
-  /**
-   * A user-defined name for the fix job.
-   */
-  jobName: string;
+  meta?: FixerRunResponse.Meta;
 }
 
-export interface FixerSubmitResponse {
-  /**
-   * The stdout/stderr output from the build command.
-   */
-  build_output?: string;
+export namespace FixerRunResponse {
+  export interface Data {
+    /**
+     * Output of the build command
+     */
+    build_output?: string;
 
-  /**
-   * Exit code of the build command after applying fixes. 0 indicates success.
-   */
-  build_status?: number;
+    /**
+     * Git diff of the changes made by the fixer, or null if no changes were made
+     */
+    diff?: string | null;
 
-  /**
-   * A git diff showing the changes applied. Empty if no changes were needed or the
-   * build failed.
-   */
-  diff?: string;
+    /**
+     * Whether the build succeeded
+     */
+    success?: boolean;
+  }
+
+  export interface Meta {
+    /**
+     * Unique ID of the fixer run
+     */
+    fixer_run_id?: string;
+  }
 }
 
-export type FixerSubmitParams = FixerSubmitParams.FixerRequestRepo | FixerSubmitParams.FixerRequestFiles;
+export interface FixerRunParams {
+  /**
+   * Array of file objects with path and contents
+   */
+  files: Array<FixerRunParams.File>;
 
-export declare namespace FixerSubmitParams {
-  export interface FixerRequestRepo {
-    /**
-     * The command required to build the project.
-     */
-    buildCmd: string;
+  /**
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
+   */
+  fixes?: FixerRunParams.Fixes;
+}
 
-    /**
-     * A user-defined name for the fix job.
-     */
-    jobName: string;
+export namespace FixerRunParams {
+  export interface File {
+    contents: string;
 
-    /**
-     * Publicly accessible URL to a .git repo, zip, tar, or tar.gz archive.
-     */
-    repoUrl: string;
+    path: string;
   }
 
-  export interface FixerRequestFiles {
+  /**
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
+   */
+  export interface Fixes {
     /**
-     * The command required to build the project.
+     * Analyzes and corrects unused, invalid, or misapplied CSS and Tailwind class
+     * references, including removal of unused styles
      */
-    buildCmd: string;
+    css?: boolean;
 
     /**
-     * List of files to be fixed. Use this instead of repoUrl when submitting
-     * individual files.
+     * Fix incorrect packages, undefined references, local paths, hallucinated
+     * dependencies, and other import/export errors
      */
-    files: Array<FixerRequestFiles.File>;
+    imports?: boolean;
 
     /**
-     * A user-defined name for the fix job.
+     * Statically fix string escape sequences, invalid characters, and other common
+     * string literal issues
      */
-    jobName: string;
-  }
+    stringLiterals?: boolean;
 
-  export namespace FixerRequestFiles {
-    export interface File {
-      /**
-       * Contents of the file
-       */
-      contents: string;
-
-      /**
-       * Path to the file within the project
-       */
-      path: string;
-    }
+    /**
+     * Applies TypeScript compiler suggestions and fixes, resolving type errors,
+     * mismatched assertions, and generic parameter issues through static analysis.
+     */
+    tsSuggestions?: boolean;
   }
 }
 
 export declare namespace Fixer {
-  export {
-    type FixerRequestBase as FixerRequestBase,
-    type FixerSubmitResponse as FixerSubmitResponse,
-    type FixerSubmitParams as FixerSubmitParams,
-  };
+  export { type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 }
