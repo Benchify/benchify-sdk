@@ -10,7 +10,7 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixer.run({
+   * const response = await client.fixer.submit({
    *   buildCmd: 'npm run build',
    *   files: [
    *     {
@@ -32,18 +32,18 @@ export class Fixer extends APIResource {
    * });
    * ```
    */
-  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
+  submit(body: FixerSubmitParams, options?: RequestOptions): APIPromise<FixerSubmitResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
 
-export interface FixerRunResponse {
-  data?: FixerRunResponse.Data;
+export interface FixerSubmitResponse {
+  data?: FixerSubmitResponse.Data;
 
-  meta?: FixerRunResponse.Meta;
+  meta?: FixerSubmitResponse.Meta;
 }
 
-export namespace FixerRunResponse {
+export namespace FixerSubmitResponse {
   export interface Data {
     /**
      * Output of the build command
@@ -69,7 +69,7 @@ export namespace FixerRunResponse {
   }
 }
 
-export interface FixerRunParams {
+export interface FixerSubmitParams {
   /**
    * The command required to build the project.
    */
@@ -79,13 +79,13 @@ export interface FixerRunParams {
    * List of files to be fixed. Use this instead of repoUrl when submitting
    * individual files.
    */
-  files?: Array<FixerRunParams.File>;
+  files?: Array<FixerSubmitParams.File>;
 
   /**
    * Benchify will apply all static fixes by default. If you want to only apply
    * certain fixes, pass in the flags you want to apply.
    */
-  fixes?: FixerRunParams.Fixes;
+  fixes?: FixerSubmitParams.Fixes;
 
   /**
    * A user-defined name for the fix job.
@@ -98,7 +98,7 @@ export interface FixerRunParams {
   repoUrl?: string;
 }
 
-export namespace FixerRunParams {
+export namespace FixerSubmitParams {
   export interface File {
     /**
      * Contents of the file
@@ -143,5 +143,5 @@ export namespace FixerRunParams {
 }
 
 export declare namespace Fixer {
-  export { type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
+  export { type FixerSubmitResponse as FixerSubmitResponse, type FixerSubmitParams as FixerSubmitParams };
 }
