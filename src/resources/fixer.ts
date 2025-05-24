@@ -10,7 +10,7 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixer.submit({
+   * const response = await client.fixer.run({
    *   files: [
    *     {
    *       path: 'package.json',
@@ -31,18 +31,18 @@ export class Fixer extends APIResource {
    * });
    * ```
    */
-  submit(body: FixerSubmitParams, options?: RequestOptions): APIPromise<FixerSubmitResponse> {
+  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
 
-export interface FixerSubmitResponse {
-  data?: FixerSubmitResponse.Data;
+export interface FixerRunResponse {
+  data?: FixerRunResponse.Data;
 
-  meta?: FixerSubmitResponse.Meta;
+  meta?: FixerRunResponse.Meta;
 }
 
-export namespace FixerSubmitResponse {
+export namespace FixerRunResponse {
   export interface Data {
     /**
      * Output of the build command
@@ -68,20 +68,20 @@ export namespace FixerSubmitResponse {
   }
 }
 
-export interface FixerSubmitParams {
+export interface FixerRunParams {
   /**
    * Array of file objects with path and contents
    */
-  files: Array<FixerSubmitParams.File>;
+  files: Array<FixerRunParams.File>;
 
   /**
    * Benchify will apply all static fixes by default. If you want to only apply
    * certain fixes, pass in the flags you want to apply.
    */
-  fixes?: FixerSubmitParams.Fixes;
+  fixes?: FixerRunParams.Fixes;
 }
 
-export namespace FixerSubmitParams {
+export namespace FixerRunParams {
   export interface File {
     contents: string;
 
@@ -120,5 +120,5 @@ export namespace FixerSubmitParams {
 }
 
 export declare namespace Fixer {
-  export { type FixerSubmitResponse as FixerSubmitResponse, type FixerSubmitParams as FixerSubmitParams };
+  export { type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 }
