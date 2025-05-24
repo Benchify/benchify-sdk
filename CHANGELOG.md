@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.0-alpha.2 (2025-05-24)
+
+Full Changelog: [v0.1.0-alpha.1...v0.1.0-alpha.2](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.1...v0.1.0-alpha.2)
+
+### Features
+
+* **api:** update via SDK Studio ([118dead](https://github.com/Benchify/benchify-sdk/commit/118dead49c79c6fc84676aba047b65e892706004))
+* **api:** update via SDK Studio ([5da43d6](https://github.com/Benchify/benchify-sdk/commit/5da43d62d8542e4c91ea3f6c66c444fe7ef271eb))
+* **api:** update via SDK Studio ([c7c63f6](https://github.com/Benchify/benchify-sdk/commit/c7c63f632cd9d54c6289434e118ba9ff886e8ae1))
+* **api:** update via SDK Studio ([32dd071](https://github.com/Benchify/benchify-sdk/commit/32dd071c93b15555fefcf8a0c9ce80e03e1c7587))
+* **api:** update via SDK Studio ([4650a72](https://github.com/Benchify/benchify-sdk/commit/4650a728a0494e86ff874cfce473bcda40eb52f9))
+* **api:** update via SDK Studio ([c8e2d4b](https://github.com/Benchify/benchify-sdk/commit/c8e2d4bbbf0b02dc8db4dcf03bf09214384b4fee))
+
+
+### Chores
+
+* update SDK settings ([16b03fe](https://github.com/Benchify/benchify-sdk/commit/16b03fe7b99c09d998f130f90546ba11446176ef))
+* update SDK settings ([9513ace](https://github.com/Benchify/benchify-sdk/commit/9513ace90b5f39b8c83a82f49e8576d9886e953b))
+* update SDK settings ([2c6a642](https://github.com/Benchify/benchify-sdk/commit/2c6a64216e8b7c85c4c06d00ed9620808d7720b0))
+
 ## 0.1.0-alpha.1 (2025-05-22)
 
 Full Changelog: [v0.0.1-alpha.0...v0.1.0-alpha.1](https://github.com/Benchify/benchify-sdk/compare/v0.0.1-alpha.0...v0.1.0-alpha.1)
