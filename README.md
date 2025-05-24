@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Benchify REST API from server-side TypeScript or JavaScript.
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [benchify.com](https://benchify.com/support). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -25,10 +25,12 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 async function main() {
-  const response = await client.fixer.submit({
+  const response = await client.fixer.run({
     files: [
       {
         contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
@@ -55,10 +57,12 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 async function main() {
-  const params: Benchify.FixerSubmitParams = {
+  const params: Benchify.FixerRunParams = {
     files: [
       {
         contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
@@ -70,7 +74,7 @@ async function main() {
       },
     ],
   };
-  const response: Benchify.FixerSubmitResponse = await client.fixer.submit(params);
+  const response: Benchify.FixerRunResponse = await client.fixer.run(params);
 }
 
 main();
@@ -88,7 +92,7 @@ a subclass of `APIError` will be thrown:
 ```ts
 async function main() {
   const response = await client.fixer
-    .submit({
+    .run({
       files: [
         {
           contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
@@ -139,12 +143,11 @@ You can use the `maxRetries` option to configure or disable this:
 ```js
 // Configure the default for all requests:
 const client = new Benchify({
-  apiKey: 'My API Key',
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await client.fixer.submit({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
+await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   maxRetries: 5,
 });
 ```
@@ -157,12 +160,11 @@ Requests time out after 1 minute by default. You can configure this with a `time
 ```ts
 // Configure the default for all requests:
 const client = new Benchify({
-  apiKey: 'My API Key',
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.fixer.submit({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
+await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -186,7 +188,7 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 const client = new Benchify();
 
 const response = await client.fixer
-  .submit({
+  .run({
     files: [
       {
         contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
@@ -203,7 +205,7 @@ console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .submit({
+  .run({
     files: [
       {
         contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
