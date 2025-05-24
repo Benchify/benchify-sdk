@@ -2,9 +2,8 @@
 
 Types:
 
-- <code><a href="./src/resources/fixer.ts">FixerRequestBase</a></code>
-- <code><a href="./src/resources/fixer.ts">FixerSubmitResponse</a></code>
+- <code><a href="./src/resources/fixer.ts">FixerRunResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">submit</a>({ ...params }) -> FixerSubmitResponse</code>
+- <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">run</a>({ ...params }) -> FixerRunResponse</code>

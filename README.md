@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Benchify REST API from server-side TypeScript or JavaScript.
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.benchify.com](https://docs.benchify.com). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -23,17 +23,24 @@ The full API of this library can be found in [api.md](api.md).
 import Benchify from 'benchify';
 
 const client = new Benchify({
-  bearerToken: process.env['BENCHIFY_BEARER_TOKEN'], // This is the default and can be omitted
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
 async function main() {
-  const response = await client.fixer.submit({
-    buildCmd: 'npm run build',
-    jobName: 'fix-my-code',
-    repoUrl: '$REPO_URL',
+  const response = await client.fixer.run({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
   });
 
-  console.log(response.build_output);
+  console.log(response.data);
 }
 
 main();
@@ -48,16 +55,23 @@ This library includes TypeScript definitions for all request params and response
 import Benchify from 'benchify';
 
 const client = new Benchify({
-  bearerToken: process.env['BENCHIFY_BEARER_TOKEN'], // This is the default and can be omitted
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
 async function main() {
-  const params: Benchify.FixerSubmitParams = {
-    buildCmd: 'npm run build',
-    jobName: 'fix-my-code',
-    repoUrl: '$REPO_URL',
+  const params: Benchify.FixerRunParams = {
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
   };
-  const response: Benchify.FixerSubmitResponse = await client.fixer.submit(params);
+  const response: Benchify.FixerRunResponse = await client.fixer.run(params);
 }
 
 main();
@@ -75,7 +89,18 @@ a subclass of `APIError` will be thrown:
 ```ts
 async function main() {
   const response = await client.fixer
-    .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
+    .run({
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+          path: 'src/index.tsx',
+        },
+      ],
+    })
     .catch(async (err) => {
       if (err instanceof Benchify.APIError) {
         console.log(err.status); // 400
@@ -119,7 +144,7 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' }, {
+await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   maxRetries: 5,
 });
 ```
@@ -136,7 +161,7 @@ const client = new Benchify({
 });
 
 // Override per-request:
-await client.fixer.submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' }, {
+await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -160,16 +185,38 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 const client = new Benchify();
 
 const response = await client.fixer
-  .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
+  .run({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .submit({ buildCmd: 'npm run build', jobName: 'fix-my-code', repoUrl: '$REPO_URL' })
+  .run({
+    files: [
+      {
+        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+        path: 'package.json',
+      },
+      {
+        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+        path: 'src/index.tsx',
+      },
+    ],
+  })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.build_output);
+console.log(response.data);
 ```
 
 ### Logging

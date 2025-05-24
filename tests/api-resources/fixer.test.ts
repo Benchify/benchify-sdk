@@ -3,17 +3,24 @@
 import Benchify from 'benchify';
 
 const client = new Benchify({
-  bearerToken: 'My Bearer Token',
+  apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
-  test.skip('submit: only required params', async () => {
-    const responsePromise = client.fixer.submit({
-      buildCmd: 'npm run build',
-      jobName: 'fix-my-code',
-      repoUrl: '$REPO_URL',
+  test.skip('run: only required params', async () => {
+    const responsePromise = client.fixer.run({
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+          path: 'src/index.tsx',
+        },
+      ],
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -25,11 +32,19 @@ describe('resource fixer', () => {
   });
 
   // skipped: tests are disabled for the time being
-  test.skip('submit: required and optional params', async () => {
-    const response = await client.fixer.submit({
-      buildCmd: 'npm run build',
-      jobName: 'fix-my-code',
-      repoUrl: '$REPO_URL',
+  test.skip('run: required and optional params', async () => {
+    const response = await client.fixer.run({
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
+          path: 'src/index.tsx',
+        },
+      ],
+      fixes: { css: true, imports: true, stringLiterals: true, tsSuggestions: true },
     });
   });
 });
