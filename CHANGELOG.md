@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.3 (2025-05-27)
+
+Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
+
+### Chores
+
+* configure new SDK language ([c345184](https://github.com/Benchify/benchify-sdk/commit/c345184451ffa9230693f33566159080829ecbc2))
+
 ## 0.1.0-alpha.2 (2025-05-24)
 
 Full Changelog: [v0.1.0-alpha.1...v0.1.0-alpha.2](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.1...v0.1.0-alpha.2)

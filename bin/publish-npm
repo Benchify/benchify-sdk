@@ -17,6 +17,8 @@ VERSION="$(node -p "require('./package.json').version")"
 if [[ "$VERSION" =~ -([a-zA-Z]+) ]]; then
   # Extract the part before any dot in the pre-release identifier
   TAG="${BASH_REMATCH[1]}"
+  echo "(pre-release) Overriding logic and setting tag to latest (dangerous)"
+  TAG="latest"
 else
   TAG="latest"
 fi
