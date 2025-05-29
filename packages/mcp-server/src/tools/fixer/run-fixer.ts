@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   resource: 'fixer',
   operation: 'write',
   tags: [],
+  httpMethod: 'post',
+  httpPath: '/v1/fixer',
+  operationId: 'runFixer',
 };
 
 export const tool: Tool = {
