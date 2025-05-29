@@ -4,6 +4,8 @@ import Benchify from 'benchify';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 
 import run_fixer from './fixer/run-fixer';
+import run_string_literal_fixer from './string-literal-fixer/run-string-literal-fixer';
+import run_diagnostics from './diagnostics/run-diagnostics';
 
 export type HandlerFunction = (client: Benchify, args: Record<string, unknown> | undefined) => Promise<any>;
 
@@ -11,6 +13,10 @@ export type Metadata = {
   resource: string;
   operation: 'read' | 'write';
   tags: string[];
+
+  httpMethod?: string;
+  httpPath?: string;
+  operationId?: string;
 };
 
 export type Endpoint = {
@@ -26,6 +32,8 @@ function addEndpoint(endpoint: Endpoint) {
 }
 
 addEndpoint(run_fixer);
+addEndpoint(run_string_literal_fixer);
+addEndpoint(run_diagnostics);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';

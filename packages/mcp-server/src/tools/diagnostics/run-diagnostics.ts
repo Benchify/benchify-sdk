@@ -5,17 +5,17 @@ import type { Metadata } from '../';
 import Benchify from 'benchify';
 
 export const metadata: Metadata = {
-  resource: 'fixer',
+  resource: 'diagnostics',
   operation: 'write',
   tags: [],
   httpMethod: 'post',
-  httpPath: '/v1/fixer',
-  operationId: 'runFixer',
+  httpPath: '/v1/diagnostics',
+  operationId: 'runDiagnostics',
 };
 
 export const tool: Tool = {
-  name: 'run_fixer',
-  description: 'Analyzes code and automatically fixes build issues',
+  name: 'run_diagnostics',
+  description: 'Analyzes code and returns a list of potential issues',
   inputSchema: {
     type: 'object',
     properties: {
@@ -69,7 +69,7 @@ export const tool: Tool = {
 
 export const handler = (client: Benchify, args: Record<string, unknown> | undefined) => {
   const body = args as any;
-  return client.fixer.run(body);
+  return client.diagnostics.run(body);
 };
 
 export default { metadata, tool, handler };

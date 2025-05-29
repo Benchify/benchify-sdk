@@ -168,3 +168,11 @@ The following tools are available in this MCP server.
 ### Resource `fixer`:
 
 - `run_fixer` (`write`): Analyzes code and automatically fixes build issues
+
+### Resource `stringLiteralFixer`:
+
+- `run_string_literal_fixer` (`write`): Analyzes a single file and automatically fixes string literal issues such as escape sequences, invalid characters, and syntax errors
+
+### Resource `diagnostics`:
+
+- `run_diagnostics` (`write`): Analyzes code and returns a list of potential issues
