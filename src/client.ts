@@ -20,7 +20,13 @@ import { APIPromise } from './core/api-promise';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
+import { DiagnosticRunParams, DiagnosticRunResponse, Diagnostics } from './resources/diagnostics';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import {
+  StringLiteralFixer,
+  StringLiteralFixerRunParams,
+  StringLiteralFixerRunResponse,
+} from './resources/string-literal-fixer';
 import { readEnv } from './internal/utils/env';
 import { formatRequestDetails, loggerFor } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
@@ -692,10 +698,26 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
+  stringLiteralFixer: API.StringLiteralFixer = new API.StringLiteralFixer(this);
+  diagnostics: API.Diagnostics = new API.Diagnostics(this);
 }
 Benchify.Fixer = Fixer;
+Benchify.StringLiteralFixer = StringLiteralFixer;
+Benchify.Diagnostics = Diagnostics;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
   export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
+
+  export {
+    StringLiteralFixer as StringLiteralFixer,
+    type StringLiteralFixerRunResponse as StringLiteralFixerRunResponse,
+    type StringLiteralFixerRunParams as StringLiteralFixerRunParams,
+  };
+
+  export {
+    Diagnostics as Diagnostics,
+    type DiagnosticRunResponse as DiagnosticRunResponse,
+    type DiagnosticRunParams as DiagnosticRunParams,
+  };
 }
