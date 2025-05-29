@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2025-05-29)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
+### Features
+
+* **api:** update via SDK Studio ([d35d735](https://github.com/Benchify/benchify-sdk/commit/d35d73521d395053a7bcb4d5338d86dd7f8a25e5))
+* **mcp:** include http information in tools ([04b3fe8](https://github.com/Benchify/benchify-sdk/commit/04b3fe8b3530415e30032062dd9596760168e48f))
+
+
+### Bug Fixes
+
+* **mcp:** include description in dynamic tool search ([f55813a](https://github.com/Benchify/benchify-sdk/commit/f55813ad704974b965993639f9fd9d7e576eba14))
+
+
+### Chores
+
+* improve publish-npm script --latest tag logic ([d3aa111](https://github.com/Benchify/benchify-sdk/commit/d3aa111942c9cd9379e719b1e5d8d4ba703da7fc))
+* **internal:** version bump ([d107058](https://github.com/Benchify/benchify-sdk/commit/d1070583a35f0148288fb41fcd86fbc9dd183de6))
+* **mcp:** remove duplicate assignment ([461e482](https://github.com/Benchify/benchify-sdk/commit/461e482274dc10da2d1a4668556605f427159750))
+
 ## 0.1.0-alpha.3 (2025-05-27)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
