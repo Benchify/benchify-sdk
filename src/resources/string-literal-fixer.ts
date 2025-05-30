@@ -91,9 +91,19 @@ export namespace StringLiteralFixerRunResponse {
 
   export interface Meta {
     /**
+     * Customer identifier if provided in the request
+     */
+    external_id?: string;
+
+    /**
      * Unique ID of the fixer run
      */
     fixer_run_id?: string;
+
+    /**
+     * Unique ID for tracing the request
+     */
+    trace_id?: string;
   }
 }
 
@@ -102,6 +112,11 @@ export interface StringLiteralFixerRunParams {
    * Single file to analyze and fix for string literal issues
    */
   file: StringLiteralFixerRunParams.File;
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  meta?: StringLiteralFixerRunParams.Meta;
 }
 
 export namespace StringLiteralFixerRunParams {
@@ -118,6 +133,16 @@ export namespace StringLiteralFixerRunParams {
      * Path of the file relative to the project root
      */
     path: string;
+  }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
   }
 }
 

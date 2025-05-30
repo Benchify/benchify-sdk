@@ -62,9 +62,19 @@ export namespace FixerRunResponse {
 
   export interface Meta {
     /**
+     * Customer identifier if provided in the request
+     */
+    external_id?: string;
+
+    /**
      * Unique ID of the fixer run
      */
     fixer_run_id?: string;
+
+    /**
+     * Unique ID for tracing the request
+     */
+    trace_id?: string;
   }
 }
 
@@ -79,6 +89,11 @@ export interface FixerRunParams {
    * certain fixes, pass in the flags you want to apply.
    */
   fixes?: FixerRunParams.Fixes;
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  meta?: FixerRunParams.Meta;
 }
 
 export namespace FixerRunParams {
@@ -116,6 +131,16 @@ export namespace FixerRunParams {
      * mismatched assertions, and generic parameter issues through static analysis.
      */
     tsSuggestions?: boolean;
+  }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
   }
 }
 

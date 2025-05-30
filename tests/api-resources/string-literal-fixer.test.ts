@@ -32,6 +32,7 @@ describe('resource stringLiteralFixer', () => {
         contents: 'function Button() { return <button>Click me</button> }',
         path: 'src/components/Button.tsx',
       },
+      meta: { external_id: 'customer-batch-001' },
     });
   });
 });
