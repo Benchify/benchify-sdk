@@ -7,6 +7,19 @@ import { RequestOptions } from '../internal/request-options';
 export class Diagnostics extends APIResource {
   /**
    * Analyzes code and returns a list of potential issues
+   *
+   * @example
+   * ```ts
+   * const response = await client.diagnostics.run({
+   *   files: [
+   *     {
+   *       path: 'src/component.tsx',
+   *       contents:
+   *         "function Button() { return <button className='bg-blue'>Click me</button> }",
+   *     },
+   *   ],
+   * });
+   * ```
    */
   run(body: DiagnosticRunParams, options?: RequestOptions): APIPromise<DiagnosticRunResponse> {
     return this._client.post('/v1/diagnostics', { body, ...options });
@@ -52,9 +65,19 @@ export namespace DiagnosticRunResponse {
 
   export interface Meta {
     /**
+     * Customer identifier if provided in the request
+     */
+    external_id?: string;
+
+    /**
      * Unique ID of the fixer run
      */
     fixer_run_id?: string;
+
+    /**
+     * Unique ID for tracing the request
+     */
+    trace_id?: string;
   }
 }
 
@@ -69,6 +92,11 @@ export interface DiagnosticRunParams {
    * certain fixes, pass in the flags you want to apply.
    */
   fixes?: DiagnosticRunParams.Fixes;
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  meta?: DiagnosticRunParams.Meta;
 }
 
 export namespace DiagnosticRunParams {
@@ -106,6 +134,16 @@ export namespace DiagnosticRunParams {
      * mismatched assertions, and generic parameter issues through static analysis.
      */
     tsSuggestions?: boolean;
+  }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
   }
 }
 

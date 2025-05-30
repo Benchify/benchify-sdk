@@ -14,7 +14,7 @@ describe('resource diagnostics', () => {
       files: [
         {
           contents: "function Button() { return <button className='bg-blue'>Click me</button> }",
-          path: 'src/components/Button.tsx',
+          path: 'src/component.tsx',
         },
       ],
     });
@@ -33,10 +33,11 @@ describe('resource diagnostics', () => {
       files: [
         {
           contents: "function Button() { return <button className='bg-blue'>Click me</button> }",
-          path: 'src/components/Button.tsx',
+          path: 'src/component.tsx',
         },
       ],
       fixes: { css: true, imports: true, stringLiterals: true, tsSuggestions: true },
+      meta: { external_id: 'customer-batch-001' },
     });
   });
 });
