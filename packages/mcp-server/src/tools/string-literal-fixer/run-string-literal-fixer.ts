@@ -35,6 +35,17 @@ export const tool: Tool = {
         },
         required: ['contents', 'path'],
       },
+      meta: {
+        type: 'object',
+        description: 'Optional metadata for tracking and identification purposes',
+        properties: {
+          external_id: {
+            type: 'string',
+            description: 'Customer identifier for tracking purposes',
+          },
+        },
+        required: [],
+      },
     },
   },
 };
