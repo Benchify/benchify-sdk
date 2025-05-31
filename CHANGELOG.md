@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.6 (2025-05-31)
+
+Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
+
+### Chores
+
+* **deps:** bump eslint-plugin-prettier ([66629ac](https://github.com/Benchify/benchify-sdk/commit/66629ac2ea2b58216288348cef6c80607626d089))
+* **internal:** update jest config ([ca32fd9](https://github.com/Benchify/benchify-sdk/commit/ca32fd9370d50c9ee8d1e03e1a081f3422c5843d))
+
 ## 0.1.0-alpha.5 (2025-05-30)
 
 Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
