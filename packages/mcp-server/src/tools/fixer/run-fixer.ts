@@ -1,5 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+import { asTextContentResult } from 'benchify-mcp/tools/types';
+
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import type { Metadata } from '../';
 import Benchify from 'benchify';
@@ -78,9 +80,9 @@ export const tool: Tool = {
   },
 };
 
-export const handler = (client: Benchify, args: Record<string, unknown> | undefined) => {
+export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const body = args as any;
-  return client.fixer.run(body);
+  return asTextContentResult(await client.fixer.run(body));
 };
 
 export default { metadata, tool, handler };
