@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.6 (2025-06-11)
+
+Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
+
+### Features
+
+* **mcp:** implement support for binary responses ([71b6f17](https://github.com/Benchify/benchify-sdk/commit/71b6f1764381f47f32ffa9f9e4050d132b2d81b4))
+
+
+### Chores
+
+* adjust eslint.config.mjs ignore pattern ([3646047](https://github.com/Benchify/benchify-sdk/commit/3646047c3eed877b5cf420fe018320400537e1f2))
+* avoid type error in certain environments ([06abcf8](https://github.com/Benchify/benchify-sdk/commit/06abcf82d54e19f3a82461451b146c11f294ee08))
+* **deps:** bump eslint-plugin-prettier ([66629ac](https://github.com/Benchify/benchify-sdk/commit/66629ac2ea2b58216288348cef6c80607626d089))
+* **docs:** use top-level-await in example snippets ([6ce4173](https://github.com/Benchify/benchify-sdk/commit/6ce417337b4c1a8f633e72b83c182ab03148960e))
+* **internal:** fix readablestream types in node 20 ([1c32303](https://github.com/Benchify/benchify-sdk/commit/1c323030d977e7ad6181f98f31a05222f55702ed))
+* **internal:** update jest config ([ca32fd9](https://github.com/Benchify/benchify-sdk/commit/ca32fd9370d50c9ee8d1e03e1a081f3422c5843d))
+* **mcp:** provides high-level initMcpServer function and exports known clients ([73a3ea3](https://github.com/Benchify/benchify-sdk/commit/73a3ea31ae0769f3466c8f4325010caee570fff8))
+
 ## 0.1.0-alpha.5 (2025-05-30)
 
 Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
