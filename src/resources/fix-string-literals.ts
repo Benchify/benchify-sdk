@@ -1,40 +1,42 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as DiagnosticsAPI from './diagnostics';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
-export class StringLiteralFixer extends APIResource {
+export class FixStringLiterals extends APIResource {
   /**
    * Analyzes a single file and automatically fixes string literal issues such as
    * escape sequences, invalid characters, and syntax errors
    *
    * @example
    * ```ts
-   * const response = await client.stringLiteralFixer.run({
-   *   file: {
-   *     path: 'src/components/Button.tsx',
-   *     contents:
-   *       'function Button() { return <button>Click me</button> }',
-   *   },
-   * });
+   * const fixStringLiteral =
+   *   await client.fixStringLiterals.create({
+   *     file: {
+   *       path: 'src/components/Button.tsx',
+   *       contents:
+   *         'function Button() { return <button>Click me</button> }',
+   *     },
+   *   });
    * ```
    */
-  run(
-    body: StringLiteralFixerRunParams,
+  create(
+    body: FixStringLiteralCreateParams,
     options?: RequestOptions,
-  ): APIPromise<StringLiteralFixerRunResponse> {
+  ): APIPromise<FixStringLiteralCreateResponse> {
     return this._client.post('/v1/fix-string-literals', { body, ...options });
   }
 }
 
-export interface StringLiteralFixerRunResponse {
-  data?: StringLiteralFixerRunResponse.Data;
+export interface FixStringLiteralCreateResponse {
+  data?: FixStringLiteralCreateResponse.Data;
 
-  meta?: StringLiteralFixerRunResponse.Meta;
+  meta?: DiagnosticsAPI.ResponseMeta;
 }
 
-export namespace StringLiteralFixerRunResponse {
+export namespace FixStringLiteralCreateResponse {
   export interface Data {
     /**
      * The file contents (original if no fix needed/failed, or fixed if successful)
@@ -88,38 +90,21 @@ export namespace StringLiteralFixerRunResponse {
       message?: string;
     }
   }
-
-  export interface Meta {
-    /**
-     * Customer identifier if provided in the request
-     */
-    external_id?: string;
-
-    /**
-     * Unique ID of the fixer run
-     */
-    fixer_run_id?: string;
-
-    /**
-     * Unique ID for tracing the request
-     */
-    trace_id?: string;
-  }
 }
 
-export interface StringLiteralFixerRunParams {
+export interface FixStringLiteralCreateParams {
   /**
    * Single file to analyze and fix for string literal issues
    */
-  file: StringLiteralFixerRunParams.File;
+  file: FixStringLiteralCreateParams.File;
 
   /**
    * Optional metadata for tracking and identification purposes
    */
-  meta?: StringLiteralFixerRunParams.Meta;
+  meta?: FixStringLiteralCreateParams.Meta;
 }
 
-export namespace StringLiteralFixerRunParams {
+export namespace FixStringLiteralCreateParams {
   /**
    * Single file to analyze and fix for string literal issues
    */
@@ -146,9 +131,9 @@ export namespace StringLiteralFixerRunParams {
   }
 }
 
-export declare namespace StringLiteralFixer {
+export declare namespace FixStringLiterals {
   export {
-    type StringLiteralFixerRunResponse as StringLiteralFixerRunResponse,
-    type StringLiteralFixerRunParams as StringLiteralFixerRunParams,
+    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
+    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
   };
 }

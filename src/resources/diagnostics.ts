@@ -26,10 +26,27 @@ export class Diagnostics extends APIResource {
   }
 }
 
+export interface ResponseMeta {
+  /**
+   * Customer identifier if provided in the request
+   */
+  external_id?: string;
+
+  /**
+   * Unique ID of the fixer run
+   */
+  fixer_run_id?: string;
+
+  /**
+   * Unique ID for tracing the request
+   */
+  trace_id?: string;
+}
+
 export interface DiagnosticRunResponse {
   data?: DiagnosticRunResponse.Data;
 
-  meta?: DiagnosticRunResponse.Meta;
+  meta?: ResponseMeta;
 }
 
 export namespace DiagnosticRunResponse {
@@ -61,23 +78,6 @@ export namespace DiagnosticRunResponse {
         line?: number;
       }
     }
-  }
-
-  export interface Meta {
-    /**
-     * Customer identifier if provided in the request
-     */
-    external_id?: string;
-
-    /**
-     * Unique ID of the fixer run
-     */
-    fixer_run_id?: string;
-
-    /**
-     * Unique ID for tracing the request
-     */
-    trace_id?: string;
   }
 }
 
@@ -149,6 +149,7 @@ export namespace DiagnosticRunParams {
 
 export declare namespace Diagnostics {
   export {
+    type ResponseMeta as ResponseMeta,
     type DiagnosticRunResponse as DiagnosticRunResponse,
     type DiagnosticRunParams as DiagnosticRunParams,
   };

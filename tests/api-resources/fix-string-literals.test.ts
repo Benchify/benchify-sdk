@@ -7,10 +7,10 @@ const client = new Benchify({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource stringLiteralFixer', () => {
+describe('resource fixStringLiterals', () => {
   // skipped: tests are disabled for the time being
-  test.skip('run: only required params', async () => {
-    const responsePromise = client.stringLiteralFixer.run({
+  test.skip('create: only required params', async () => {
+    const responsePromise = client.fixStringLiterals.create({
       file: {
         contents: 'function Button() { return <button>Click me</button> }',
         path: 'src/components/Button.tsx',
@@ -26,8 +26,8 @@ describe('resource stringLiteralFixer', () => {
   });
 
   // skipped: tests are disabled for the time being
-  test.skip('run: required and optional params', async () => {
-    const response = await client.stringLiteralFixer.run({
+  test.skip('create: required and optional params', async () => {
+    const response = await client.fixStringLiterals.create({
       file: {
         contents: 'function Button() { return <button>Click me</button> }',
         path: 'src/components/Button.tsx',

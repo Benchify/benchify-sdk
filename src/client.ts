@@ -20,13 +20,23 @@ import { APIPromise } from './core/api-promise';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
-import { DiagnosticRunParams, DiagnosticRunResponse, Diagnostics } from './resources/diagnostics';
-import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
 import {
-  StringLiteralFixer,
-  StringLiteralFixerRunParams,
-  StringLiteralFixerRunResponse,
-} from './resources/string-literal-fixer';
+  DiagnosticRunParams,
+  DiagnosticRunResponse,
+  Diagnostics,
+  ResponseMeta,
+} from './resources/diagnostics';
+import {
+  FixStringLiteralCreateParams,
+  FixStringLiteralCreateResponse,
+  FixStringLiterals,
+} from './resources/fix-string-literals';
+import { Fixer, FixerRequest, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import {
+  ValidateSql,
+  ValidateSqlValidateParams,
+  ValidateSqlValidateResponse,
+} from './resources/validate-sql';
 import { readEnv } from './internal/utils/env';
 import { formatRequestDetails, loggerFor } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
@@ -698,26 +708,40 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
-  stringLiteralFixer: API.StringLiteralFixer = new API.StringLiteralFixer(this);
   diagnostics: API.Diagnostics = new API.Diagnostics(this);
+  fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
+  validateSql: API.ValidateSql = new API.ValidateSql(this);
 }
 Benchify.Fixer = Fixer;
-Benchify.StringLiteralFixer = StringLiteralFixer;
 Benchify.Diagnostics = Diagnostics;
+Benchify.FixStringLiterals = FixStringLiterals;
+Benchify.ValidateSql = ValidateSql;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
-  export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
-
   export {
-    StringLiteralFixer as StringLiteralFixer,
-    type StringLiteralFixerRunResponse as StringLiteralFixerRunResponse,
-    type StringLiteralFixerRunParams as StringLiteralFixerRunParams,
+    Fixer as Fixer,
+    type FixerRequest as FixerRequest,
+    type FixerRunResponse as FixerRunResponse,
+    type FixerRunParams as FixerRunParams,
   };
 
   export {
     Diagnostics as Diagnostics,
+    type ResponseMeta as ResponseMeta,
     type DiagnosticRunResponse as DiagnosticRunResponse,
     type DiagnosticRunParams as DiagnosticRunParams,
+  };
+
+  export {
+    FixStringLiterals as FixStringLiterals,
+    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
+    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
+  };
+
+  export {
+    ValidateSql as ValidateSql,
+    type ValidateSqlValidateResponse as ValidateSqlValidateResponse,
+    type ValidateSqlValidateParams as ValidateSqlValidateParams,
   };
 }

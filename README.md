@@ -4,15 +4,18 @@
 
 This library provides convenient access to the Benchify REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [docs.benchify.com](https://docs.benchify.com). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [benchify.com](https://benchify.com/support). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
 ## Installation
 
 ```sh
-npm install benchify
+npm install git+ssh://git@github.com:stainless-sdks/benchify-typescript.git
 ```
+
+> [!NOTE]
+> Once this package is [published to npm](https://app.stainless.com/docs/guides/publish), this will become: `npm install benchify`
 
 ## Usage
 
@@ -395,7 +398,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/Benchify/benchify-sdk/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/benchify-typescript/issues) with questions, bugs, or suggestions.
 
 ## Requirements
 
