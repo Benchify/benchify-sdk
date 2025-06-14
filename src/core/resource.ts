@@ -2,7 +2,7 @@
 
 import type { Benchify } from '../client';
 
-export class APIResource {
+export abstract class APIResource {
   protected _client: Benchify;
 
   constructor(client: Benchify) {

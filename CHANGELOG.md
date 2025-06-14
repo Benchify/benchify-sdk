@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.9 (2025-06-14)
+
+Full Changelog: [v0.1.0-alpha.8...v0.1.0-alpha.9](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.8...v0.1.0-alpha.9)
+
+### Bug Fixes
+
+* publish script — handle NPM errors correctly ([10a431e](https://github.com/Benchify/benchify-sdk/commit/10a431e87c0d0fff4929fb718c644b6155d366df))
+
+
+### Chores
+
+* **internal:** add pure annotations, make base APIResource abstract ([108304c](https://github.com/Benchify/benchify-sdk/commit/108304c7d840656dd01abe1736c7b53d081ed351))
+
 ## 0.1.0-alpha.8 (2025-06-13)
 
 Full Changelog: [v0.1.0-alpha.7...v0.1.0-alpha.8](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.7...v0.1.0-alpha.8)
