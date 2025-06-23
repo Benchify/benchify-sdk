@@ -45,7 +45,7 @@ describe('resource fixer', () => {
         },
       ],
       fixes: { css: true, imports: true, stringLiterals: true, tsSuggestions: true },
-      meta: { external_id: 'customer-batch-001' },
+      meta: { external_id: 'customer-batch-001', template: 'viber-template/frontend' },
     });
   });
 });

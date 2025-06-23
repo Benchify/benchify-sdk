@@ -144,6 +144,11 @@ export namespace DiagnosticRunParams {
      * Customer identifier for tracking purposes
      */
     external_id?: string;
+
+    /**
+     * Template path for the request (must be a valid template path for the user's org)
+     */
+    template?: string;
   }
 }
 

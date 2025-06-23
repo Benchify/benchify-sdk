@@ -100,6 +100,11 @@ export namespace FixerRequest {
      * Customer identifier for tracking purposes
      */
     external_id?: string;
+
+    /**
+     * Template path for the request (must be a valid template path for the user's org)
+     */
+    template?: string;
   }
 }
 
@@ -117,14 +122,62 @@ export namespace FixerRunResponse {
     build_output?: string;
 
     /**
-     * Git diff of the changes made by the fixer, or null if no changes were made
-     */
-    diff?: string | null;
-
-    /**
      * Whether the build succeeded
      */
     success?: boolean;
+
+    suggested_changes?: Data.Diff | Data.ChangedFiles | Data.AllFiles;
+  }
+
+  export namespace Data {
+    export interface Diff {
+      /**
+       * Git diff of the changes made by the fixer, or null if no changes were made
+       */
+      diff?: string | null;
+    }
+
+    export interface ChangedFiles {
+      /**
+       * List of changed files with their new contents, or null if no changes were made
+       */
+      changed_files?: Array<ChangedFiles.ChangedFile> | null;
+    }
+
+    export namespace ChangedFiles {
+      export interface ChangedFile {
+        /**
+         * New contents of the file
+         */
+        contents?: string;
+
+        /**
+         * Path of the changed file
+         */
+        path?: string;
+      }
+    }
+
+    export interface AllFiles {
+      /**
+       * List of all files with their current contents
+       */
+      all_files?: Array<AllFiles.AllFile> | null;
+    }
+
+    export namespace AllFiles {
+      export interface AllFile {
+        /**
+         * Current contents of the file
+         */
+        contents?: string;
+
+        /**
+         * Path of the file
+         */
+        path?: string;
+      }
+    }
   }
 }
 
@@ -191,6 +244,11 @@ export namespace FixerRunParams {
      * Customer identifier for tracking purposes
      */
     external_id?: string;
+
+    /**
+     * Template path for the request (must be a valid template path for the user's org)
+     */
+    template?: string;
   }
 }
 

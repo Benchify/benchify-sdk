@@ -54,6 +54,11 @@ export namespace FixStringLiteralCreateResponse {
     error?: string | null;
 
     /**
+     * Status of the fix operation
+     */
+    fix_status?: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND';
+
+    /**
      * Human-readable message explaining the status
      */
     message?: string;
@@ -64,7 +69,8 @@ export namespace FixStringLiteralCreateResponse {
     relevant_error?: Data.RelevantError | null;
 
     /**
-     * Status of the string literal fix operation
+     * Status of the string literal fix operation (deprecated, will be replaced by
+     * fix_status)
      */
     status?: 'no_fix_needed' | 'fix_applied' | 'fix_failed' | 'error';
   }
