@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.1.0-alpha.9 (2025-07-03)
+
+Full Changelog: [v0.1.0-alpha.8...v0.1.0-alpha.9](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.8...v0.1.0-alpha.9)
+
+### Features
+
+* **api:** update via SDK Studio ([d1d5ef2](https://github.com/Benchify/benchify-sdk/commit/d1d5ef2b542598d72e66797bcbba13a133c05eb1))
+* **api:** update via SDK Studio ([51be479](https://github.com/Benchify/benchify-sdk/commit/51be479c14d5d017535b86e80bfda76c4d5ccec5))
+* **client:** add support for endpoint-specific base URLs ([820aefe](https://github.com/Benchify/benchify-sdk/commit/820aefe43a5dd6eac6964c05a1fa5a9556a9c635))
+
+
+### Bug Fixes
+
+* **client:** explicitly copy fetch in withOptions ([7d8d7f5](https://github.com/Benchify/benchify-sdk/commit/7d8d7f5bf972fc819a1142c120660a5e335a0529))
+* **client:** get fetchOptions type more reliably ([305cb10](https://github.com/Benchify/benchify-sdk/commit/305cb104da21d9a20e3046f78456b1d8a54f9fe8))
+* publish script — handle NPM errors correctly ([10a431e](https://github.com/Benchify/benchify-sdk/commit/10a431e87c0d0fff4929fb718c644b6155d366df))
+
+
+### Chores
+
+* add docs to RequestOptions type ([28d1790](https://github.com/Benchify/benchify-sdk/commit/28d17902754eef4dd168849da43bcc1d6983830c))
+* **ci:** enable for pull requests ([8436707](https://github.com/Benchify/benchify-sdk/commit/8436707738d155cd4c68cd09d0d8ad0e9473cbf8))
+* **ci:** only run for pushes and fork pull requests ([5ea291f](https://github.com/Benchify/benchify-sdk/commit/5ea291f95f5cce884512696c74e654d29e12e69d))
+* **client:** improve path param validation ([184aa6b](https://github.com/Benchify/benchify-sdk/commit/184aa6bf3817678611b628db98f21a54fc32189f))
+* **client:** refactor imports ([9989b61](https://github.com/Benchify/benchify-sdk/commit/9989b611583237731492db178c98ead86616619c))
+* **internal:** add pure annotations, make base APIResource abstract ([108304c](https://github.com/Benchify/benchify-sdk/commit/108304c7d840656dd01abe1736c7b53d081ed351))
+* **readme:** update badges ([98d0091](https://github.com/Benchify/benchify-sdk/commit/98d009114a18882cd354e0fd0f3c9cc675405d60))
+* **readme:** use better example snippet for undocumented params ([a61a28b](https://github.com/Benchify/benchify-sdk/commit/a61a28bf5f6139e43d755abca442426c53adbb5c))
+* update SDK settings ([3884f3d](https://github.com/Benchify/benchify-sdk/commit/3884f3d9a119ed45ca54d1cb0aeba8823aa843de))
+
 ## 0.1.0-alpha.8 (2025-06-13)
 
 Full Changelog: [v0.1.0-alpha.7...v0.1.0-alpha.8](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.7...v0.1.0-alpha.8)
