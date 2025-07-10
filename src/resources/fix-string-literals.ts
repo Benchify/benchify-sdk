@@ -1,27 +1,23 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as DiagnosticsAPI from './diagnostics';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 export class FixStringLiterals extends APIResource {
   /**
-   * Fix string literal issues in TypeScript files.
-   *
-   * Args: request: The request containing the file to fix load_balancer: The
-   * diagnostic load balancer instance
-   *
-   * Returns: StringLiteralsFixerResponse: The response containing the fixed file or
-   * error details
+   * Analyzes a single file and automatically fixes string literal issues such as
+   * escape sequences, invalid characters, and syntax errors
    *
    * @example
    * ```ts
    * const fixStringLiteral =
    *   await client.fixStringLiterals.create({
    *     file: {
-   *       contents: 'contents',
-   *       original_contents: 'original_contents',
-   *       path: 'x',
+   *       path: 'src/components/Button.tsx',
+   *       contents:
+   *         'function Button() { return <button>Click me</button> }',
    *     },
    *   });
    * ```
@@ -34,146 +30,110 @@ export class FixStringLiterals extends APIResource {
   }
 }
 
-/**
- * Response model for the /api/fix_string_literals endpoint
- */
 export interface FixStringLiteralCreateResponse {
-  /**
-   * The file contents (original or fixed)
-   */
-  contents: string;
+  data?: FixStringLiteralCreateResponse.Data;
 
-  /**
-   * Human-readable message explaining the status
-   */
-  message: string;
-
-  /**
-   * Status of the fix operation
-   */
-  status: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND';
-
-  /**
-   * Number of diagnostics found
-   */
-  diagnostics_found?: number | null;
-
-  /**
-   * Error details if status is 'error'
-   */
-  error?: string | null;
-
-  /**
-   * Enhanced diagnostic model for external API
-   */
-  relevant_error?: FixStringLiteralCreateResponse.RelevantError | null;
+  meta?: DiagnosticsAPI.ResponseMeta;
 }
 
 export namespace FixStringLiteralCreateResponse {
-  /**
-   * Enhanced diagnostic model for external API
-   */
-  export interface RelevantError {
+  export interface Data {
     /**
-     * Category of diagnostic
+     * The file contents (original if no fix needed/failed, or fixed if successful)
      */
-    category: 'tsc' | 'tsgo' | 'import_export';
+    contents?: string;
 
     /**
-     * Code given by the diagnostic generator
+     * Number of diagnostics found in the file
      */
-    code: number;
+    diagnostics_found?: number | null;
 
     /**
-     * File where diagnostic occurs
+     * Error details if status is 'error'
      */
-    file_path: string;
+    error?: string | null;
 
     /**
-     * Location of the diagnostic
+     * Status of the fix operation
      */
-    location: RelevantError.Location;
+    fix_status?: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND';
 
     /**
-     * Diagnostic message
+     * Human-readable message explaining the status
      */
-    message: string;
+    message?: string;
 
     /**
-     * Surrounding code context
+     * The earliest relevant string literal error found, if any
      */
-    context?: string | null;
+    relevant_error?: Data.RelevantError | null;
 
     /**
-     * Whether this can be auto-fixed
+     * Status of the string literal fix operation (deprecated, will be replaced by
+     * fix_status)
      */
-    is_fixable?: boolean;
-
-    /**
-     * Diagnostic category
-     */
-    severity?: 'error' | 'warning';
+    status?: 'no_fix_needed' | 'fix_applied' | 'fix_failed' | 'error';
   }
 
-  export namespace RelevantError {
+  export namespace Data {
     /**
-     * Location of the diagnostic
+     * The earliest relevant string literal error found, if any
      */
-    export interface Location {
+    export interface RelevantError {
       /**
-       * Column number (1-based)
+       * Column number where the error occurred
        */
-      column: number;
+      column?: number;
 
       /**
-       * Line number (1-based)
+       * Line number where the error occurred
        */
-      line: number;
+      line?: number;
 
       /**
-       * Span of the error
+       * Error message
        */
-      span: number;
-
-      /**
-       * Position of the first character of the error location in the source code
-       */
-      starting_character_position: number;
+      message?: string;
     }
   }
 }
 
 export interface FixStringLiteralCreateParams {
   /**
-   * File to process
+   * Single file to analyze and fix for string literal issues
    */
   file: FixStringLiteralCreateParams.File;
 
   /**
-   * Unique identifier for the event
+   * Optional metadata for tracking and identification purposes
    */
-  event_id?: string | null;
+  meta?: FixStringLiteralCreateParams.Meta;
 }
 
 export namespace FixStringLiteralCreateParams {
   /**
-   * File to process
+   * Single file to analyze and fix for string literal issues
    */
   export interface File {
     /**
-     * Contents of the file
+     * Full contents of the file to analyze
      */
     contents: string;
 
     /**
-     * Original contents of the file before any modifications
-     */
-    original_contents: string;
-
-    /**
-     * Path to the file
+     * Path of the file relative to the project root
      */
     path: string;
+  }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
   }
 }
 

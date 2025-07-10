@@ -16,7 +16,12 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import { Diagnostics } from './resources/diagnostics';
+import {
+  DiagnosticRunParams,
+  DiagnosticRunResponse,
+  Diagnostics,
+  ResponseMeta,
+} from './resources/diagnostics';
 import {
   FixStringLiteralCreateParams,
   FixStringLiteralCreateResponse,
@@ -744,7 +749,12 @@ export declare namespace Benchify {
     type FixerRunParams as FixerRunParams,
   };
 
-  export { Diagnostics as Diagnostics };
+  export {
+    Diagnostics as Diagnostics,
+    type ResponseMeta as ResponseMeta,
+    type DiagnosticRunResponse as DiagnosticRunResponse,
+    type DiagnosticRunParams as DiagnosticRunParams,
+  };
 
   export {
     FixStringLiterals as FixStringLiterals,

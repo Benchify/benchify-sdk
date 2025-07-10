@@ -1,23 +1,34 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as DiagnosticsAPI from './diagnostics';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 export class Fixer extends APIResource {
   /**
-   * Handle fixer requests to process and fix TypeScript files.
+   * Analyzes code and automatically fixes build issues
    *
    * @example
    * ```ts
    * const response = await client.fixer.run({
    *   files: [
    *     {
-   *       contents: 'contents',
-   *       original_contents: 'original_contents',
-   *       path: 'x',
+   *       path: 'package.json',
+   *       contents:
+   *         '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+   *     },
+   *     {
+   *       path: 'src/index.tsx',
+   *       contents:
+   *         "import Link from 'next/navigation/link';\nconsole.log('Max's demo');",
    *     },
    *   ],
+   *   fixes: {
+   *     imports: true,
+   *     stringLiterals: true,
+   *     tsSuggestions: true,
+   *   },
    * });
    * ```
    */
@@ -26,503 +37,228 @@ export class Fixer extends APIResource {
   }
 }
 
-/**
- * Request model for the /api/fixer endpoint
- */
 export interface FixerRequest {
   /**
-   * List of files to process
+   * Array of file objects with path and contents
    */
   files: Array<FixerRequest.File>;
 
   /**
-   * Command to build the project
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
    */
-  build_cmd?: string;
+  fixes?: FixerRequest.Fixes;
 
   /**
-   * Command to run the development server
+   * Optional metadata for tracking and identification purposes
    */
-  dev_cmd?: string;
+  meta?: FixerRequest.Meta;
 
   /**
-   * Unique identifier for the event
-   */
-  event_id?: string;
-
-  /**
-   * Configuration object for specifying which fixes to apply
-   */
-  fixes?: FixerRequest.Fixes | null;
-
-  /**
-   * List of fixer flags to apply
-   */
-  flags?: Array<string> | null;
-
-  /**
-   * Format for the response (diff, changed_files, or all_files)
+   * Format of the response (DIFF, CHANGED_FILES, ALL_FILES)
    */
   response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
 
   /**
-   * Return before and after diagnostics when fixing.
-   */
-  return_diagnostics?: boolean;
-
-  /**
-   * Template to use for the fixer process
+   * Template ID for the request (must be a valid template ID for the user's org)
    */
   template?: string;
-
-  /**
-   * Command to run TypeScript compiler
-   */
-  tsc_cmd?: string;
 }
 
 export namespace FixerRequest {
-  /**
-   * Model for file data in requests
-   */
   export interface File {
-    /**
-     * Contents of the file
-     */
     contents: string;
 
-    /**
-     * Original contents of the file before any modifications
-     */
-    original_contents: string;
-
-    /**
-     * Path to the file
-     */
     path: string;
   }
 
   /**
-   * Configuration object for specifying which fixes to apply
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
    */
   export interface Fixes {
     /**
-     * Whether to fix CSS issues
+     * Analyzes and corrects unused, invalid, or misapplied CSS and Tailwind class
+     * references, including removal of unused styles
      */
     css?: boolean;
 
     /**
-     * Whether to fix import issues
+     * Fix incorrect packages, undefined references, local paths, hallucinated
+     * dependencies, and other import/export errors
      */
     imports?: boolean;
 
     /**
-     * Whether to fix string literal issues
+     * Statically fix string escape sequences, invalid characters, and other common
+     * string literal issues
      */
     stringLiterals?: boolean;
 
     /**
-     * Whether to fix TypeScript suggestions
+     * Applies TypeScript compiler suggestions and fixes, resolving type errors,
+     * mismatched assertions, and generic parameter issues through static analysis.
      */
     tsSuggestions?: boolean;
   }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
+  }
 }
 
-/**
- * Response model for the /api/fixer endpoint
- */
 export interface FixerRunResponse {
-  /**
-   * Status code of the build process
-   */
-  build_status: number;
+  data?: FixerRunResponse.Data;
 
-  /**
-   * Number of files processed
-   */
-  files_processed: number;
-
-  /**
-   * Diagnostics from the code after fixing
-   */
-  final_diagnostics: FixerRunResponse.FinalDiagnostics;
-
-  /**
-   * Version of the fixer
-   */
-  fixer_version: string;
-
-  /**
-   * Diagnostics from the code before fixing
-   */
-  initial_diagnostics: FixerRunResponse.InitialDiagnostics;
-
-  /**
-   * Output of the build command
-   */
-  build_output?: string;
-
-  /**
-   * Information about fixed files
-   */
-  fixed_files?: { [key: string]: unknown } | null;
-
-  /**
-   * Data about the fixer
-   */
-  fixer_data?: { [key: string]: unknown } | null;
-
-  /**
-   * Changes made by the fixer in the requested format
-   */
-  suggested_changes?:
-    | FixerRunResponse.DiffFormat
-    | FixerRunResponse.ChangedFilesFormat
-    | FixerRunResponse.AllFilesFormat
-    | null;
+  meta?: DiagnosticsAPI.ResponseMeta;
 }
 
 export namespace FixerRunResponse {
-  /**
-   * Diagnostics from the code after fixing
-   */
-  export interface FinalDiagnostics {
+  export interface Data {
     /**
-     * Diagnostics grouped by file
+     * Output of the build command
      */
-    file_to_diagnostics?: { [key: string]: Array<FinalDiagnostics.FileToDiagnostic> };
+    build_output?: string;
 
     /**
-     * Human-readable summary of issues
+     * Whether the build succeeded
      */
-    summary?: string;
+    success?: boolean;
 
-    /**
-     * Total number of diagnostics
-     */
-    total_count?: number;
+    suggested_changes?: Data.Diff | Data.ChangedFiles | Data.AllFiles;
   }
 
-  export namespace FinalDiagnostics {
-    /**
-     * Enhanced diagnostic model for external API
-     */
-    export interface FileToDiagnostic {
+  export namespace Data {
+    export interface Diff {
       /**
-       * Category of diagnostic
+       * Git diff of the changes made by the fixer, or null if no changes were made
        */
-      category: 'tsc' | 'tsgo' | 'import_export';
-
-      /**
-       * Code given by the diagnostic generator
-       */
-      code: number;
-
-      /**
-       * File where diagnostic occurs
-       */
-      file_path: string;
-
-      /**
-       * Location of the diagnostic
-       */
-      location: FileToDiagnostic.Location;
-
-      /**
-       * Diagnostic message
-       */
-      message: string;
-
-      /**
-       * Surrounding code context
-       */
-      context?: string | null;
-
-      /**
-       * Whether this can be auto-fixed
-       */
-      is_fixable?: boolean;
-
-      /**
-       * Diagnostic category
-       */
-      severity?: 'error' | 'warning';
+      diff?: string | null;
     }
 
-    export namespace FileToDiagnostic {
+    export interface ChangedFiles {
       /**
-       * Location of the diagnostic
+       * List of changed files with their new contents, or null if no changes were made
        */
-      export interface Location {
+      changed_files?: Array<ChangedFiles.ChangedFile> | null;
+    }
+
+    export namespace ChangedFiles {
+      export interface ChangedFile {
         /**
-         * Column number (1-based)
+         * New contents of the file
          */
-        column: number;
+        contents?: string;
 
         /**
-         * Line number (1-based)
+         * Path of the changed file
          */
-        line: number;
-
-        /**
-         * Span of the error
-         */
-        span: number;
-
-        /**
-         * Position of the first character of the error location in the source code
-         */
-        starting_character_position: number;
+        path?: string;
       }
     }
-  }
 
-  /**
-   * Diagnostics from the code before fixing
-   */
-  export interface InitialDiagnostics {
-    /**
-     * Diagnostics grouped by file
-     */
-    file_to_diagnostics?: { [key: string]: Array<InitialDiagnostics.FileToDiagnostic> };
-
-    /**
-     * Human-readable summary of issues
-     */
-    summary?: string;
-
-    /**
-     * Total number of diagnostics
-     */
-    total_count?: number;
-  }
-
-  export namespace InitialDiagnostics {
-    /**
-     * Enhanced diagnostic model for external API
-     */
-    export interface FileToDiagnostic {
+    export interface AllFiles {
       /**
-       * Category of diagnostic
+       * List of all files with their current contents
        */
-      category: 'tsc' | 'tsgo' | 'import_export';
-
-      /**
-       * Code given by the diagnostic generator
-       */
-      code: number;
-
-      /**
-       * File where diagnostic occurs
-       */
-      file_path: string;
-
-      /**
-       * Location of the diagnostic
-       */
-      location: FileToDiagnostic.Location;
-
-      /**
-       * Diagnostic message
-       */
-      message: string;
-
-      /**
-       * Surrounding code context
-       */
-      context?: string | null;
-
-      /**
-       * Whether this can be auto-fixed
-       */
-      is_fixable?: boolean;
-
-      /**
-       * Diagnostic category
-       */
-      severity?: 'error' | 'warning';
+      all_files?: Array<AllFiles.AllFile> | null;
     }
 
-    export namespace FileToDiagnostic {
-      /**
-       * Location of the diagnostic
-       */
-      export interface Location {
+    export namespace AllFiles {
+      export interface AllFile {
         /**
-         * Column number (1-based)
+         * Current contents of the file
          */
-        column: number;
+        contents?: string;
 
         /**
-         * Line number (1-based)
+         * Path of the file
          */
-        line: number;
-
-        /**
-         * Span of the error
-         */
-        span: number;
-
-        /**
-         * Position of the first character of the error location in the source code
-         */
-        starting_character_position: number;
+        path?: string;
       }
-    }
-  }
-
-  export interface DiffFormat {
-    /**
-     * Git diff of changes made
-     */
-    diff?: string | null;
-  }
-
-  export interface ChangedFilesFormat {
-    /**
-     * List of changed files with their new contents
-     */
-    changed_files?: Array<ChangedFilesFormat.ChangedFile> | null;
-  }
-
-  export namespace ChangedFilesFormat {
-    /**
-     * Model for a single file change
-     */
-    export interface ChangedFile {
-      /**
-       * Contents of the file
-       */
-      contents: string;
-
-      /**
-       * Path of the file
-       */
-      path: string;
-    }
-  }
-
-  export interface AllFilesFormat {
-    /**
-     * List of all files with their current contents
-     */
-    all_files?: Array<AllFilesFormat.AllFile> | null;
-  }
-
-  export namespace AllFilesFormat {
-    /**
-     * Model for a single file change
-     */
-    export interface AllFile {
-      /**
-       * Contents of the file
-       */
-      contents: string;
-
-      /**
-       * Path of the file
-       */
-      path: string;
     }
   }
 }
 
 export interface FixerRunParams {
   /**
-   * List of files to process
+   * Array of file objects with path and contents
    */
   files: Array<FixerRunParams.File>;
 
   /**
-   * Command to build the project
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
    */
-  build_cmd?: string;
+  fixes?: FixerRunParams.Fixes;
 
   /**
-   * Command to run the development server
+   * Optional metadata for tracking and identification purposes
    */
-  dev_cmd?: string;
+  meta?: FixerRunParams.Meta;
 
   /**
-   * Unique identifier for the event
-   */
-  event_id?: string;
-
-  /**
-   * Configuration object for specifying which fixes to apply
-   */
-  fixes?: FixerRunParams.Fixes | null;
-
-  /**
-   * List of fixer flags to apply
-   */
-  flags?: Array<string> | null;
-
-  /**
-   * Format for the response (diff, changed_files, or all_files)
+   * Format of the response (DIFF, CHANGED_FILES, ALL_FILES)
    */
   response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
 
   /**
-   * Return before and after diagnostics when fixing.
-   */
-  return_diagnostics?: boolean;
-
-  /**
-   * Template to use for the fixer process
+   * Template ID for the request (must be a valid template ID for the user's org)
    */
   template?: string;
-
-  /**
-   * Command to run TypeScript compiler
-   */
-  tsc_cmd?: string;
 }
 
 export namespace FixerRunParams {
-  /**
-   * Model for file data in requests
-   */
   export interface File {
-    /**
-     * Contents of the file
-     */
     contents: string;
 
-    /**
-     * Original contents of the file before any modifications
-     */
-    original_contents: string;
-
-    /**
-     * Path to the file
-     */
     path: string;
   }
 
   /**
-   * Configuration object for specifying which fixes to apply
+   * Benchify will apply all static fixes by default. If you want to only apply
+   * certain fixes, pass in the flags you want to apply.
    */
   export interface Fixes {
     /**
-     * Whether to fix CSS issues
+     * Analyzes and corrects unused, invalid, or misapplied CSS and Tailwind class
+     * references, including removal of unused styles
      */
     css?: boolean;
 
     /**
-     * Whether to fix import issues
+     * Fix incorrect packages, undefined references, local paths, hallucinated
+     * dependencies, and other import/export errors
      */
     imports?: boolean;
 
     /**
-     * Whether to fix string literal issues
+     * Statically fix string escape sequences, invalid characters, and other common
+     * string literal issues
      */
     stringLiterals?: boolean;
 
     /**
-     * Whether to fix TypeScript suggestions
+     * Applies TypeScript compiler suggestions and fixes, resolving type errors,
+     * mismatched assertions, and generic parameter issues through static analysis.
      */
     tsSuggestions?: boolean;
+  }
+
+  /**
+   * Optional metadata for tracking and identification purposes
+   */
+  export interface Meta {
+    /**
+     * Customer identifier for tracking purposes
+     */
+    external_id?: string;
   }
 }
 
