@@ -30,19 +30,10 @@ const client = new Benchify({
 });
 
 const response = await client.fixer.run({
-  files: [
-    {
-      contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-      path: 'package.json',
-    },
-    {
-      contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-      path: 'src/index.tsx',
-    },
-  ],
+  files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
 });
 
-console.log(response.data);
+console.log(response.build_status);
 ```
 
 ### Request & Response types
@@ -58,16 +49,7 @@ const client = new Benchify({
 });
 
 const params: Benchify.FixerRunParams = {
-  files: [
-    {
-      contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-      path: 'package.json',
-    },
-    {
-      contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-      path: 'src/index.tsx',
-    },
-  ],
+  files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
 };
 const response: Benchify.FixerRunResponse = await client.fixer.run(params);
 ```
@@ -83,18 +65,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 const response = await client.fixer
-  .run({
-    files: [
-      {
-        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-        path: 'package.json',
-      },
-      {
-        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-        path: 'src/index.tsx',
-      },
-    ],
-  })
+  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .catch(async (err) => {
     if (err instanceof Benchify.APIError) {
       console.log(err.status); // 400
@@ -135,7 +106,7 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
+await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
   maxRetries: 5,
 });
 ```
@@ -152,7 +123,7 @@ const client = new Benchify({
 });
 
 // Override per-request:
-await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}', path: 'package.json' }, { contents: 'import Link from \'next/navigation/link\';\nconsole.log(\'Hello world\');', path: 'src/index.tsx' }] }, {
+await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -176,38 +147,16 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 const client = new Benchify();
 
 const response = await client.fixer
-  .run({
-    files: [
-      {
-        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-        path: 'package.json',
-      },
-      {
-        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-        path: 'src/index.tsx',
-      },
-    ],
-  })
+  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .run({
-    files: [
-      {
-        contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
-        path: 'package.json',
-      },
-      {
-        contents: "import Link from 'next/navigation/link';\nconsole.log('Hello world');",
-        path: 'src/index.tsx',
-      },
-    ],
-  })
+  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.data);
+console.log(response.build_status);
 ```
 
 ### Logging

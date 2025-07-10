@@ -11,15 +11,6 @@ Methods:
 
 # Diagnostics
 
-Types:
-
-- <code><a href="./src/resources/diagnostics.ts">ResponseMeta</a></code>
-- <code><a href="./src/resources/diagnostics.ts">DiagnosticRunResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/diagnostics">client.diagnostics.<a href="./src/resources/diagnostics.ts">run</a>({ ...params }) -> DiagnosticRunResponse</code>
-
 # FixStringLiterals
 
 Types:
