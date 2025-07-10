@@ -1,6 +1,11 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { Diagnostics } from './diagnostics';
+export {
+  Diagnostics,
+  type ResponseMeta,
+  type DiagnosticRunResponse,
+  type DiagnosticRunParams,
+} from './diagnostics';
 export {
   FixStringLiterals,
   type FixStringLiteralCreateResponse,
