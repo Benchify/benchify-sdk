@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.11 (2025-07-10)
+
+Full Changelog: [v0.1.0-alpha.10...v0.1.0-alpha.11](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.10...v0.1.0-alpha.11)
+
+### Features
+
+* **api:** update via SDK Studio ([7e75501](https://github.com/Benchify/benchify-sdk/commit/7e75501246884d0aa6c52c5d5f0e7e46351d8679))
+
 ## 0.1.0-alpha.10 (2025-07-10)
 
 Full Changelog: [v0.1.0-alpha.9...v0.1.0-alpha.10](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.9...v0.1.0-alpha.10)
