@@ -11,7 +11,16 @@ describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
   test.skip('run: only required params', async () => {
     const responsePromise = client.fixer.run({
-      files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Max's demo');",
+          path: 'src/index.tsx',
+        },
+      ],
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -25,16 +34,20 @@ describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
   test.skip('run: required and optional params', async () => {
     const response = await client.fixer.run({
-      files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
-      build_cmd: 'x',
-      dev_cmd: 'x',
-      event_id: 'event_id',
+      files: [
+        {
+          contents: '{"name": "simple-shopping-app", "version": "0.1.0", "scripts": {"build": "next build"}}',
+          path: 'package.json',
+        },
+        {
+          contents: "import Link from 'next/navigation/link';\nconsole.log('Max's demo');",
+          path: 'src/index.tsx',
+        },
+      ],
       fixes: { css: true, imports: true, stringLiterals: true, tsSuggestions: true },
-      flags: ['string'],
+      meta: { external_id: 'customer-batch-001' },
       response_format: 'DIFF',
-      return_diagnostics: true,
-      template: 'template',
-      tsc_cmd: 'x',
+      template: 'template_123',
     });
   });
 });
