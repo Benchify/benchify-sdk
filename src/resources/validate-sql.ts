@@ -1,18 +1,17 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as DiagnosticsAPI from './diagnostics';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 export class ValidateSql extends APIResource {
   /**
-   * Analyzes SQL queries for potential issues and forbidden keywords
+   * Validate SQL queries.
    *
    * @example
    * ```ts
    * const response = await client.validateSql.validate({
-   *   sql: 'SELECT * FROM users WHERE id = 1',
+   *   sql: 'x',
    * });
    * ```
    */
@@ -24,24 +23,24 @@ export class ValidateSql extends APIResource {
   }
 }
 
+/**
+ * Response model for the /api/validate_sql endpoint
+ */
 export interface ValidateSqlValidateResponse {
-  data?: ValidateSqlValidateResponse.Data;
+  /**
+   * Validation message or error details
+   */
+  message: string;
 
-  meta?: DiagnosticsAPI.ResponseMeta;
-}
+  /**
+   * Whether the SQL is valid
+   */
+  valid: boolean;
 
-export namespace ValidateSqlValidateResponse {
-  export interface Data {
-    /**
-     * Description of validation result or error message
-     */
-    message?: string;
-
-    /**
-     * Whether the SQL query is valid
-     */
-    valid?: boolean;
-  }
+  /**
+   * Error details if validation fails
+   */
+  error?: string | null;
 }
 
 export interface ValidateSqlValidateParams {
@@ -51,21 +50,9 @@ export interface ValidateSqlValidateParams {
   sql: string;
 
   /**
-   * Optional metadata for tracking and identification purposes
+   * Unique identifier for the event
    */
-  meta?: ValidateSqlValidateParams.Meta;
-}
-
-export namespace ValidateSqlValidateParams {
-  /**
-   * Optional metadata for tracking and identification purposes
-   */
-  export interface Meta {
-    /**
-     * Customer identifier for tracking purposes
-     */
-    external_id?: string;
-  }
+  event_id?: string | null;
 }
 
 export declare namespace ValidateSql {
