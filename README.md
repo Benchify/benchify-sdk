@@ -142,13 +142,13 @@ await client.fixer.run({ files: [{ contents: '{"name": "simple-shopping-app", "v
 
 ### Timeouts
 
-Requests time out after 1 minute by default. You can configure this with a `timeout` option:
+Requests time out after 4 seconds by default. You can configure this with a `timeout` option:
 
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
 const client = new Benchify({
-  timeout: 20 * 1000, // 20 seconds (default is 1 minute)
+  timeout: 20 * 1000, // 20 seconds (default is 4 seconds)
 });
 
 // Override per-request:
