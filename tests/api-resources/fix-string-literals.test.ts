@@ -11,10 +11,7 @@ describe('resource fixStringLiterals', () => {
   // skipped: tests are disabled for the time being
   test.skip('create: only required params', async () => {
     const responsePromise = client.fixStringLiterals.create({
-      file: {
-        contents: 'function Button() { return <button>Click me</button> }',
-        path: 'src/components/Button.tsx',
-      },
+      file: { contents: 'contents', original_contents: 'original_contents', path: 'x' },
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -28,11 +25,8 @@ describe('resource fixStringLiterals', () => {
   // skipped: tests are disabled for the time being
   test.skip('create: required and optional params', async () => {
     const response = await client.fixStringLiterals.create({
-      file: {
-        contents: 'function Button() { return <button>Click me</button> }',
-        path: 'src/components/Button.tsx',
-      },
-      meta: { external_id: 'customer-batch-001' },
+      file: { contents: 'contents', original_contents: 'original_contents', path: 'x' },
+      event_id: 'x',
     });
   });
 });
