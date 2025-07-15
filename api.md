@@ -9,8 +9,6 @@ Methods:
 
 - <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">run</a>({ ...params }) -> FixerRunResponse</code>
 
-# Diagnostics
-
 # FixStringLiterals
 
 Types:

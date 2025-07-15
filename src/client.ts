@@ -16,7 +16,6 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import { Diagnostics } from './resources/diagnostics';
 import {
   FixStringLiteralCreateParams,
   FixStringLiteralCreateResponse,
@@ -726,12 +725,10 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
-  diagnostics: API.Diagnostics = new API.Diagnostics(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
   validateSql: API.ValidateSql = new API.ValidateSql(this);
 }
 Benchify.Fixer = Fixer;
-Benchify.Diagnostics = Diagnostics;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateSql = ValidateSql;
 export declare namespace Benchify {
@@ -743,8 +740,6 @@ export declare namespace Benchify {
     type FixerRunResponse as FixerRunResponse,
     type FixerRunParams as FixerRunParams,
   };
-
-  export { Diagnostics as Diagnostics };
 
   export {
     FixStringLiterals as FixStringLiterals,
