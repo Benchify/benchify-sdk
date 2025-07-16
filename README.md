@@ -26,11 +26,11 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const response = await client.fixer.run({
+const fixer = await client.fixer.create({
   files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
 });
 
-console.log(response.build_status);
+console.log(fixer.build_status);
 ```
 
 ### Request & Response types
@@ -45,10 +45,10 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const params: Benchify.FixerRunParams = {
+const params: Benchify.FixerCreateParams = {
   files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
 };
-const response: Benchify.FixerRunResponse = await client.fixer.run(params);
+const fixer: Benchify.FixerCreateResponse = await client.fixer.create(params);
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -61,8 +61,8 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const response = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
+const fixer = await client.fixer
+  .create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .catch(async (err) => {
     if (err instanceof Benchify.APIError) {
       console.log(err.status); // 400
@@ -103,24 +103,24 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
+await client.fixer.create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
   maxRetries: 5,
 });
 ```
 
 ### Timeouts
 
-Requests time out after 4 seconds by default. You can configure this with a `timeout` option:
+Requests time out after 1 minute by default. You can configure this with a `timeout` option:
 
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
 const client = new Benchify({
-  timeout: 20 * 1000, // 20 seconds (default is 4 seconds)
+  timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
+await client.fixer.create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -144,16 +144,16 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 const client = new Benchify();
 
 const response = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
+  .create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: response, response: raw } = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
+const { data: fixer, response: raw } = await client.fixer
+  .create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.build_status);
+console.log(fixer.build_status);
 ```
 
 ### Logging
@@ -233,7 +233,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.fixer.run({
+client.fixer.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',

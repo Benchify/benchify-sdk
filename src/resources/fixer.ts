@@ -1,6 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as FixerAPI from './fixer';
+import * as FixStringLiteralsAPI from './fix-string-literals';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -10,7 +12,7 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixer.run({
+   * const fixer = await client.fixer.create({
    *   files: [
    *     {
    *       contents: 'contents',
@@ -21,112 +23,119 @@ export class Fixer extends APIResource {
    * });
    * ```
    */
-  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
+  create(body: FixerCreateParams, options?: RequestOptions): APIPromise<FixerCreateResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
 
 /**
- * Request model for the /api/fixer endpoint
+ * Result of running diagnostics
  */
-export interface FixerRequest {
+export interface DiagnosticResponse {
   /**
-   * List of files to process
+   * Diagnostics grouped by file
    */
-  files: Array<FixerRequest.File>;
+  file_to_diagnostics?: { [key: string]: Array<DiagnosticResponse.FileToDiagnostic> };
 
   /**
-   * Command to build the project
+   * Human-readable summary of issues
    */
-  build_cmd?: string;
+  summary?: string;
 
   /**
-   * Command to run the development server
+   * Total number of diagnostics
    */
-  dev_cmd?: string;
-
-  /**
-   * Configuration object for specifying which fixes to apply
-   */
-  fixes?: FixerRequest.Fixes | null;
-
-  /**
-   * Format for the response (diff, changed_files, or all_files)
-   */
-  response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
-
-  /**
-   * Return before and after diagnostics when fixing.
-   */
-  return_diagnostics?: boolean;
-
-  /**
-   * Command to run TypeScript compiler
-   */
-  tsc_cmd?: string;
+  total_count?: number;
 }
 
-export namespace FixerRequest {
+export namespace DiagnosticResponse {
   /**
-   * Model for file data in requests
+   * Enhanced diagnostic model for external API
    */
-  export interface File {
+  export interface FileToDiagnostic {
     /**
-     * Contents of the file
+     * Category of diagnostic
      */
-    contents: string;
+    category: 'tsc' | 'tsgo' | 'import_export';
 
     /**
-     * Original contents of the file before any modifications
+     * Code given by the diagnostic generator
      */
-    original_contents: string;
+    code: number;
 
     /**
-     * Path to the file
+     * File where diagnostic occurs
      */
-    path: string;
+    file_path: string;
+
+    /**
+     * Location of the diagnostic
+     */
+    location: FileToDiagnostic.Location;
+
+    /**
+     * Diagnostic message
+     */
+    message: string;
+
+    /**
+     * Surrounding code context
+     */
+    context?: string | null;
+
+    /**
+     * Diagnostic category
+     */
+    severity?: 'error' | 'warning';
   }
 
-  /**
-   * Configuration object for specifying which fixes to apply
-   */
-  export interface Fixes {
+  export namespace FileToDiagnostic {
     /**
-     * Whether to fix CSS issues
+     * Location of the diagnostic
      */
-    css?: boolean;
+    export interface Location {
+      /**
+       * Column number (1-based)
+       */
+      column: number;
 
-    /**
-     * Whether to fix import issues
-     */
-    imports?: boolean;
+      /**
+       * Line number (1-based)
+       */
+      line: number;
 
-    /**
-     * Whether to fix React issues
-     */
-    react?: boolean;
+      /**
+       * Span of the error
+       */
+      span: number;
 
-    /**
-     * Whether to fix string literal issues
-     */
-    stringLiterals?: boolean;
-
-    /**
-     * Whether to fix Tailwind issues
-     */
-    tailwind?: boolean;
-
-    /**
-     * Whether to fix TypeScript suggestions
-     */
-    tsSuggestions?: boolean;
+      /**
+       * Position of the first character of the error location in the source code
+       */
+      starting_character_position: number;
+    }
   }
+}
+
+/**
+ * Model for a single file change
+ */
+export interface FileChange {
+  /**
+   * Contents of the file
+   */
+  contents: string;
+
+  /**
+   * Path of the file
+   */
+  path: string;
 }
 
 /**
  * Response model for the /api/fixer endpoint
  */
-export interface FixerRunResponse {
+export interface FixerCreateResponse {
   /**
    * Status code of the build process
    */
@@ -140,7 +149,7 @@ export interface FixerRunResponse {
   /**
    * Diagnostics from the code after fixing
    */
-  final_diagnostics: FixerRunResponse.FinalDiagnostics;
+  final_diagnostics: DiagnosticResponse;
 
   /**
    * Version of the fixer
@@ -150,7 +159,7 @@ export interface FixerRunResponse {
   /**
    * Diagnostics from the code before fixing
    */
-  initial_diagnostics: FixerRunResponse.InitialDiagnostics;
+  initial_diagnostics: DiagnosticResponse;
 
   /**
    * Output of the build command
@@ -171,191 +180,13 @@ export interface FixerRunResponse {
    * Changes made by the fixer in the requested format
    */
   suggested_changes?:
-    | FixerRunResponse.DiffFormat
-    | FixerRunResponse.ChangedFilesFormat
-    | FixerRunResponse.AllFilesFormat
+    | FixerCreateResponse.DiffFormat
+    | FixerCreateResponse.ChangedFilesFormat
+    | FixerCreateResponse.AllFilesFormat
     | null;
 }
 
-export namespace FixerRunResponse {
-  /**
-   * Diagnostics from the code after fixing
-   */
-  export interface FinalDiagnostics {
-    /**
-     * Diagnostics grouped by file
-     */
-    file_to_diagnostics?: { [key: string]: Array<FinalDiagnostics.FileToDiagnostic> };
-
-    /**
-     * Human-readable summary of issues
-     */
-    summary?: string;
-
-    /**
-     * Total number of diagnostics
-     */
-    total_count?: number;
-  }
-
-  export namespace FinalDiagnostics {
-    /**
-     * Enhanced diagnostic model for external API
-     */
-    export interface FileToDiagnostic {
-      /**
-       * Category of diagnostic
-       */
-      category: 'tsc' | 'tsgo' | 'import_export';
-
-      /**
-       * Code given by the diagnostic generator
-       */
-      code: number;
-
-      /**
-       * File where diagnostic occurs
-       */
-      file_path: string;
-
-      /**
-       * Location of the diagnostic
-       */
-      location: FileToDiagnostic.Location;
-
-      /**
-       * Diagnostic message
-       */
-      message: string;
-
-      /**
-       * Surrounding code context
-       */
-      context?: string | null;
-
-      /**
-       * Diagnostic category
-       */
-      severity?: 'error' | 'warning';
-    }
-
-    export namespace FileToDiagnostic {
-      /**
-       * Location of the diagnostic
-       */
-      export interface Location {
-        /**
-         * Column number (1-based)
-         */
-        column: number;
-
-        /**
-         * Line number (1-based)
-         */
-        line: number;
-
-        /**
-         * Span of the error
-         */
-        span: number;
-
-        /**
-         * Position of the first character of the error location in the source code
-         */
-        starting_character_position: number;
-      }
-    }
-  }
-
-  /**
-   * Diagnostics from the code before fixing
-   */
-  export interface InitialDiagnostics {
-    /**
-     * Diagnostics grouped by file
-     */
-    file_to_diagnostics?: { [key: string]: Array<InitialDiagnostics.FileToDiagnostic> };
-
-    /**
-     * Human-readable summary of issues
-     */
-    summary?: string;
-
-    /**
-     * Total number of diagnostics
-     */
-    total_count?: number;
-  }
-
-  export namespace InitialDiagnostics {
-    /**
-     * Enhanced diagnostic model for external API
-     */
-    export interface FileToDiagnostic {
-      /**
-       * Category of diagnostic
-       */
-      category: 'tsc' | 'tsgo' | 'import_export';
-
-      /**
-       * Code given by the diagnostic generator
-       */
-      code: number;
-
-      /**
-       * File where diagnostic occurs
-       */
-      file_path: string;
-
-      /**
-       * Location of the diagnostic
-       */
-      location: FileToDiagnostic.Location;
-
-      /**
-       * Diagnostic message
-       */
-      message: string;
-
-      /**
-       * Surrounding code context
-       */
-      context?: string | null;
-
-      /**
-       * Diagnostic category
-       */
-      severity?: 'error' | 'warning';
-    }
-
-    export namespace FileToDiagnostic {
-      /**
-       * Location of the diagnostic
-       */
-      export interface Location {
-        /**
-         * Column number (1-based)
-         */
-        column: number;
-
-        /**
-         * Line number (1-based)
-         */
-        line: number;
-
-        /**
-         * Span of the error
-         */
-        span: number;
-
-        /**
-         * Position of the first character of the error location in the source code
-         */
-        starting_character_position: number;
-      }
-    }
-  }
-
+export namespace FixerCreateResponse {
   export interface DiffFormat {
     /**
      * Git diff of changes made
@@ -367,56 +198,22 @@ export namespace FixerRunResponse {
     /**
      * List of changed files with their new contents
      */
-    changed_files?: Array<ChangedFilesFormat.ChangedFile> | null;
-  }
-
-  export namespace ChangedFilesFormat {
-    /**
-     * Model for a single file change
-     */
-    export interface ChangedFile {
-      /**
-       * Contents of the file
-       */
-      contents: string;
-
-      /**
-       * Path of the file
-       */
-      path: string;
-    }
+    changed_files?: Array<FixerAPI.FileChange> | null;
   }
 
   export interface AllFilesFormat {
     /**
      * List of all files with their current contents
      */
-    all_files?: Array<AllFilesFormat.AllFile> | null;
-  }
-
-  export namespace AllFilesFormat {
-    /**
-     * Model for a single file change
-     */
-    export interface AllFile {
-      /**
-       * Contents of the file
-       */
-      contents: string;
-
-      /**
-       * Path of the file
-       */
-      path: string;
-    }
+    all_files?: Array<FixerAPI.FileChange> | null;
   }
 }
 
-export interface FixerRunParams {
+export interface FixerCreateParams {
   /**
    * List of files to process
    */
-  files: Array<FixerRunParams.File>;
+  files: Array<FixStringLiteralsAPI.RequestTestFile>;
 
   /**
    * Command to build the project
@@ -431,7 +228,7 @@ export interface FixerRunParams {
   /**
    * Configuration object for specifying which fixes to apply
    */
-  fixes?: FixerRunParams.Fixes | null;
+  fixes?: FixerCreateParams.Fixes | null;
 
   /**
    * Format for the response (diff, changed_files, or all_files)
@@ -449,27 +246,7 @@ export interface FixerRunParams {
   tsc_cmd?: string;
 }
 
-export namespace FixerRunParams {
-  /**
-   * Model for file data in requests
-   */
-  export interface File {
-    /**
-     * Contents of the file
-     */
-    contents: string;
-
-    /**
-     * Original contents of the file before any modifications
-     */
-    original_contents: string;
-
-    /**
-     * Path to the file
-     */
-    path: string;
-  }
-
+export namespace FixerCreateParams {
   /**
    * Configuration object for specifying which fixes to apply
    */
@@ -508,8 +285,9 @@ export namespace FixerRunParams {
 
 export declare namespace Fixer {
   export {
-    type FixerRequest as FixerRequest,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
+    type DiagnosticResponse as DiagnosticResponse,
+    type FileChange as FileChange,
+    type FixerCreateResponse as FixerCreateResponse,
+    type FixerCreateParams as FixerCreateParams,
   };
 }

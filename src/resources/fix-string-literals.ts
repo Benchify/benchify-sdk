@@ -35,6 +35,26 @@ export class FixStringLiterals extends APIResource {
 }
 
 /**
+ * Model for file data in requests
+ */
+export interface RequestTestFile {
+  /**
+   * Contents of the file
+   */
+  contents: string;
+
+  /**
+   * Original contents of the file before any modifications
+   */
+  original_contents: string;
+
+  /**
+   * Path to the file
+   */
+  path: string;
+}
+
+/**
  * Response model for the /api/fix_string_literals endpoint
  */
 export interface FixStringLiteralCreateResponse {
@@ -142,7 +162,7 @@ export interface FixStringLiteralCreateParams {
   /**
    * File to process
    */
-  file: FixStringLiteralCreateParams.File;
+  file: RequestTestFile;
 
   /**
    * Unique identifier for the event
@@ -150,30 +170,9 @@ export interface FixStringLiteralCreateParams {
   event_id?: string | null;
 }
 
-export namespace FixStringLiteralCreateParams {
-  /**
-   * File to process
-   */
-  export interface File {
-    /**
-     * Contents of the file
-     */
-    contents: string;
-
-    /**
-     * Original contents of the file before any modifications
-     */
-    original_contents: string;
-
-    /**
-     * Path to the file
-     */
-    path: string;
-  }
-}
-
 export declare namespace FixStringLiterals {
   export {
+    type RequestTestFile as RequestTestFile,
     type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
     type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
   };
