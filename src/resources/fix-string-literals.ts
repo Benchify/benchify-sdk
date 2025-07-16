@@ -16,16 +16,12 @@ export class FixStringLiterals extends APIResource {
    *
    * @example
    * ```ts
-   * const fixStringLiteral =
-   *   await client.fixStringLiterals.create({
-   *     file: { contents: 'contents', path: 'x' },
-   *   });
+   * const response = await client.fixStringLiterals.run({
+   *   file: { contents: 'contents', path: 'x' },
+   * });
    * ```
    */
-  create(
-    body: FixStringLiteralCreateParams,
-    options?: RequestOptions,
-  ): APIPromise<FixStringLiteralCreateResponse> {
+  run(body: FixStringLiteralRunParams, options?: RequestOptions): APIPromise<FixStringLiteralRunResponse> {
     return this._client.post('/v1/fix-string-literals', { body, ...options });
   }
 }
@@ -48,7 +44,7 @@ export interface RequestTestFile {
 /**
  * Response model for the /api/fix_string_literals endpoint
  */
-export interface FixStringLiteralCreateResponse {
+export interface FixStringLiteralRunResponse {
   /**
    * The file contents (original or fixed)
    */
@@ -77,10 +73,10 @@ export interface FixStringLiteralCreateResponse {
   /**
    * Enhanced diagnostic model for external API
    */
-  relevant_error?: FixStringLiteralCreateResponse.RelevantError | null;
+  relevant_error?: FixStringLiteralRunResponse.RelevantError | null;
 }
 
-export namespace FixStringLiteralCreateResponse {
+export namespace FixStringLiteralRunResponse {
   /**
    * Enhanced diagnostic model for external API
    */
@@ -149,7 +145,7 @@ export namespace FixStringLiteralCreateResponse {
   }
 }
 
-export interface FixStringLiteralCreateParams {
+export interface FixStringLiteralRunParams {
   /**
    * File to process
    */
@@ -164,7 +160,7 @@ export interface FixStringLiteralCreateParams {
 export declare namespace FixStringLiterals {
   export {
     type RequestTestFile as RequestTestFile,
-    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
-    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
+    type FixStringLiteralRunResponse as FixStringLiteralRunResponse,
+    type FixStringLiteralRunParams as FixStringLiteralRunParams,
   };
 }
