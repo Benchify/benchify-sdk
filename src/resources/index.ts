@@ -3,15 +3,15 @@
 export {
   FixStringLiterals,
   type RequestTestFile,
-  type FixStringLiteralRunResponse,
-  type FixStringLiteralRunParams,
+  type FixStringLiteralCreateResponse,
+  type FixStringLiteralCreateParams,
 } from './fix-string-literals';
 export {
   Fixer,
   type DiagnosticResponse,
   type FileChange,
-  type FixerRunResponse,
-  type FixerRunParams,
+  type FixerCreateResponse,
+  type FixerCreateParams,
 } from './fixer';
 export {
   ValidateSql,

@@ -9,10 +9,8 @@ const client = new Benchify({
 
 describe('resource fixStringLiterals', () => {
   // skipped: tests are disabled for the time being
-  test.skip('run: only required params', async () => {
-    const responsePromise = client.fixStringLiterals.run({
-      file: { contents: 'contents', original_contents: 'original_contents', path: 'x' },
-    });
+  test.skip('create: only required params', async () => {
+    const responsePromise = client.fixStringLiterals.create({ file: { contents: 'contents', path: 'x' } });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -23,9 +21,9 @@ describe('resource fixStringLiterals', () => {
   });
 
   // skipped: tests are disabled for the time being
-  test.skip('run: required and optional params', async () => {
-    const response = await client.fixStringLiterals.run({
-      file: { contents: 'contents', original_contents: 'original_contents', path: 'x' },
+  test.skip('create: required and optional params', async () => {
+    const response = await client.fixStringLiterals.create({
+      file: { contents: 'contents', path: 'x' },
       event_id: 'x',
     });
   });
