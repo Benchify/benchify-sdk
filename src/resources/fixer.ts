@@ -13,13 +13,7 @@ export class Fixer extends APIResource {
    * @example
    * ```ts
    * const response = await client.fixer.run({
-   *   files: [
-   *     {
-   *       contents: 'contents',
-   *       original_contents: 'original_contents',
-   *       path: 'x',
-   *     },
-   *   ],
+   *   files: [{ contents: 'contents', path: 'x' }],
    * });
    * ```
    */
@@ -145,11 +139,6 @@ export interface FixerRunResponse {
    * Diagnostics from the code after fixing
    */
   final_diagnostics: DiagnosticResponse;
-
-  /**
-   * Version of the fixer
-   */
-  fixer_version: string;
 
   /**
    * Diagnostics from the code before fixing
