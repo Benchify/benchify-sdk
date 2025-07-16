@@ -2,10 +2,17 @@
 
 export {
   FixStringLiterals,
+  type RequestTestFile,
   type FixStringLiteralCreateResponse,
   type FixStringLiteralCreateParams,
 } from './fix-string-literals';
-export { Fixer, type FixerRequest, type FixerRunResponse, type FixerRunParams } from './fixer';
+export {
+  Fixer,
+  type DiagnosticResponse,
+  type FileChange,
+  type FixerCreateResponse,
+  type FixerCreateParams,
+} from './fixer';
 export {
   ValidateSql,
   type ValidateSqlValidateResponse,

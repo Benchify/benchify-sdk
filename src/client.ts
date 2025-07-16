@@ -20,8 +20,15 @@ import {
   FixStringLiteralCreateParams,
   FixStringLiteralCreateResponse,
   FixStringLiterals,
+  RequestTestFile,
 } from './resources/fix-string-literals';
-import { Fixer, FixerRequest, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import {
+  DiagnosticResponse,
+  FileChange,
+  Fixer,
+  FixerCreateParams,
+  FixerCreateResponse,
+} from './resources/fixer';
 import {
   ValidateSql,
   ValidateSqlValidateParams,
@@ -138,7 +145,7 @@ export class Benchify {
    *
    * @param {string | undefined} [opts.apiKey=process.env['BENCHIFY_API_KEY'] ?? undefined]
    * @param {string} [opts.baseURL=process.env['BENCHIFY_BASE_URL'] ?? https://api.benchify.com] - Override the default base URL for the API.
-   * @param {number} [opts.timeout=4 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
+   * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
    * @param {number} [opts.maxRetries=2] - The maximum number of times the client will retry a request.
@@ -163,7 +170,7 @@ export class Benchify {
     };
 
     this.baseURL = options.baseURL!;
-    this.timeout = options.timeout ?? Benchify.DEFAULT_TIMEOUT /* 4 seconds */;
+    this.timeout = options.timeout ?? Benchify.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
     // Set default logLevel early so that we can log a warning in parseLogLevel.
@@ -706,7 +713,7 @@ export class Benchify {
   }
 
   static Benchify = this;
-  static DEFAULT_TIMEOUT = 4000; // 4 seconds
+  static DEFAULT_TIMEOUT = 60000; // 1 minute
 
   static BenchifyError = Errors.BenchifyError;
   static APIError = Errors.APIError;
@@ -736,13 +743,15 @@ export declare namespace Benchify {
 
   export {
     Fixer as Fixer,
-    type FixerRequest as FixerRequest,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
+    type DiagnosticResponse as DiagnosticResponse,
+    type FileChange as FileChange,
+    type FixerCreateResponse as FixerCreateResponse,
+    type FixerCreateParams as FixerCreateParams,
   };
 
   export {
     FixStringLiterals as FixStringLiterals,
+    type RequestTestFile as RequestTestFile,
     type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
     type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
   };
