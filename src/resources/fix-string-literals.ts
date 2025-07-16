@@ -16,16 +16,16 @@ export class FixStringLiterals extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixStringLiterals.run({
-   *   file: {
-   *     contents: 'contents',
-   *     original_contents: 'original_contents',
-   *     path: 'x',
-   *   },
-   * });
+   * const fixStringLiteral =
+   *   await client.fixStringLiterals.create({
+   *     file: { contents: 'contents', path: 'x' },
+   *   });
    * ```
    */
-  run(body: FixStringLiteralRunParams, options?: RequestOptions): APIPromise<FixStringLiteralRunResponse> {
+  create(
+    body: FixStringLiteralCreateParams,
+    options?: RequestOptions,
+  ): APIPromise<FixStringLiteralCreateResponse> {
     return this._client.post('/v1/fix-string-literals', { body, ...options });
   }
 }
@@ -35,14 +35,9 @@ export class FixStringLiterals extends APIResource {
  */
 export interface RequestTestFile {
   /**
-   * Contents of the file
-   */
-  contents: string;
-
-  /**
    * Original contents of the file before any modifications
    */
-  original_contents: string;
+  contents: string;
 
   /**
    * Path to the file
@@ -53,7 +48,7 @@ export interface RequestTestFile {
 /**
  * Response model for the /api/fix_string_literals endpoint
  */
-export interface FixStringLiteralRunResponse {
+export interface FixStringLiteralCreateResponse {
   /**
    * The file contents (original or fixed)
    */
@@ -82,10 +77,10 @@ export interface FixStringLiteralRunResponse {
   /**
    * Enhanced diagnostic model for external API
    */
-  relevant_error?: FixStringLiteralRunResponse.RelevantError | null;
+  relevant_error?: FixStringLiteralCreateResponse.RelevantError | null;
 }
 
-export namespace FixStringLiteralRunResponse {
+export namespace FixStringLiteralCreateResponse {
   /**
    * Enhanced diagnostic model for external API
    */
@@ -154,7 +149,7 @@ export namespace FixStringLiteralRunResponse {
   }
 }
 
-export interface FixStringLiteralRunParams {
+export interface FixStringLiteralCreateParams {
   /**
    * File to process
    */
@@ -169,7 +164,7 @@ export interface FixStringLiteralRunParams {
 export declare namespace FixStringLiterals {
   export {
     type RequestTestFile as RequestTestFile,
-    type FixStringLiteralRunResponse as FixStringLiteralRunResponse,
-    type FixStringLiteralRunParams as FixStringLiteralRunParams,
+    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
+    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
   };
 }

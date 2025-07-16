@@ -12,18 +12,12 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixer.run({
-   *   files: [
-   *     {
-   *       contents: 'contents',
-   *       original_contents: 'original_contents',
-   *       path: 'x',
-   *     },
-   *   ],
+   * const fixer = await client.fixer.create({
+   *   files: [{ contents: 'contents', path: 'x' }],
    * });
    * ```
    */
-  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
+  create(body: FixerCreateParams, options?: RequestOptions): APIPromise<FixerCreateResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
@@ -135,7 +129,7 @@ export interface FileChange {
 /**
  * Response model for the /api/fixer endpoint
  */
-export interface FixerRunResponse {
+export interface FixerCreateResponse {
   /**
    * Number of files processed
    */
@@ -147,11 +141,6 @@ export interface FixerRunResponse {
   final_diagnostics: DiagnosticResponse;
 
   /**
-   * Version of the fixer
-   */
-  fixer_version: string;
-
-  /**
    * Diagnostics from the code before fixing
    */
   initial_diagnostics: DiagnosticResponse;
@@ -159,7 +148,7 @@ export interface FixerRunResponse {
   /**
    * Final per-file status after fixing
    */
-  status: FixerRunResponse.Status;
+  status: FixerCreateResponse.Status;
 
   /**
    * Information about fixed files
@@ -170,13 +159,13 @@ export interface FixerRunResponse {
    * Changes made by the fixer in the requested format
    */
   suggested_changes?:
-    | FixerRunResponse.DiffFormat
-    | FixerRunResponse.ChangedFilesFormat
-    | FixerRunResponse.AllFilesFormat
+    | FixerCreateResponse.DiffFormat
+    | FixerCreateResponse.ChangedFilesFormat
+    | FixerCreateResponse.AllFilesFormat
     | null;
 }
 
-export namespace FixerRunResponse {
+export namespace FixerCreateResponse {
   /**
    * Final per-file status after fixing
    */
@@ -209,7 +198,7 @@ export namespace FixerRunResponse {
   }
 }
 
-export interface FixerRunParams {
+export interface FixerCreateParams {
   /**
    * List of files to process
    */
@@ -228,7 +217,7 @@ export interface FixerRunParams {
   /**
    * Configuration object for specifying which fixes to apply
    */
-  fixes?: FixerRunParams.Fixes | null;
+  fixes?: FixerCreateParams.Fixes | null;
 
   /**
    * Format for the response (diff, changed_files, or all_files)
@@ -246,7 +235,7 @@ export interface FixerRunParams {
   tsc_cmd?: string;
 }
 
-export namespace FixerRunParams {
+export namespace FixerCreateParams {
   /**
    * Configuration object for specifying which fixes to apply
    */
@@ -287,7 +276,7 @@ export declare namespace Fixer {
   export {
     type DiagnosticResponse as DiagnosticResponse,
     type FileChange as FileChange,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
+    type FixerCreateResponse as FixerCreateResponse,
+    type FixerCreateParams as FixerCreateParams,
   };
 }

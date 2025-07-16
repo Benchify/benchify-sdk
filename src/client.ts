@@ -17,12 +17,18 @@ import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import {
-  FixStringLiteralRunParams,
-  FixStringLiteralRunResponse,
+  FixStringLiteralCreateParams,
+  FixStringLiteralCreateResponse,
   FixStringLiterals,
   RequestTestFile,
 } from './resources/fix-string-literals';
-import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import {
+  DiagnosticResponse,
+  FileChange,
+  Fixer,
+  FixerCreateParams,
+  FixerCreateResponse,
+} from './resources/fixer';
 import {
   ValidateSql,
   ValidateSqlValidateParams,
@@ -739,15 +745,15 @@ export declare namespace Benchify {
     Fixer as Fixer,
     type DiagnosticResponse as DiagnosticResponse,
     type FileChange as FileChange,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
+    type FixerCreateResponse as FixerCreateResponse,
+    type FixerCreateParams as FixerCreateParams,
   };
 
   export {
     FixStringLiterals as FixStringLiterals,
     type RequestTestFile as RequestTestFile,
-    type FixStringLiteralRunResponse as FixStringLiteralRunResponse,
-    type FixStringLiteralRunParams as FixStringLiteralRunParams,
+    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
+    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
   };
 
   export {
