@@ -26,9 +26,7 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const response = await client.fixer.run({
-  files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
-});
+const response = await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] });
 
 console.log(response.files_processed);
 ```
@@ -45,9 +43,7 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const params: Benchify.FixerRunParams = {
-  files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
-};
+const params: Benchify.FixerRunParams = { files: [{ contents: 'contents', path: 'x' }] };
 const response: Benchify.FixerRunResponse = await client.fixer.run(params);
 ```
 
@@ -62,7 +58,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 const response = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
+  .run({ files: [{ contents: 'contents', path: 'x' }] })
   .catch(async (err) => {
     if (err instanceof Benchify.APIError) {
       console.log(err.status); // 400
@@ -103,7 +99,7 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
+await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }, {
   maxRetries: 5,
 });
 ```
@@ -120,7 +116,7 @@ const client = new Benchify({
 });
 
 // Override per-request:
-await client.fixer.run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] }, {
+await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -143,14 +139,12 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Benchify();
 
-const response = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
-  .asResponse();
+const response = await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }).asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: response, response: raw } = await client.fixer
-  .run({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
+  .run({ files: [{ contents: 'contents', path: 'x' }] })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
 console.log(response.files_processed);

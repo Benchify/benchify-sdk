@@ -17,11 +17,7 @@ export class FixStringLiterals extends APIResource {
    * @example
    * ```ts
    * const response = await client.fixStringLiterals.run({
-   *   file: {
-   *     contents: 'contents',
-   *     original_contents: 'original_contents',
-   *     path: 'x',
-   *   },
+   *   file: { contents: 'contents', path: 'x' },
    * });
    * ```
    */
@@ -35,14 +31,9 @@ export class FixStringLiterals extends APIResource {
  */
 export interface RequestTestFile {
   /**
-   * Contents of the file
-   */
-  contents: string;
-
-  /**
    * Original contents of the file before any modifications
    */
-  original_contents: string;
+  contents: string;
 
   /**
    * Path to the file
