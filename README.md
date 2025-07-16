@@ -30,7 +30,7 @@ const fixer = await client.fixer.create({
   files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
 });
 
-console.log(fixer.build_status);
+console.log(fixer.files_processed);
 ```
 
 ### Request & Response types
@@ -153,7 +153,7 @@ const { data: fixer, response: raw } = await client.fixer
   .create({ files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }] })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(fixer.build_status);
+console.log(fixer.files_processed);
 ```
 
 ### Logging
