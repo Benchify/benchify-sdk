@@ -137,11 +137,6 @@ export interface FileChange {
  */
 export interface FixerCreateResponse {
   /**
-   * Status code of the build process
-   */
-  build_status: number;
-
-  /**
    * Number of files processed
    */
   files_processed: number;
@@ -162,19 +157,14 @@ export interface FixerCreateResponse {
   initial_diagnostics: DiagnosticResponse;
 
   /**
-   * Output of the build command
+   * Final per-file status after fixing
    */
-  build_output?: string;
+  status: FixerCreateResponse.Status;
 
   /**
    * Information about fixed files
    */
   fixed_files?: { [key: string]: unknown } | null;
-
-  /**
-   * Data about the fixer
-   */
-  fixer_data?: { [key: string]: unknown } | null;
 
   /**
    * Changes made by the fixer in the requested format
@@ -187,6 +177,16 @@ export interface FixerCreateResponse {
 }
 
 export namespace FixerCreateResponse {
+  /**
+   * Final per-file status after fixing
+   */
+  export interface Status {
+    /**
+     * Fix status of each file sent.
+     */
+    file_to_status?: { [key: string]: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND' };
+  }
+
   export interface DiffFormat {
     /**
      * Git diff of changes made
