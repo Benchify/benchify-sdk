@@ -9,8 +9,8 @@ const client = new Benchify({
 
 describe('resource fixer', () => {
   // skipped: tests are disabled for the time being
-  test.skip('run: only required params', async () => {
-    const responsePromise = client.fixer.run({
+  test.skip('create: only required params', async () => {
+    const responsePromise = client.fixer.create({
       files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
     });
     const rawResponse = await responsePromise.asResponse();
@@ -23,8 +23,8 @@ describe('resource fixer', () => {
   });
 
   // skipped: tests are disabled for the time being
-  test.skip('run: required and optional params', async () => {
-    const response = await client.fixer.run({
+  test.skip('create: required and optional params', async () => {
+    const response = await client.fixer.create({
       files: [{ contents: 'contents', original_contents: 'original_contents', path: 'x' }],
       build_cmd: 'x',
       dev_cmd: 'x',
