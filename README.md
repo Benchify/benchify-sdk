@@ -28,7 +28,7 @@ const client = new Benchify({
 
 const response = await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] });
 
-console.log(response.files_processed);
+console.log(response.data);
 ```
 
 ### Request & Response types
@@ -147,7 +147,7 @@ const { data: response, response: raw } = await client.fixer
   .run({ files: [{ contents: 'contents', path: 'x' }] })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.files_processed);
+console.log(response.data);
 ```
 
 ### Logging
