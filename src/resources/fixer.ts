@@ -130,71 +130,92 @@ export interface FileChange {
  * Response model for the /api/fixer endpoint
  */
 export interface FixerRunResponse {
-  /**
-   * Number of files processed
-   */
-  files_processed: number;
+  data?: FixerRunResponse.Data;
 
-  /**
-   * Diagnostics from the code after fixing
-   */
-  final_diagnostics: DiagnosticResponse;
-
-  /**
-   * Diagnostics from the code before fixing
-   */
-  initial_diagnostics: DiagnosticResponse;
-
-  /**
-   * Final per-file status after fixing
-   */
-  status: FixerRunResponse.Status;
-
-  /**
-   * Information about fixed files
-   */
-  fixed_files?: { [key: string]: unknown } | null;
-
-  /**
-   * Changes made by the fixer in the requested format
-   */
-  suggested_changes?:
-    | FixerRunResponse.DiffFormat
-    | FixerRunResponse.ChangedFilesFormat
-    | FixerRunResponse.AllFilesFormat
-    | null;
+  meta?: FixerRunResponse.Meta;
 }
 
 export namespace FixerRunResponse {
-  /**
-   * Final per-file status after fixing
-   */
-  export interface Status {
+  export interface Data {
     /**
-     * Fix status of each file sent.
+     * Number of files processed
      */
-    file_to_status?: { [key: string]: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND' };
+    files_processed: number;
+
+    /**
+     * Diagnostics from the code after fixing
+     */
+    final_diagnostics: FixerAPI.DiagnosticResponse;
+
+    /**
+     * Diagnostics from the code before fixing
+     */
+    initial_diagnostics: FixerAPI.DiagnosticResponse;
+
+    /**
+     * Final per-file status after fixing
+     */
+    status: Data.Status;
+
+    /**
+     * Information about fixed files
+     */
+    fixed_files?: { [key: string]: unknown } | null;
+
+    /**
+     * Changes made by the fixer in the requested format
+     */
+    suggested_changes?: Data.DiffFormat | Data.ChangedFilesFormat | Data.AllFilesFormat | null;
   }
 
-  export interface DiffFormat {
+  export namespace Data {
     /**
-     * Git diff of changes made
+     * Final per-file status after fixing
      */
-    diff?: string | null;
+    export interface Status {
+      /**
+       * Fix status of each file sent.
+       */
+      file_to_status?: { [key: string]: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND' };
+    }
+
+    export interface DiffFormat {
+      /**
+       * Git diff of changes made
+       */
+      diff?: string | null;
+    }
+
+    export interface ChangedFilesFormat {
+      /**
+       * List of changed files with their new contents
+       */
+      changed_files?: Array<FixerAPI.FileChange> | null;
+    }
+
+    export interface AllFilesFormat {
+      /**
+       * List of all files with their current contents
+       */
+      all_files?: Array<FixerAPI.FileChange> | null;
+    }
   }
 
-  export interface ChangedFilesFormat {
+  export interface Meta {
     /**
-     * List of changed files with their new contents
+     * Customer identifier if provided in the request
      */
-    changed_files?: Array<FixerAPI.FileChange> | null;
-  }
+    external_id?: string;
 
-  export interface AllFilesFormat {
     /**
-     * List of all files with their current contents
+     * Unique ID of the fixer run
      */
-    all_files?: Array<FixerAPI.FileChange> | null;
+    fixer_run_id?: string;
+
+    /**
+     * Unique ID for tracing the request
+     */
+    trace_id?: string;
   }
 }
 
