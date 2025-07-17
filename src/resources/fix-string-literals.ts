@@ -45,103 +45,129 @@ export interface RequestTestFile {
  * Response model for the /api/fix_string_literals endpoint
  */
 export interface FixStringLiteralRunResponse {
-  /**
-   * The file contents (original or fixed)
-   */
-  contents: string;
+  data?: FixStringLiteralRunResponse.Data;
 
-  /**
-   * Human-readable message explaining the status
-   */
-  message: string;
-
-  /**
-   * Status of the fix operation
-   */
-  status: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND';
-
-  /**
-   * Number of diagnostics found
-   */
-  diagnostics_found?: number | null;
-
-  /**
-   * Error details if status is 'error'
-   */
-  error?: string | null;
-
-  /**
-   * Enhanced diagnostic model for external API
-   */
-  relevant_error?: FixStringLiteralRunResponse.RelevantError | null;
+  meta?: FixStringLiteralRunResponse.Meta;
 }
 
 export namespace FixStringLiteralRunResponse {
-  /**
-   * Enhanced diagnostic model for external API
-   */
-  export interface RelevantError {
+  export interface Data {
     /**
-     * Category of diagnostic
+     * The file contents (original or fixed)
      */
-    category: 'tsc' | 'tsgo' | 'import_export';
+    contents: string;
 
     /**
-     * Code given by the diagnostic generator
-     */
-    code: number;
-
-    /**
-     * File where diagnostic occurs
-     */
-    file_path: string;
-
-    /**
-     * Location of the diagnostic
-     */
-    location: RelevantError.Location;
-
-    /**
-     * Diagnostic message
+     * Human-readable message explaining the status
      */
     message: string;
 
     /**
-     * Surrounding code context
+     * Status of the string literal fix operation (deprecated, will be replaced by
+     * fix_status)
      */
-    context?: string | null;
+    status: 'no_fix_needed' | 'fix_applied' | 'fix_failed' | 'error';
 
     /**
-     * Diagnostic category
+     * Number of diagnostics found
      */
-    severity?: 'error' | 'warning';
+    diagnostics_found?: number | null;
+
+    /**
+     * Error details if status is 'error'
+     */
+    error?: string | null;
+
+    /**
+     * Enhanced diagnostic model for external API
+     */
+    relevant_error?: Data.RelevantError | null;
   }
 
-  export namespace RelevantError {
+  export namespace Data {
     /**
-     * Location of the diagnostic
+     * Enhanced diagnostic model for external API
      */
-    export interface Location {
+    export interface RelevantError {
       /**
-       * Column number (1-based)
+       * Category of diagnostic
        */
-      column: number;
+      category: 'tsc' | 'tsgo' | 'import_export';
 
       /**
-       * Line number (1-based)
+       * Code given by the diagnostic generator
        */
-      line: number;
+      code: number;
 
       /**
-       * Span of the error
+       * File where diagnostic occurs
        */
-      span: number;
+      file_path: string;
 
       /**
-       * Position of the first character of the error location in the source code
+       * Location of the diagnostic
        */
-      starting_character_position: number;
+      location: RelevantError.Location;
+
+      /**
+       * Diagnostic message
+       */
+      message: string;
+
+      /**
+       * Surrounding code context
+       */
+      context?: string | null;
+
+      /**
+       * Diagnostic category
+       */
+      severity?: 'error' | 'warning';
     }
+
+    export namespace RelevantError {
+      /**
+       * Location of the diagnostic
+       */
+      export interface Location {
+        /**
+         * Column number (1-based)
+         */
+        column: number;
+
+        /**
+         * Line number (1-based)
+         */
+        line: number;
+
+        /**
+         * Span of the error
+         */
+        span: number;
+
+        /**
+         * Position of the first character of the error location in the source code
+         */
+        starting_character_position: number;
+      }
+    }
+  }
+
+  export interface Meta {
+    /**
+     * Customer identifier if provided in the request
+     */
+    external_id?: string;
+
+    /**
+     * Unique ID of the fixer run
+     */
+    fixer_run_id?: string;
+
+    /**
+     * Unique ID for tracing the request
+     */
+    trace_id?: string;
   }
 }
 
