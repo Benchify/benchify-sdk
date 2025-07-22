@@ -36,3 +36,13 @@ Types:
 Methods:
 
 - <code title="post /v1/validate-sql">client.validateSql.<a href="./src/resources/validate-sql.ts">validate</a>({ ...params }) -> ValidateSqlValidateResponse</code>
+
+# Heartbeat
+
+Types:
+
+- <code><a href="./src/resources/heartbeat.ts">HeartbeatCheckResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/heartbeat">client.heartbeat.<a href="./src/resources/heartbeat.ts">check</a>() -> unknown</code>
