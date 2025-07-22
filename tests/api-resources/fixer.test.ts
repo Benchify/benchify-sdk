@@ -37,6 +37,7 @@ describe('resource fixer', () => {
       meta: { external_id: 'external_id' },
       response_format: 'DIFF',
       return_diagnostics: true,
+      template_id: 'template_id',
       tsc_cmd: 'x',
     });
   });

@@ -239,6 +239,11 @@ export interface FixerRunParams {
   return_diagnostics?: boolean;
 
   /**
+   * ID of the template to use for the fixer process
+   */
+  template_id?: string | null;
+
+  /**
    * Command to run TypeScript compiler
    */
   tsc_cmd?: string;
