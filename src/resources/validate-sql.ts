@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -35,7 +36,7 @@ export interface ValidateSqlValidateResponse {
   /**
    * Meta information for API responses
    */
-  meta: ValidateSqlValidateResponse.Meta;
+  meta: Shared.ResponseMeta;
 }
 
 export namespace ValidateSqlValidateResponse {
@@ -57,16 +58,6 @@ export namespace ValidateSqlValidateResponse {
      * Error details if validation fails
      */
     error?: string | null;
-  }
-
-  /**
-   * Meta information for API responses
-   */
-  export interface Meta {
-    /**
-     * Unique trace identifier for the request
-     */
-    trace_id?: string | null;
   }
 }
 
