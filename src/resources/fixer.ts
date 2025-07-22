@@ -3,6 +3,7 @@
 import { APIResource } from '../core/resource';
 import * as FixerAPI from './fixer';
 import * as FixStringLiteralsAPI from './fix-string-literals';
+import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -138,7 +139,7 @@ export interface FixerRunResponse {
   /**
    * Meta information for API responses
    */
-  meta: FixerRunResponse.Meta;
+  meta: Shared.ResponseMeta;
 }
 
 export namespace FixerRunResponse {
@@ -198,16 +199,6 @@ export namespace FixerRunResponse {
        */
       all_files?: Array<FixerAPI.FileChange> | null;
     }
-  }
-
-  /**
-   * Meta information for API responses
-   */
-  export interface Meta {
-    /**
-     * Unique trace identifier for the request
-     */
-    trace_id?: string | null;
   }
 }
 

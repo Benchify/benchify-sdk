@@ -755,4 +755,6 @@ export declare namespace Benchify {
     type ValidateSqlValidateResponse as ValidateSqlValidateResponse,
     type ValidateSqlValidateParams as ValidateSqlValidateParams,
   };
+
+  export type ResponseMeta = API.ResponseMeta;
 }
