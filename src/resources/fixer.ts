@@ -3,6 +3,7 @@
 import { APIResource } from '../core/resource';
 import * as FixerAPI from './fixer';
 import * as FixStringLiteralsAPI from './fix-string-literals';
+import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -50,7 +51,7 @@ export namespace DiagnosticResponse {
     /**
      * Category of diagnostic
      */
-    category: 'tsc' | 'tsgo' | 'import_export';
+    category: 'typescript' | 'import_export';
 
     /**
      * Code given by the diagnostic generator
@@ -127,30 +128,29 @@ export interface FileChange {
 }
 
 /**
- * Response model for the /api/fixer endpoint
+ * Wrapped response model for benchify-api compatibility
  */
 export interface FixerRunResponse {
-  data?: FixerRunResponse.Data;
+  /**
+   * Response model for the /api/fixer endpoint
+   */
+  data: FixerRunResponse.Data;
 
-  meta?: FixerRunResponse.Meta;
+  /**
+   * Meta information for API responses
+   */
+  meta: Shared.ResponseMeta;
 }
 
 export namespace FixerRunResponse {
+  /**
+   * Response model for the /api/fixer endpoint
+   */
   export interface Data {
     /**
      * Number of files processed
      */
     files_processed: number;
-
-    /**
-     * Diagnostics from the code after fixing
-     */
-    final_diagnostics: FixerAPI.DiagnosticResponse;
-
-    /**
-     * Diagnostics from the code before fixing
-     */
-    initial_diagnostics: FixerAPI.DiagnosticResponse;
 
     /**
      * Final per-file status after fixing
@@ -200,23 +200,6 @@ export namespace FixerRunResponse {
       all_files?: Array<FixerAPI.FileChange> | null;
     }
   }
-
-  export interface Meta {
-    /**
-     * Customer identifier if provided in the request
-     */
-    external_id?: string;
-
-    /**
-     * Unique ID of the fixer run
-     */
-    fixer_run_id?: string;
-
-    /**
-     * Unique ID for tracing the request
-     */
-    trace_id?: string;
-  }
 }
 
 export interface FixerRunParams {
@@ -239,6 +222,11 @@ export interface FixerRunParams {
    * Configuration object for specifying which fixes to apply
    */
   fixes?: FixerRunParams.Fixes | null;
+
+  /**
+   * Meta information for API requests
+   */
+  meta?: FixerRunParams.Meta | null;
 
   /**
    * Format for the response (diff, changed_files, or all_files)
@@ -290,6 +278,16 @@ export namespace FixerRunParams {
      * Whether to fix TypeScript suggestions
      */
     tsSuggestions?: boolean;
+  }
+
+  /**
+   * Meta information for API requests
+   */
+  export interface Meta {
+    /**
+     * Customer tracking identifier
+     */
+    external_id?: string | null;
   }
 }
 

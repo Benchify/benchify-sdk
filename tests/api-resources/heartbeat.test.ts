@@ -7,10 +7,10 @@ const client = new Benchify({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource fixStringLiterals', () => {
+describe('resource heartbeat', () => {
   // skipped: tests are disabled for the time being
-  test.skip('run: only required params', async () => {
-    const responsePromise = client.fixStringLiterals.run({ file: { contents: 'contents', path: 'x' } });
+  test.skip('check', async () => {
+    const responsePromise = client.heartbeat.check();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -18,14 +18,5 @@ describe('resource fixStringLiterals', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // skipped: tests are disabled for the time being
-  test.skip('run: required and optional params', async () => {
-    const response = await client.fixStringLiterals.run({
-      file: { contents: 'contents', path: 'x' },
-      event_id: 'x',
-      meta: { external_id: 'external_id' },
-    });
   });
 });
