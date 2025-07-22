@@ -25,6 +25,7 @@ describe('resource fixStringLiterals', () => {
     const response = await client.fixStringLiterals.run({
       file: { contents: 'contents', path: 'x' },
       event_id: 'x',
+      meta: { external_id: 'external_id' },
     });
   });
 });
