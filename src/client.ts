@@ -23,6 +23,7 @@ import {
   RequestTestFile,
 } from './resources/fix-string-literals';
 import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { Heartbeat, HeartbeatCheckResponse } from './resources/heartbeat';
 import {
   ValidateSql,
   ValidateSqlValidateParams,
@@ -728,10 +729,12 @@ export class Benchify {
   fixer: API.Fixer = new API.Fixer(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
   validateSql: API.ValidateSql = new API.ValidateSql(this);
+  heartbeat: API.Heartbeat = new API.Heartbeat(this);
 }
 Benchify.Fixer = Fixer;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateSql = ValidateSql;
+Benchify.Heartbeat = Heartbeat;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
@@ -755,6 +758,8 @@ export declare namespace Benchify {
     type ValidateSqlValidateResponse as ValidateSqlValidateResponse,
     type ValidateSqlValidateParams as ValidateSqlValidateParams,
   };
+
+  export { Heartbeat as Heartbeat, type HeartbeatCheckResponse as HeartbeatCheckResponse };
 
   export type ResponseMeta = API.ResponseMeta;
 }
