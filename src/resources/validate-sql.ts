@@ -24,23 +24,50 @@ export class ValidateSql extends APIResource {
 }
 
 /**
- * Response model for the /api/validate_sql endpoint
+ * Wrapped response model for benchify-api compatibility
  */
 export interface ValidateSqlValidateResponse {
   /**
-   * Validation message or error details
+   * Response model for the /api/validate_sql endpoint
    */
-  message: string;
+  data: ValidateSqlValidateResponse.Data;
 
   /**
-   * Whether the SQL is valid
+   * Meta information for API responses
    */
-  valid: boolean;
+  meta: ValidateSqlValidateResponse.Meta;
+}
+
+export namespace ValidateSqlValidateResponse {
+  /**
+   * Response model for the /api/validate_sql endpoint
+   */
+  export interface Data {
+    /**
+     * Validation message or error details
+     */
+    message: string;
+
+    /**
+     * Whether the SQL is valid
+     */
+    valid: boolean;
+
+    /**
+     * Error details if validation fails
+     */
+    error?: string | null;
+  }
 
   /**
-   * Error details if validation fails
+   * Meta information for API responses
    */
-  error?: string | null;
+  export interface Meta {
+    /**
+     * Unique trace identifier for the request
+     */
+    trace_id?: string | null;
+  }
 }
 
 export interface ValidateSqlValidateParams {

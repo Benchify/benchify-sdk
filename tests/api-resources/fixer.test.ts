@@ -34,6 +34,7 @@ describe('resource fixer', () => {
         tailwind: true,
         tsSuggestions: true,
       },
+      meta: { external_id: 'external_id' },
       response_format: 'DIFF',
       return_diagnostics: true,
       tsc_cmd: 'x',

@@ -42,15 +42,24 @@ export interface RequestTestFile {
 }
 
 /**
- * Response model for the /api/fix_string_literals endpoint
+ * Wrapped response model for benchify-api compatibility
  */
 export interface FixStringLiteralRunResponse {
-  data?: FixStringLiteralRunResponse.Data;
+  /**
+   * Response model for the /api/fix_string_literals endpoint
+   */
+  data: FixStringLiteralRunResponse.Data;
 
-  meta?: FixStringLiteralRunResponse.Meta;
+  /**
+   * Meta information for API responses
+   */
+  meta: FixStringLiteralRunResponse.Meta;
 }
 
 export namespace FixStringLiteralRunResponse {
+  /**
+   * Response model for the /api/fix_string_literals endpoint
+   */
   export interface Data {
     /**
      * The file contents (original or fixed)
@@ -63,10 +72,9 @@ export namespace FixStringLiteralRunResponse {
     message: string;
 
     /**
-     * Status of the string literal fix operation (deprecated, will be replaced by
-     * fix_status)
+     * Status of the fix operation
      */
-    status: 'no_fix_needed' | 'fix_applied' | 'fix_failed' | 'error';
+    status: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND' | 'fix_applied';
 
     /**
      * Number of diagnostics found
@@ -92,7 +100,7 @@ export namespace FixStringLiteralRunResponse {
       /**
        * Category of diagnostic
        */
-      category: 'tsc' | 'tsgo' | 'import_export';
+      category: 'typescript' | 'import_export';
 
       /**
        * Code given by the diagnostic generator
@@ -153,21 +161,14 @@ export namespace FixStringLiteralRunResponse {
     }
   }
 
+  /**
+   * Meta information for API responses
+   */
   export interface Meta {
     /**
-     * Customer identifier if provided in the request
+     * Unique trace identifier for the request
      */
-    external_id?: string;
-
-    /**
-     * Unique ID of the fixer run
-     */
-    fixer_run_id?: string;
-
-    /**
-     * Unique ID for tracing the request
-     */
-    trace_id?: string;
+    trace_id?: string | null;
   }
 }
 
@@ -181,6 +182,23 @@ export interface FixStringLiteralRunParams {
    * Unique identifier for the event
    */
   event_id?: string | null;
+
+  /**
+   * Meta information for API requests
+   */
+  meta?: FixStringLiteralRunParams.Meta | null;
+}
+
+export namespace FixStringLiteralRunParams {
+  /**
+   * Meta information for API requests
+   */
+  export interface Meta {
+    /**
+     * Customer tracking identifier
+     */
+    external_id?: string | null;
+  }
 }
 
 export declare namespace FixStringLiterals {
