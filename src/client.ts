@@ -759,14 +759,10 @@ export class Benchify {
    * ```
    */
   async runFixer(
-    files: Record<string, string>,
+    files: API.RequestTestFile[],
     options?: Partial<API.FixerRunParams> & { response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES' },
   ): Promise<string | Array<FixerAPI.FileChange>> {
     // Convert the dictionary to the expected RequestTestFile format
-    const fileArray: API.RequestTestFile[] = Object.entries(files).map(([path, contents]) => ({
-      path,
-      contents,
-    }));
 
     // Default to ALL_FILES if no format specified
     const responseFormat = options?.response_format || 'ALL_FILES';
@@ -774,7 +770,7 @@ export class Benchify {
     // Call the underlying fixer.run method with the converted files
     return this.fixer
       .run({
-        files: fileArray,
+        files: files,
         response_format: responseFormat,
         ...options,
       })
