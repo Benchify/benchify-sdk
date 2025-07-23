@@ -1,5 +1,79 @@
 # Changelog
 
+## 0.1.0-alpha.20 (2025-07-23)
+
+Full Changelog: [v0.1.0-alpha.19...v0.1.0-alpha.20](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.19...v0.1.0-alpha.20)
+
+### Features
+
+* **api:** update via SDK Studio ([fcc1ff4](https://github.com/Benchify/benchify-sdk/commit/fcc1ff4338260d6e3e8a8bd8e4483a8dc532e237))
+* **api:** update via SDK Studio ([059e2da](https://github.com/Benchify/benchify-sdk/commit/059e2da0fee9b7b1ef743c87620e7a547913fa0a))
+* **api:** update via SDK Studio ([90ac46a](https://github.com/Benchify/benchify-sdk/commit/90ac46a8ea253a649e0a9ef4f3f91a18b06b255b))
+* **api:** update via SDK Studio ([85ce784](https://github.com/Benchify/benchify-sdk/commit/85ce784c68597d26c49872c99192394de5d07e25))
+* **api:** update via SDK Studio ([69a3519](https://github.com/Benchify/benchify-sdk/commit/69a3519334377a02a5c7328ae47bbce40d189c78))
+* **api:** update via SDK Studio ([020cc3d](https://github.com/Benchify/benchify-sdk/commit/020cc3dff7189c63320cd1e6f504681d4d7003c1))
+* **api:** update via SDK Studio ([b995333](https://github.com/Benchify/benchify-sdk/commit/b995333fa99e3f7c99d295b80976149efc8ac467))
+* **api:** update via SDK Studio ([9287e69](https://github.com/Benchify/benchify-sdk/commit/9287e69554e60eee7fbe2a0514317a9dd6624fa7))
+* **api:** update via SDK Studio ([42f1a0d](https://github.com/Benchify/benchify-sdk/commit/42f1a0dde00215b3491010443f8aaf93fd65f2e7))
+* **api:** update via SDK Studio ([9ac3d42](https://github.com/Benchify/benchify-sdk/commit/9ac3d42c9cf79956f6532b5ea8e7d57481fc04aa))
+* **api:** update via SDK Studio ([6e225d9](https://github.com/Benchify/benchify-sdk/commit/6e225d9e60727e1b2ba4a206f478cf5777e3b990))
+* **api:** update via SDK Studio ([1c901c0](https://github.com/Benchify/benchify-sdk/commit/1c901c0cfdd9ce539e0a4886fdf69e900e43cf46))
+* **api:** update via SDK Studio ([11bb4c6](https://github.com/Benchify/benchify-sdk/commit/11bb4c6b8e7fd1ae3839b0e3819273634398bf9e))
+* **api:** update via SDK Studio ([2b8889c](https://github.com/Benchify/benchify-sdk/commit/2b8889c9af9641c69b480ec0011b84fc35212d6e))
+* **api:** update via SDK Studio ([6b83075](https://github.com/Benchify/benchify-sdk/commit/6b8307542c1b99560b35e8c7f7d4cc617afab119))
+* **api:** update via SDK Studio ([09efff1](https://github.com/Benchify/benchify-sdk/commit/09efff1d6f2fb7eb7f188f5ab070a72b2a910824))
+* **api:** update via SDK Studio ([5f5db29](https://github.com/Benchify/benchify-sdk/commit/5f5db2940063bf3f15b737d261bcfe45fedc7de5))
+* **api:** update via SDK Studio ([6e78bb0](https://github.com/Benchify/benchify-sdk/commit/6e78bb04559c4ed6367ada2c3f29b986ecdc8b61))
+* **api:** update via SDK Studio ([118dead](https://github.com/Benchify/benchify-sdk/commit/118dead49c79c6fc84676aba047b65e892706004))
+* **api:** update via SDK Studio ([5da43d6](https://github.com/Benchify/benchify-sdk/commit/5da43d62d8542e4c91ea3f6c66c444fe7ef271eb))
+* **api:** update via SDK Studio ([c7c63f6](https://github.com/Benchify/benchify-sdk/commit/c7c63f632cd9d54c6289434e118ba9ff886e8ae1))
+* **api:** update via SDK Studio ([32dd071](https://github.com/Benchify/benchify-sdk/commit/32dd071c93b15555fefcf8a0c9ce80e03e1c7587))
+* **api:** update via SDK Studio ([4650a72](https://github.com/Benchify/benchify-sdk/commit/4650a728a0494e86ff874cfce473bcda40eb52f9))
+* **api:** update via SDK Studio ([c8e2d4b](https://github.com/Benchify/benchify-sdk/commit/c8e2d4bbbf0b02dc8db4dcf03bf09214384b4fee))
+* **api:** update via SDK Studio ([d245b21](https://github.com/Benchify/benchify-sdk/commit/d245b21f156a0efa5430f30e41c6cf5b7084e8ec))
+* **api:** update via SDK Studio ([b2b9096](https://github.com/Benchify/benchify-sdk/commit/b2b9096526017e3ebc6195ba683dc09001107856))
+* **client:** add support for endpoint-specific base URLs ([df3d7e7](https://github.com/Benchify/benchify-sdk/commit/df3d7e71af191943e0e5d6e8f63409da65dbe9c2))
+* **mcp:** implement support for binary responses ([1e51b26](https://github.com/Benchify/benchify-sdk/commit/1e51b26a6de6067914cdfc8b23e448eafe82def6))
+
+
+### Bug Fixes
+
+* **client:** explicitly copy fetch in withOptions ([cea2014](https://github.com/Benchify/benchify-sdk/commit/cea2014a0de09827f59432e72247b20b91516e35))
+* **client:** get fetchOptions type more reliably ([b277aed](https://github.com/Benchify/benchify-sdk/commit/b277aedd22a39a3e78e18df88a9f785ce9546d4f))
+* compat with more runtimes ([4f906da](https://github.com/Benchify/benchify-sdk/commit/4f906da6b6990e628acba17a92d589fdc386f7e2))
+* publish script — handle NPM errors correctly ([49dadd7](https://github.com/Benchify/benchify-sdk/commit/49dadd75ceb734a318fdc0c038e24ba575adeb38))
+
+
+### Chores
+
+* add docs to RequestOptions type ([8631a7f](https://github.com/Benchify/benchify-sdk/commit/8631a7f2f5f0135500dd6adea762c27ffc846f1c))
+* adjust eslint.config.mjs ignore pattern ([9cc11d4](https://github.com/Benchify/benchify-sdk/commit/9cc11d4ae44872d6888af8cd64bf709555590af1))
+* avoid type error in certain environments ([97f44e0](https://github.com/Benchify/benchify-sdk/commit/97f44e08373bf854244ee480de0d47242cf8ab89))
+* **ci:** enable for pull requests ([c95df6d](https://github.com/Benchify/benchify-sdk/commit/c95df6d0025ea4fc0b72743801978fca363de286))
+* **ci:** only run for pushes and fork pull requests ([c997d9b](https://github.com/Benchify/benchify-sdk/commit/c997d9ba29d93154c322be74c11c7e8bfb4069dc))
+* **client:** improve path param validation ([099a38e](https://github.com/Benchify/benchify-sdk/commit/099a38e7cdd19789a693a2ee02be67b945dc5b6c))
+* **client:** refactor imports ([24e6891](https://github.com/Benchify/benchify-sdk/commit/24e6891642e1013462cbef4dd9115a49b95e355f))
+* **deps:** bump eslint-plugin-prettier ([8e85367](https://github.com/Benchify/benchify-sdk/commit/8e85367856ae17aaa42399ba52a6d246c5942715))
+* **docs:** use top-level-await in example snippets ([ee69809](https://github.com/Benchify/benchify-sdk/commit/ee69809bb7dfa099f136f09803ea01f6da9cf49a))
+* **internal:** add pure annotations, make base APIResource abstract ([ca1e401](https://github.com/Benchify/benchify-sdk/commit/ca1e4015ed0e9c4ccafc833e7e8e02cfa0329773))
+* **internal:** fix readablestream types in node 20 ([499fd1f](https://github.com/Benchify/benchify-sdk/commit/499fd1f2d4c28ebd9d1ad44feb6564f07f6ac0a6))
+* **internal:** update jest config ([18f846a](https://github.com/Benchify/benchify-sdk/commit/18f846ae8e83f267795e5d6acf3ce6bac3f8c630))
+* make some internal functions async ([3a38fae](https://github.com/Benchify/benchify-sdk/commit/3a38fae3bd700c622bb22d6b68625b8d470e6824))
+* **mcp:** provides high-level initMcpServer function and exports known clients ([d1643ff](https://github.com/Benchify/benchify-sdk/commit/d1643ff775034483f46c217d01a4382d0e79ae04))
+* **readme:** update badges ([50697f1](https://github.com/Benchify/benchify-sdk/commit/50697f1eeac61e634a268822d35adb96f86337a1))
+* **readme:** use better example snippet for undocumented params ([34cdba0](https://github.com/Benchify/benchify-sdk/commit/34cdba0bd11fed987493dfa9ea2f1c5860f8d88b))
+* **ts:** reorder package.json imports ([dc00b9b](https://github.com/Benchify/benchify-sdk/commit/dc00b9b90fea2da973de33af28d233f4b4c473f2))
+* update SDK settings ([7f3f5a1](https://github.com/Benchify/benchify-sdk/commit/7f3f5a16b0e7d8b2a6e1b60ccfba25921d246cbb))
+* update SDK settings ([cdca694](https://github.com/Benchify/benchify-sdk/commit/cdca694a872b6f3406be5abd5d91e2112f003280))
+* update SDK settings ([4d8d0d5](https://github.com/Benchify/benchify-sdk/commit/4d8d0d51c3522e03067ba1c4e53a5df02a079524))
+* update SDK settings ([85db9cc](https://github.com/Benchify/benchify-sdk/commit/85db9cc1bb07787c4773b17e9ce6f67c30eca15f))
+* update SDK settings ([dfff087](https://github.com/Benchify/benchify-sdk/commit/dfff0877df5511fccef57b2ec89c10d01c38c5b9))
+* update SDK settings ([16b03fe](https://github.com/Benchify/benchify-sdk/commit/16b03fe7b99c09d998f130f90546ba11446176ef))
+* update SDK settings ([9513ace](https://github.com/Benchify/benchify-sdk/commit/9513ace90b5f39b8c83a82f49e8576d9886e953b))
+* update SDK settings ([2c6a642](https://github.com/Benchify/benchify-sdk/commit/2c6a64216e8b7c85c4c06d00ed9620808d7720b0))
+* update SDK settings ([cbfa418](https://github.com/Benchify/benchify-sdk/commit/cbfa418cf1aeb02289ada457493649c86b8a42cc))
+* update SDK settings ([ad8acff](https://github.com/Benchify/benchify-sdk/commit/ad8acffe8a1ccaf8b4b6e0d456b8e23b1d4346b7))
+
 ## 0.1.0-alpha.19 (2025-07-23)
 
 ### Features
