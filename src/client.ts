@@ -734,11 +734,11 @@ export class Benchify {
 
   /**
    * Process all files using the fixer with a simplified interface.
-   * 
+   *
    * @param files - Dictionary of filename to file contents
    * @param options - Optional parameters for the fixer run
    * @returns Promise resolving to the appropriate format based on response_format
-   * 
+   *
    * @example
    * ```ts
    * // Get all files
@@ -746,12 +746,12 @@ export class Benchify {
    *   "src/index.ts": "export const hello = 'world';",
    *   "src/utils.ts": "export function helper() {}"
    * }, { response_format: 'ALL_FILES' });
-   * 
+   *
    * // Get only changed files
    * const changedFiles = await client.runFixer({
    *   "src/index.ts": "export const hello = 'world';"
    * }, { response_format: 'CHANGED_FILES' });
-   * 
+   *
    * // Get diff format
    * const diff = await client.runFixer({
    *   "src/index.ts": "export const hello = 'world';"
@@ -760,41 +760,43 @@ export class Benchify {
    */
   async runFixer(
     files: Record<string, string>,
-    options?: Partial<API.FixerRunParams> & { response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES' }
+    options?: Partial<API.FixerRunParams> & { response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES' },
   ): Promise<string | Array<FixerAPI.FileChange>> {
     // Convert the dictionary to the expected RequestTestFile format
     const fileArray: API.RequestTestFile[] = Object.entries(files).map(([path, contents]) => ({
       path,
-      contents
+      contents,
     }));
 
     // Default to ALL_FILES if no format specified
     const responseFormat = options?.response_format || 'ALL_FILES';
 
     // Call the underlying fixer.run method with the converted files
-    return this.fixer.run({
-      files: fileArray,
-      response_format: responseFormat,
-      ...options
-    }).then((response) => {
-      const changes = response.data.suggested_changes;
-      
-      switch (responseFormat) {
-        case 'DIFF':
-          const diffFormat = changes as FixerAPI.FixerRunResponse.Data.DiffFormat;
-          return diffFormat.diff ?? '';
-        case 'CHANGED_FILES':
-          const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-          return changedFormat.changed_files ?? [];
-        case 'ALL_FILES':
-          const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-          return allFilesFormat.all_files ?? [];
-        default:
-          // Fallback to all files if format is somehow invalid
-          const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-          return fallbackFormat.all_files ?? [];
-      }
-    });
+    return this.fixer
+      .run({
+        files: fileArray,
+        response_format: responseFormat,
+        ...options,
+      })
+      .then((response) => {
+        const changes = response.data.suggested_changes;
+
+        switch (responseFormat) {
+          case 'DIFF':
+            const diffFormat = changes as FixerAPI.FixerRunResponse.Data.DiffFormat;
+            return diffFormat.diff ?? '';
+          case 'CHANGED_FILES':
+            const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
+            return changedFormat.changed_files ?? [];
+          case 'ALL_FILES':
+            const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
+            return allFilesFormat.all_files ?? [];
+          default:
+            // Fallback to all files if format is somehow invalid
+            const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
+            return fallbackFormat.all_files ?? [];
+        }
+      });
   }
 }
 Benchify.Fixer = Fixer;
