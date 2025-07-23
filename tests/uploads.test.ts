@@ -69,7 +69,8 @@ describe('toFile', () => {
     const result = await toFile(input);
     const file: File = result;
     const blob: Blob = result;
-    void file, blob;
+    void file;
+    void blob;
   });
 });
 
