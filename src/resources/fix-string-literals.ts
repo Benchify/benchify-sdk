@@ -47,19 +47,19 @@ export interface RequestTestFile {
  */
 export interface FixStringLiteralRunResponse {
   /**
-   * The actual response data
+   * Response model for the /api/fix_string_literals endpoint
    */
   data: FixStringLiteralRunResponse.Data;
 
   /**
-   * Meta information
+   * Meta information for API responses
    */
-  meta?: Shared.ResponseMeta;
+  meta: Shared.ResponseMeta;
 }
 
 export namespace FixStringLiteralRunResponse {
   /**
-   * The actual response data
+   * Response model for the /api/fix_string_literals endpoint
    */
   export interface Data {
     /**
@@ -142,12 +142,12 @@ export namespace FixStringLiteralRunResponse {
         /**
          * Column number (1-based)
          */
-        column: number | null;
+        column: number;
 
         /**
          * Line number (1-based)
          */
-        line: number | null;
+        line: number;
 
         /**
          * Span of the error
@@ -157,7 +157,7 @@ export namespace FixStringLiteralRunResponse {
         /**
          * Position of the first character of the error location in the source code
          */
-        starting_character_position: number | null;
+        starting_character_position: number;
       }
     }
   }
