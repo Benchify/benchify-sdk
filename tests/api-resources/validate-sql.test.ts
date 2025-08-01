@@ -22,6 +22,6 @@ describe('resource validateSql', () => {
 
   // skipped: tests are disabled for the time being
   test.skip('validate: required and optional params', async () => {
-    const response = await client.validateSql.validate({ sql: 'x', event_id: 'x' });
+    const response = await client.validateSql.validate({ sql: 'x', meta: { external_id: 'external_id' } });
   });
 });

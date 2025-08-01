@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -25,40 +24,23 @@ export class ValidateSql extends APIResource {
 }
 
 /**
- * Wrapped response model for benchify-api compatibility
+ * Response model for the /api/validate_sql endpoint
  */
 export interface ValidateSqlValidateResponse {
   /**
-   * Response model for the /api/validate_sql endpoint
+   * Validation message or error details
    */
-  data: ValidateSqlValidateResponse.Data;
+  message: string;
 
   /**
-   * Meta information for API responses
+   * Whether the SQL is valid
    */
-  meta: Shared.ResponseMeta;
-}
+  valid: boolean;
 
-export namespace ValidateSqlValidateResponse {
   /**
-   * Response model for the /api/validate_sql endpoint
+   * Error details if validation fails
    */
-  export interface Data {
-    /**
-     * Validation message or error details
-     */
-    message: string;
-
-    /**
-     * Whether the SQL is valid
-     */
-    valid: boolean;
-
-    /**
-     * Error details if validation fails
-     */
-    error?: string | null;
-  }
+  error?: string | null;
 }
 
 export interface ValidateSqlValidateParams {
@@ -68,9 +50,21 @@ export interface ValidateSqlValidateParams {
   sql: string;
 
   /**
-   * Unique identifier for the event
+   * Meta information for API requests
    */
-  event_id?: string | null;
+  meta?: ValidateSqlValidateParams.Meta | null;
+}
+
+export namespace ValidateSqlValidateParams {
+  /**
+   * Meta information for API requests
+   */
+  export interface Meta {
+    /**
+     * Customer tracking identifier
+     */
+    external_id?: string | null;
+  }
 }
 
 export declare namespace ValidateSql {
