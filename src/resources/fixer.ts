@@ -92,12 +92,12 @@ export namespace DiagnosticResponse {
       /**
        * Column number (1-based)
        */
-      column: number;
+      column: number | null;
 
       /**
        * Line number (1-based)
        */
-      line: number;
+      line: number | null;
 
       /**
        * Span of the error
@@ -107,7 +107,7 @@ export namespace DiagnosticResponse {
       /**
        * Position of the first character of the error location in the source code
        */
-      starting_character_position: number;
+      starting_character_position: number | null;
     }
   }
 }
@@ -132,19 +132,19 @@ export interface FileChange {
  */
 export interface FixerRunResponse {
   /**
-   * Response model for the /api/fixer endpoint
+   * The actual response data
    */
   data: FixerRunResponse.Data;
 
   /**
-   * Meta information for API responses
+   * Meta information
    */
-  meta: Shared.ResponseMeta;
+  meta?: Shared.ResponseMeta;
 }
 
 export namespace FixerRunResponse {
   /**
-   * Response model for the /api/fixer endpoint
+   * The actual response data
    */
   export interface Data {
     /**
