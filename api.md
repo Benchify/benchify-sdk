@@ -27,6 +27,12 @@ Methods:
 
 - <code title="post /v1/fix-string-literals">client.fixStringLiterals.<a href="./src/resources/fix-string-literals.ts">run</a>({ ...params }) -> FixStringLiteralRunResponse</code>
 
-# ValidateSql
+# ValidateTemplate
 
-# Heartbeat
+Types:
+
+- <code><a href="./src/resources/validate-template.ts">ValidateTemplateValidateResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/validate-template">client.validateTemplate.<a href="./src/resources/validate-template.ts">validate</a>({ ...params }) -> ValidateTemplateValidateResponse</code>

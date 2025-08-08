@@ -14,5 +14,8 @@ export {
   type FixerRunResponse,
   type FixerRunParams,
 } from './fixer';
-export { Heartbeat } from './heartbeat';
-export { ValidateSql } from './validate-sql';
+export {
+  ValidateTemplate,
+  type ValidateTemplateValidateResponse,
+  type ValidateTemplateValidateParams,
+} from './validate-template';
