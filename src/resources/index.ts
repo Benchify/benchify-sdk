@@ -14,5 +14,5 @@ export {
   type FixerRunResponse,
   type FixerRunParams,
 } from './fixer';
-export { Heartbeat, type HeartbeatCheckResponse } from './heartbeat';
+export { Heartbeat } from './heartbeat';
 export { ValidateSql } from './validate-sql';

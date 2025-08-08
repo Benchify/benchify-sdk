@@ -106,12 +106,7 @@ export namespace FixStringLiteralRunResponse {
       /**
        * Category of diagnostic
        */
-      category: 'typescript' | 'import_export';
-
-      /**
-       * Code given by the diagnostic generator
-       */
-      code: number;
+      category: 'typescript';
 
       /**
        * File where diagnostic occurs
@@ -127,6 +122,11 @@ export namespace FixStringLiteralRunResponse {
        * Diagnostic message
        */
       message: string;
+
+      /**
+       * Code given by the diagnostic generator
+       */
+      code?: number | null;
 
       /**
        * Surrounding code context
