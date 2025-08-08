@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-alpha.24 (2025-08-08)
+
+Full Changelog: [v0.1.0-alpha.23...v0.1.0-alpha.24](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.23...v0.1.0-alpha.24)
+
+### Features
+
+* **api:** add mcp server ([4d21d1a](https://github.com/Benchify/benchify-sdk/commit/4d21d1a6e72ce6879b8a80c9e3b18365dcdae297))
+* **api:** manual updates, remove validate-sql and heartbeat public endpoints ([3ff5766](https://github.com/Benchify/benchify-sdk/commit/3ff57664fb16cca61433a9ca671b951fbc4d2549))
+* **api:** manual updates, remove validate-template and fix_string_literals ([ca198a2](https://github.com/Benchify/benchify-sdk/commit/ca198a27c4449030953d6a075104eee1c31e99dd))
+
 ## 0.1.0-alpha.23 (2025-08-08)
 
 Full Changelog: [v0.1.0-alpha.22...v0.1.0-alpha.23](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.22...v0.1.0-alpha.23)
