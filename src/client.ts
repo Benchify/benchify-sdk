@@ -24,11 +24,7 @@ import {
 } from './resources/fix-string-literals';
 import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
 import { Heartbeat, HeartbeatCheckResponse } from './resources/heartbeat';
-import {
-  ValidateSql,
-  ValidateSqlValidateParams,
-  ValidateSqlValidateResponse,
-} from './resources/validate-sql';
+import { ValidateSql } from './resources/validate-sql';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -753,11 +749,7 @@ export declare namespace Benchify {
     type FixStringLiteralRunParams as FixStringLiteralRunParams,
   };
 
-  export {
-    ValidateSql as ValidateSql,
-    type ValidateSqlValidateResponse as ValidateSqlValidateResponse,
-    type ValidateSqlValidateParams as ValidateSqlValidateParams,
-  };
+  export { ValidateSql as ValidateSql };
 
   export { Heartbeat as Heartbeat, type HeartbeatCheckResponse as HeartbeatCheckResponse };
 

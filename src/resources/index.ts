@@ -15,8 +15,4 @@ export {
   type FixerRunParams,
 } from './fixer';
 export { Heartbeat, type HeartbeatCheckResponse } from './heartbeat';
-export {
-  ValidateSql,
-  type ValidateSqlValidateResponse,
-  type ValidateSqlValidateParams,
-} from './validate-sql';
+export { ValidateSql } from './validate-sql';

@@ -47,19 +47,24 @@ export interface RequestTestFile {
  */
 export interface FixStringLiteralRunResponse {
   /**
-   * Response model for the /api/fix_string_literals endpoint
+   * The actual response data
    */
   data: FixStringLiteralRunResponse.Data;
 
   /**
-   * Meta information for API responses
+   * The error from the API query
    */
-  meta: Shared.ResponseMeta;
+  error?: FixStringLiteralRunResponse.Error | null;
+
+  /**
+   * Meta information
+   */
+  meta?: Shared.ResponseMeta;
 }
 
 export namespace FixStringLiteralRunResponse {
   /**
-   * Response model for the /api/fix_string_literals endpoint
+   * The actual response data
    */
   export interface Data {
     /**
@@ -142,12 +147,12 @@ export namespace FixStringLiteralRunResponse {
         /**
          * Column number (1-based)
          */
-        column: number;
+        column: number | null;
 
         /**
          * Line number (1-based)
          */
-        line: number;
+        line: number | null;
 
         /**
          * Span of the error
@@ -157,9 +162,34 @@ export namespace FixStringLiteralRunResponse {
         /**
          * Position of the first character of the error location in the source code
          */
-        starting_character_position: number;
+        starting_character_position: number | null;
       }
     }
+  }
+
+  /**
+   * The error from the API query
+   */
+  export interface Error {
+    /**
+     * The error code
+     */
+    code: string;
+
+    /**
+     * The error message
+     */
+    message: string;
+
+    /**
+     * Details about what caused the error, if available
+     */
+    details?: string;
+
+    /**
+     * Potential suggestions about how to fix the error, if applicable
+     */
+    suggestions?: Array<string>;
   }
 }
 
