@@ -23,8 +23,11 @@ import {
   RequestTestFile,
 } from './resources/fix-string-literals';
 import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import { Heartbeat } from './resources/heartbeat';
-import { ValidateSql } from './resources/validate-sql';
+import {
+  ValidateTemplate,
+  ValidateTemplateValidateParams,
+  ValidateTemplateValidateResponse,
+} from './resources/validate-template';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -724,13 +727,11 @@ export class Benchify {
 
   fixer: API.Fixer = new API.Fixer(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
-  validateSql: API.ValidateSql = new API.ValidateSql(this);
-  heartbeat: API.Heartbeat = new API.Heartbeat(this);
+  validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
 }
 Benchify.Fixer = Fixer;
 Benchify.FixStringLiterals = FixStringLiterals;
-Benchify.ValidateSql = ValidateSql;
-Benchify.Heartbeat = Heartbeat;
+Benchify.ValidateTemplate = ValidateTemplate;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
@@ -749,9 +750,11 @@ export declare namespace Benchify {
     type FixStringLiteralRunParams as FixStringLiteralRunParams,
   };
 
-  export { ValidateSql as ValidateSql };
-
-  export { Heartbeat as Heartbeat };
+  export {
+    ValidateTemplate as ValidateTemplate,
+    type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
+    type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
+  };
 
   export type ResponseMeta = API.ResponseMeta;
 }
