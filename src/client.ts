@@ -23,7 +23,7 @@ import {
   RequestTestFile,
 } from './resources/fix-string-literals';
 import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import { Heartbeat, HeartbeatCheckResponse } from './resources/heartbeat';
+import { Heartbeat } from './resources/heartbeat';
 import { ValidateSql } from './resources/validate-sql';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -751,7 +751,7 @@ export declare namespace Benchify {
 
   export { ValidateSql as ValidateSql };
 
-  export { Heartbeat as Heartbeat, type HeartbeatCheckResponse as HeartbeatCheckResponse };
+  export { Heartbeat as Heartbeat };
 
   export type ResponseMeta = API.ResponseMeta;
 }
