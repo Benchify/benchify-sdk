@@ -5,6 +5,11 @@
  */
 export interface ResponseMeta {
   /**
+   * Customer tracking identifier
+   */
+  external_id?: string | null;
+
+  /**
    * Unique trace identifier for the request
    */
   trace_id?: string | null;

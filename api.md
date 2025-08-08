@@ -29,14 +29,6 @@ Methods:
 
 # ValidateSql
 
-Types:
-
-- <code><a href="./src/resources/validate-sql.ts">ValidateSqlValidateResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/validate-sql">client.validateSql.<a href="./src/resources/validate-sql.ts">validate</a>({ ...params }) -> ValidateSqlValidateResponse</code>
-
 # Heartbeat
 
 Types:
