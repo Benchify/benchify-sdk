@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.0-alpha.23 (2025-08-08)
+
+Full Changelog: [v0.1.0-alpha.22...v0.1.0-alpha.23](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.22...v0.1.0-alpha.23)
+
+### Features
+
+* **api:** api update ([00657ac](https://github.com/Benchify/benchify-sdk/commit/00657ac5285f75039077ec655ed082cc0962e9cc))
+* **api:** api update ([5c8cc23](https://github.com/Benchify/benchify-sdk/commit/5c8cc23fbd238edd652739d5bd50db377cbfdf4b))
+* **api:** update via SDK Studio ([f0fd679](https://github.com/Benchify/benchify-sdk/commit/f0fd679d2823c0f7fcef47860d9fafec132c2345))
+* **api:** update via SDK Studio ([b7804c2](https://github.com/Benchify/benchify-sdk/commit/b7804c249ddc67177b78b1172ded3c06681287ed))
+
+
+### Chores
+
+* **internal:** move publish config ([2be9831](https://github.com/Benchify/benchify-sdk/commit/2be983164a2345d85b376f8e1caaa10fa79034dc))
+* **internal:** remove redundant imports config ([b893dd5](https://github.com/Benchify/benchify-sdk/commit/b893dd5698e3a09057e816b40155b43cef8770db))
+
 ## 0.1.0-alpha.22 (2025-07-23)
 
 Full Changelog: [v0.1.0-alpha.21...v0.1.0-alpha.22](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.21...v0.1.0-alpha.22)
