@@ -51,12 +51,7 @@ export namespace DiagnosticResponse {
     /**
      * Category of diagnostic
      */
-    category: 'typescript' | 'import_export';
-
-    /**
-     * Code given by the diagnostic generator
-     */
-    code: number;
+    category: 'typescript';
 
     /**
      * File where diagnostic occurs
@@ -72,6 +67,11 @@ export namespace DiagnosticResponse {
      * Diagnostic message
      */
     message: string;
+
+    /**
+     * Code given by the diagnostic generator
+     */
+    code?: number | null;
 
     /**
      * Surrounding code context
@@ -239,16 +239,6 @@ export interface FixerRunParams {
   files: Array<FixStringLiteralsAPI.RequestTestFile>;
 
   /**
-   * Command to build the project
-   */
-  build_cmd?: string;
-
-  /**
-   * Command to run the development server
-   */
-  dev_cmd?: string;
-
-  /**
    * Configuration object for specifying which fixes to apply
    */
   fixes?: FixerRunParams.Fixes | null;
@@ -264,19 +254,9 @@ export interface FixerRunParams {
   response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
 
   /**
-   * Return before and after diagnostics when fixing.
-   */
-  return_diagnostics?: boolean;
-
-  /**
    * ID of the template to use for the fixer process
    */
   template_id?: string | null;
-
-  /**
-   * Command to run TypeScript compiler
-   */
-  tsc_cmd?: string;
 }
 
 export namespace FixerRunParams {
