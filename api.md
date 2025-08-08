@@ -15,24 +15,3 @@ Types:
 Methods:
 
 - <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">run</a>({ ...params }) -> FixerRunResponse</code>
-
-# FixStringLiterals
-
-Types:
-
-- <code><a href="./src/resources/fix-string-literals.ts">RequestTestFile</a></code>
-- <code><a href="./src/resources/fix-string-literals.ts">FixStringLiteralRunResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/fix-string-literals">client.fixStringLiterals.<a href="./src/resources/fix-string-literals.ts">run</a>({ ...params }) -> FixStringLiteralRunResponse</code>
-
-# ValidateTemplate
-
-Types:
-
-- <code><a href="./src/resources/validate-template.ts">ValidateTemplateValidateResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/validate-template">client.validateTemplate.<a href="./src/resources/validate-template.ts">validate</a>({ ...params }) -> ValidateTemplateValidateResponse</code>

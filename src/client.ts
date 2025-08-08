@@ -16,18 +16,7 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import {
-  FixStringLiteralRunParams,
-  FixStringLiteralRunResponse,
-  FixStringLiterals,
-  RequestTestFile,
-} from './resources/fix-string-literals';
 import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import {
-  ValidateTemplate,
-  ValidateTemplateValidateParams,
-  ValidateTemplateValidateResponse,
-} from './resources/validate-template';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -726,12 +715,8 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
-  fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
-  validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
 }
 Benchify.Fixer = Fixer;
-Benchify.FixStringLiterals = FixStringLiterals;
-Benchify.ValidateTemplate = ValidateTemplate;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
@@ -741,19 +726,6 @@ export declare namespace Benchify {
     type FileChange as FileChange,
     type FixerRunResponse as FixerRunResponse,
     type FixerRunParams as FixerRunParams,
-  };
-
-  export {
-    FixStringLiterals as FixStringLiterals,
-    type RequestTestFile as RequestTestFile,
-    type FixStringLiteralRunResponse as FixStringLiteralRunResponse,
-    type FixStringLiteralRunParams as FixStringLiteralRunParams,
-  };
-
-  export {
-    ValidateTemplate as ValidateTemplate,
-    type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
-    type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
   };
 
   export type ResponseMeta = API.ResponseMeta;

@@ -2,7 +2,6 @@
 
 import { APIResource } from '../core/resource';
 import * as FixerAPI from './fixer';
-import * as FixStringLiteralsAPI from './fix-string-literals';
 import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
@@ -236,7 +235,7 @@ export interface FixerRunParams {
   /**
    * List of files to process
    */
-  files: Array<FixStringLiteralsAPI.RequestTestFile>;
+  files: Array<FixerRunParams.File>;
 
   /**
    * Configuration object for specifying which fixes to apply
@@ -260,6 +259,21 @@ export interface FixerRunParams {
 }
 
 export namespace FixerRunParams {
+  /**
+   * Model for file data in requests
+   */
+  export interface File {
+    /**
+     * Original contents of the file before any modifications
+     */
+    contents: string;
+
+    /**
+     * Path to the file
+     */
+    path: string;
+  }
+
   /**
    * Configuration object for specifying which fixes to apply
    */
