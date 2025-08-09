@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-alpha.25 (2025-08-09)
+
+Full Changelog: [v0.1.0-alpha.24...v0.1.0-alpha.25](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.24...v0.1.0-alpha.25)
+
+### Features
+
+* **api:** manual updates ([23acaa8](https://github.com/Benchify/benchify-sdk/commit/23acaa813cea6d49a6a39b635cfc4b93fe41b359))
+
+
+### Chores
+
+* **internal:** update comment in script ([67c2915](https://github.com/Benchify/benchify-sdk/commit/67c2915499f7c544992e31d33d8a7973a1929dbf))
+* update @stainless-api/prism-cli to v5.15.0 ([6b1007a](https://github.com/Benchify/benchify-sdk/commit/6b1007a657ef090928a85a9d97b50b01e957d26b))
+
 ## 0.1.0-alpha.24 (2025-08-08)
 
 Full Changelog: [v0.1.0-alpha.23...v0.1.0-alpha.24](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.23...v0.1.0-alpha.24)
