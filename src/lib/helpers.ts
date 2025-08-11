@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import minimatch from 'minimatch';
-import pkg from 'glob';
-const { glob } = pkg;
 
 export interface FileData {
   path: string;
