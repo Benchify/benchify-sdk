@@ -20,3 +20,5 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './core/error';
+
+export { collectFiles, applyChanges, type FileData } from './lib/helpers';
