@@ -31,47 +31,61 @@ const DEFAULT_IGNORE = [
   '**/.env*',
 ];
 
+function walkDirectory(dir: string, basePath: string, patterns: string[], ignore: string[]): string[] {
+  const files: string[] = [];
+
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relativePath = path.relative(basePath, fullPath);
+
+      if (ignore.some((ignorePattern) => minimatch(relativePath, ignorePattern))) {
+        continue;
+      }
+
+      if (entry.isDirectory()) {
+        files.push(...walkDirectory(fullPath, basePath, patterns, ignore));
+      } else if (entry.isFile()) {
+        if (patterns.some((pattern) => minimatch(relativePath, pattern))) {
+          files.push(relativePath);
+        }
+      }
+    }
+  } catch {
+    // Skip directories we can't read
+  }
+
+  return files;
+}
+
 export async function collectFiles({
   basePath = process.cwd(),
   patterns = DEFAULT_PATTERNS,
   ignore = DEFAULT_IGNORE,
 }: { basePath?: string; patterns?: string[]; ignore?: string[] } = {}): Promise<FileData[]> {
-  const originalCwd = process.cwd();
+  const resolvedBasePath = path.resolve(basePath);
+  const filePaths = walkDirectory(resolvedBasePath, resolvedBasePath, patterns, ignore);
 
-  try {
-    process.chdir(basePath);
+  const files: FileData[] = [];
 
-    const allFilePaths: string[] = [];
-    for (const pattern of patterns) {
-      const globResult = glob.sync(pattern, { nodir: true });
-      const filtered = globResult.filter(
-        (match: string) => !ignore.some((ignorePattern) => minimatch(match, ignorePattern)),
-      );
-      allFilePaths.push(...filtered);
-    }
-
-    const filePaths = [...new Set(allFilePaths)];
-
-    const files: FileData[] = [];
-
-    for (const filePath of filePaths) {
-      try {
-        const contents = fs.readFileSync(path.resolve(basePath, filePath), 'utf8');
-        if (contents.trim()) {
-          files.push({
-            path: filePath,
-            contents,
-          });
-        }
-      } catch {
-        continue;
+  for (const filePath of filePaths) {
+    try {
+      const fullPath = path.join(resolvedBasePath, filePath);
+      const contents = fs.readFileSync(fullPath, 'utf8');
+      if (contents.trim()) {
+        files.push({
+          path: filePath,
+          contents,
+        });
       }
+    } catch {
+      continue;
     }
-
-    return files;
-  } finally {
-    process.chdir(originalCwd);
   }
+
+  return files;
 }
 
 export function applyChanges({
