@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { glob } from 'glob';
 import minimatch from 'minimatch';
+import pkg from 'glob';
+const { glob } = pkg;
 
 export interface FileData {
   path: string;
@@ -9,8 +10,13 @@ export interface FileData {
 }
 
 const DEFAULT_PATTERNS = [
-  '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx',
-  '**/package.json', '**/tsconfig*.json', '**/*.config.*'
+  '**/*.ts',
+  '**/*.tsx',
+  '**/*.js',
+  '**/*.jsx',
+  '**/package.json',
+  '**/tsconfig*.json',
+  '**/*.config.*',
 ];
 
 const DEFAULT_IGNORE = [
@@ -22,28 +28,28 @@ const DEFAULT_IGNORE = [
   '.next/**',
   'coverage/**',
   '**/__tests__/**',
-  '**/.env*'
+  '**/.env*',
 ];
 
 export async function collectFiles(
   basePath: string = process.cwd(),
   patterns: string[] = DEFAULT_PATTERNS,
-  ignore: string[] = DEFAULT_IGNORE
+  ignore: string[] = DEFAULT_IGNORE,
 ): Promise<FileData[]> {
   const originalCwd = process.cwd();
-  
+
   try {
     process.chdir(basePath);
-    
+
     const allFilePaths: string[] = [];
     for (const pattern of patterns) {
       const globResult = glob.sync(pattern, { nodir: true });
-      const filtered = globResult.filter((match: string) => 
-        !ignore.some(ignorePattern => minimatch(match, ignorePattern))
+      const filtered = globResult.filter(
+        (match: string) => !ignore.some((ignorePattern) => minimatch(match, ignorePattern)),
       );
       allFilePaths.push(...filtered);
     }
-    
+
     const filePaths = [...new Set(allFilePaths)];
 
     const files: FileData[] = [];
@@ -52,9 +58,9 @@ export async function collectFiles(
       try {
         const contents = fs.readFileSync(path.resolve(basePath, filePath), 'utf8');
         if (contents.trim()) {
-          files.push({ 
-            path: filePath, 
-            contents
+          files.push({
+            path: filePath,
+            contents,
           });
         }
       } catch {
@@ -68,15 +74,12 @@ export async function collectFiles(
   }
 }
 
-export function applyChanges(
-  changedFiles: FileData[],
-  basePath: string = process.cwd()
-): void {
+export function applyChanges(changedFiles: FileData[], basePath: string = process.cwd()): void {
   for (const file of changedFiles) {
     try {
       const fullPath = path.resolve(basePath, file.path);
       const dirPath = path.dirname(fullPath);
-      
+
       fs.mkdirSync(dirPath, { recursive: true });
       fs.writeFileSync(fullPath, file.contents, 'utf8');
     } catch {
