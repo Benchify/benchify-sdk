@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { glob } from 'glob';
+import minimatch from 'minimatch';
 
 export interface FileData {
   path: string;
@@ -20,6 +21,7 @@ const DEFAULT_IGNORE = [
   'build/**',
   '.next/**',
   'coverage/**',
+  '**/__tests__/**',
   '**/.env*'
 ];
 
@@ -35,12 +37,11 @@ export async function collectFiles(
     
     const allFilePaths: string[] = [];
     for (const pattern of patterns) {
-      const filePaths = await glob(pattern, {
-        ignore,
-        nodir: true,
-        absolute: false
-      });
-      allFilePaths.push(...filePaths);
+      const globResult = glob.sync(pattern, { nodir: true });
+      const filtered = globResult.filter((match: string) => 
+        !ignore.some(ignorePattern => minimatch(match, ignorePattern))
+      );
+      allFilePaths.push(...filtered);
     }
     
     const filePaths = [...new Set(allFilePaths)];
@@ -49,11 +50,11 @@ export async function collectFiles(
 
     for (const filePath of filePaths) {
       try {
-        const content = fs.readFileSync(path.resolve(basePath, filePath), 'utf8');
-        if (content.trim()) {
+        const contents = fs.readFileSync(path.resolve(basePath, filePath), 'utf8');
+        if (contents.trim()) {
           files.push({ 
             path: filePath, 
-            content 
+            contents
           });
         }
       } catch {
