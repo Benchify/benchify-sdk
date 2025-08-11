@@ -31,11 +31,11 @@ const DEFAULT_IGNORE = [
   '**/.env*',
 ];
 
-export async function collectFiles(
-  basePath: string = process.cwd(),
-  patterns: string[] = DEFAULT_PATTERNS,
-  ignore: string[] = DEFAULT_IGNORE,
-): Promise<FileData[]> {
+export async function collectFiles({
+  basePath = process.cwd(),
+  patterns = DEFAULT_PATTERNS,
+  ignore = DEFAULT_IGNORE,
+}: { basePath?: string; patterns?: string[]; ignore?: string[] } = {}): Promise<FileData[]> {
   const originalCwd = process.cwd();
 
   try {
@@ -74,8 +74,14 @@ export async function collectFiles(
   }
 }
 
-export function applyChanges(changedFiles: FileData[], basePath: string = process.cwd()): void {
-  for (const file of changedFiles) {
+export function applyChanges({
+  files,
+  basePath = process.cwd(),
+}: {
+  files: FileData[];
+  basePath?: string;
+}): void {
+  for (const file of files) {
     try {
       const fullPath = path.resolve(basePath, file.path);
       const dirPath = path.dirname(fullPath);
