@@ -45,10 +45,30 @@ export const tool: Tool = {
           required: ['contents', 'path'],
         },
       },
+      fix_types: {
+        type: 'array',
+        title: 'Fix Types',
+        description: 'Configuration for which fix types to apply',
+        items: {
+          type: 'string',
+          title: 'FixTypeName',
+          description: 'Enumeration of available fix types',
+          enum: [
+            'import_export',
+            'string_literals',
+            'ts_suggestions',
+            'css',
+            'tailwind',
+            'react',
+            'ai_fallback',
+            'types',
+          ],
+        },
+      },
       fixes: {
         type: 'object',
         title: 'FixConfigObject',
-        description: 'Configuration object for specifying which fixes to apply',
+        description: 'DEPRECATED: legacy boolean flags for which fixes to apply.',
         properties: {
           css: {
             type: 'boolean',
