@@ -238,21 +238,7 @@ export interface FixerRunParams {
   files: Array<FixerRunParams.File>;
 
   /**
-   * Configuration for which fix types to apply
-   */
-  fix_types?: Array<
-    | 'import_export'
-    | 'string_literals'
-    | 'ts_suggestions'
-    | 'css'
-    | 'tailwind'
-    | 'react'
-    | 'ai_fallback'
-    | 'types'
-  >;
-
-  /**
-   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
+   * Configuration object for specifying which fixes to apply
    */
   fixes?: FixerRunParams.Fixes | null;
 
@@ -289,38 +275,38 @@ export namespace FixerRunParams {
   }
 
   /**
-   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
+   * Configuration object for specifying which fixes to apply
    */
   export interface Fixes {
     /**
-     * @deprecated Whether to fix CSS issues
+     * Whether to fix CSS issues
      */
-    css?: boolean | null;
+    css?: boolean;
 
     /**
-     * @deprecated Whether to fix import issues
+     * Whether to fix import issues
      */
-    imports?: boolean | null;
+    imports?: boolean;
 
     /**
-     * @deprecated Whether to fix React issues
+     * Whether to fix React issues
      */
-    react?: boolean | null;
+    react?: boolean;
 
     /**
-     * @deprecated Whether to fix string literal issues
+     * Whether to fix string literal issues
      */
-    stringLiterals?: boolean | null;
+    stringLiterals?: boolean;
 
     /**
-     * @deprecated Whether to fix Tailwind issues
+     * Whether to fix Tailwind issues
      */
-    tailwind?: boolean | null;
+    tailwind?: boolean;
 
     /**
-     * @deprecated Whether to fix TypeScript suggestions
+     * Whether to fix TypeScript suggestions
      */
-    tsSuggestions?: boolean | null;
+    tsSuggestions?: boolean;
   }
 
   /**
