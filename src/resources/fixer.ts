@@ -48,11 +48,6 @@ export namespace DiagnosticResponse {
    */
   export interface FileToDiagnostic {
     /**
-     * Category of diagnostic
-     */
-    category: 'typescript';
-
-    /**
      * File where diagnostic occurs
      */
     file_path: string;
@@ -66,6 +61,18 @@ export namespace DiagnosticResponse {
      * Diagnostic message
      */
     message: string;
+
+    /**
+     * Type of the diagnostic
+     */
+    type:
+      | 'type_error'
+      | 'string_literal'
+      | 'import_export'
+      | 'implicit_any'
+      | 'implicit_any_array'
+      | 'invalid_jsx'
+      | 'unclassified';
 
     /**
      * Code given by the diagnostic generator
@@ -238,7 +245,21 @@ export interface FixerRunParams {
   files: Array<FixerRunParams.File>;
 
   /**
-   * Configuration object for specifying which fixes to apply
+   * Configuration for which fix types to apply
+   */
+  fix_types?: Array<
+    | 'import_export'
+    | 'string_literals'
+    | 'ts_suggestions'
+    | 'css'
+    | 'tailwind'
+    | 'react'
+    | 'ai_fallback'
+    | 'types'
+  >;
+
+  /**
+   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
    */
   fixes?: FixerRunParams.Fixes | null;
 
@@ -275,38 +296,38 @@ export namespace FixerRunParams {
   }
 
   /**
-   * Configuration object for specifying which fixes to apply
+   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
    */
   export interface Fixes {
     /**
-     * Whether to fix CSS issues
+     * @deprecated Whether to fix CSS issues
      */
-    css?: boolean;
+    css?: boolean | null;
 
     /**
-     * Whether to fix import issues
+     * @deprecated Whether to fix import issues
      */
-    imports?: boolean;
+    imports?: boolean | null;
 
     /**
-     * Whether to fix React issues
+     * @deprecated Whether to fix React issues
      */
-    react?: boolean;
+    react?: boolean | null;
 
     /**
-     * Whether to fix string literal issues
+     * @deprecated Whether to fix string literal issues
      */
-    stringLiterals?: boolean;
+    stringLiterals?: boolean | null;
 
     /**
-     * Whether to fix Tailwind issues
+     * @deprecated Whether to fix Tailwind issues
      */
-    tailwind?: boolean;
+    tailwind?: boolean | null;
 
     /**
-     * Whether to fix TypeScript suggestions
+     * @deprecated Whether to fix TypeScript suggestions
      */
-    tsSuggestions?: boolean;
+    tsSuggestions?: boolean | null;
   }
 
   /**

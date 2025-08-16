@@ -786,7 +786,9 @@ export class Benchify {
       });
   }
 }
+
 Benchify.Fixer = Fixer;
+
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
