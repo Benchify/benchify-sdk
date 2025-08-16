@@ -716,7 +716,9 @@ export class Benchify {
 
   fixer: API.Fixer = new API.Fixer(this);
 }
+
 Benchify.Fixer = Fixer;
+
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
