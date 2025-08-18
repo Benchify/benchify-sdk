@@ -24,6 +24,7 @@ describe('resource fixer', () => {
   test.skip('run: required and optional params', async () => {
     const response = await client.fixer.run({
       files: [{ contents: 'contents', path: 'x' }],
+      bundle: true,
       fix_types: ['import_export'],
       fixes: {
         css: true,
