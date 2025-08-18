@@ -30,16 +30,6 @@ export interface DiagnosticResponse {
    * Diagnostics grouped by file
    */
   file_to_diagnostics?: { [key: string]: Array<DiagnosticResponse.FileToDiagnostic> };
-
-  /**
-   * Human-readable summary of issues
-   */
-  summary?: string;
-
-  /**
-   * Total number of diagnostics
-   */
-  total_count?: number;
 }
 
 export namespace DiagnosticResponse {
@@ -83,11 +73,6 @@ export namespace DiagnosticResponse {
      * Surrounding code context
      */
     context?: string | null;
-
-    /**
-     * Diagnostic category
-     */
-    severity?: 'error' | 'warning';
   }
 
   export namespace FileToDiagnostic {
@@ -159,19 +144,14 @@ export namespace FixerRunResponse {
    */
   export interface Data {
     /**
-     * Number of files processed
-     */
-    files_processed: number;
-
-    /**
      * Final per-file status after fixing
      */
     status: Data.Status;
 
     /**
-     * Information about fixed files
+     * Bundled files
      */
-    fixed_files?: { [key: string]: unknown } | null;
+    bundled_files?: Array<FixerAPI.FileChange> | null;
 
     /**
      * Changes made by the fixer in the requested format
@@ -245,18 +225,14 @@ export interface FixerRunParams {
   files: Array<FixerRunParams.File>;
 
   /**
+   * Whether to bundle the project (experimental)
+   */
+  bundle?: boolean;
+
+  /**
    * Configuration for which fix types to apply
    */
-  fix_types?: Array<
-    | 'import_export'
-    | 'string_literals'
-    | 'ts_suggestions'
-    | 'css'
-    | 'tailwind'
-    | 'react'
-    | 'ai_fallback'
-    | 'types'
-  >;
+  fix_types?: Array<'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types'>;
 
   /**
    * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
