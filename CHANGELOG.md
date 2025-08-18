@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.0-alpha.27 (2025-08-18)
+
+Full Changelog: [v0.1.0-alpha.26...v0.1.0-alpha.27](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.26...v0.1.0-alpha.27)
+
+### Features
+
+* **api:** api update ([38868ee](https://github.com/Benchify/benchify-sdk/commit/38868ee05dcb933892f6832bf774a82920b3e859))
+* **api:** api update ([dc63afb](https://github.com/Benchify/benchify-sdk/commit/dc63afb29c6736cabe999255ecb8e92d3bfbb763))
+* **api:** api update ([8d0d58a](https://github.com/Benchify/benchify-sdk/commit/8d0d58adfb215d36ffbc970a8bd28f1ad4e6da78))
+* **api:** api update ([585d01e](https://github.com/Benchify/benchify-sdk/commit/585d01e40f89c2d7a4cde9cbda7efcb65b5b70b4))
+
+
+### Bug Fixes
+
+* **mcp:** generate additionalProperties=true for map schemas to avoid validation issues ([cf925ad](https://github.com/Benchify/benchify-sdk/commit/cf925ad24dc8709fe0ed65ea1616fec5571496e9))
+
+
+### Chores
+
+* **deps:** update dependency @types/node to v20.17.58 ([6efc5bf](https://github.com/Benchify/benchify-sdk/commit/6efc5bfe43b91566e490952b551dbd3bb5a33085))
+* **internal:** codegen related update ([2c2d91b](https://github.com/Benchify/benchify-sdk/commit/2c2d91b26fc1c2084ebe5fefe223ba3533ee1e20))
+* **internal:** formatting change ([bf8be45](https://github.com/Benchify/benchify-sdk/commit/bf8be452e307ff976370b534681457ca5bcb52c0))
+* **mcp:** document remote server in README.md ([a9436b7](https://github.com/Benchify/benchify-sdk/commit/a9436b77e2c2e5880a66c7e56202284bf52b2118))
+* **mcp:** minor cleanup of types and package.json ([4457795](https://github.com/Benchify/benchify-sdk/commit/4457795b4f1314342ab309c840ad1fe3a3ae1f31))
+* **mcp:** update README ([bf15c28](https://github.com/Benchify/benchify-sdk/commit/bf15c28363dcbed6ca86e84358efff64631893b4))
+
 ## 0.1.0-alpha.26 (2025-08-11)
 
 Full Changelog: [v0.1.0-alpha.25...v0.1.0-alpha.26](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.25...v0.1.0-alpha.26)
