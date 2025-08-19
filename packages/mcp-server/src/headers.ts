@@ -17,7 +17,7 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
   }
 
   const apiKey =
-    req.headers['x-benchify-api-key'] instanceof Array ?
+    Array.isArray(req.headers['x-benchify-api-key']) ?
       req.headers['x-benchify-api-key'][0]
     : req.headers['x-benchify-api-key'];
   return { apiKey };
