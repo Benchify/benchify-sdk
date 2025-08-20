@@ -3275,10 +3275,9 @@ ts-node@^10.5.0:
     v8-compile-cache-lib "^3.0.0"
     yn "3.1.1"
 
-"tsc-multi@https://github.com/stainless-api/tsc-multi/releases/download/v1.1.8/tsc-multi.tgz":
-  version "1.1.8"
-  resolved "https://github.com/stainless-api/tsc-multi/releases/download/v1.1.8/tsc-multi.tgz"
-  integrity sha512-N+vIn8wLhD7IWX8l3OCIse5f2rjXTWf4dQDBJD9HMg4tvBUSEf5Im/VekNnV8gTp6h+dsFXuyTjblJXWkrpEGg==
+"tsc-multi@https://github.com/stainless-api/tsc-multi/releases/download/v1.1.9/tsc-multi.tgz":
+  version "1.1.9"
+  resolved "https://github.com/stainless-api/tsc-multi/releases/download/v1.1.9/tsc-multi.tgz#777f6f5d9e26bf0e94e5170990dd3a841d6707cd"
   dependencies:
     debug "^4.3.7"
     fast-glob "^3.3.2"
