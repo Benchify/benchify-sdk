@@ -9,7 +9,8 @@
     "target": "es2020",
     "lib": [
       "es2020",
-      "dom"
+      "dom",
+      "dom.iterable"
     ],
     "module": "commonjs",
     "jsx": "react-jsx",
