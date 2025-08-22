@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type ClientOptions } from 'benchify/client';
+import { ClientOptions } from 'benchify';
 
 export type WorkerInput = {
   opts: ClientOptions;
