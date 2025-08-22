@@ -22,4 +22,3 @@ export {
 } from './core/error';
 
 export { collectFiles, applyChanges, type FileData } from './lib/helpers';
-export { BundleRenderer, type BundleFile } from './lib/bundle-renderer';

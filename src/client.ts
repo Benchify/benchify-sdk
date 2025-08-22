@@ -691,7 +691,7 @@ export class Benchify {
         // Preserve legacy string encoding behavior for now
         headers.values.has('content-type')) ||
       // `Blob` is superset of `File`
-      body instanceof Blob ||
+      ((globalThis as any).Blob && body instanceof (globalThis as any).Blob) ||
       // `FormData` -> `multipart/form-data`
       body instanceof FormData ||
       // `URLSearchParams` -> `application/x-www-form-urlencoded`
@@ -763,10 +763,23 @@ export class Benchify {
    * // Returns: { files: FileChange[], bundled_files: FileChange[] }
    * ```
    */
-  async runFixer<T extends ResponseFormat = 'ALL_FILES', B extends boolean = false>(
+  // Overload for bundle: true
+  async runFixer<T extends ResponseFormat = 'ALL_FILES'>(
     files: API.FixerRunParams.File[],
-    options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: B },
-  ): Promise<B extends true ? FixerBundleOutput<T> : FixerOutput<T>> {
+    options: Partial<API.FixerRunParams> & { response_format?: T; bundle: true },
+  ): Promise<FixerBundleOutput<T>>;
+  
+  // Overload for bundle: false or undefined
+  async runFixer<T extends ResponseFormat = 'ALL_FILES'>(
+    files: API.FixerRunParams.File[],
+    options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: false },
+  ): Promise<FixerOutput<T>>;
+  
+  // Implementation
+  async runFixer<T extends ResponseFormat = 'ALL_FILES'>(
+    files: API.FixerRunParams.File[],
+    options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: boolean },
+  ): Promise<FixerOutput<T> | FixerBundleOutput<T>> {
     // Default to ALL_FILES if no format specified
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
@@ -813,11 +826,11 @@ export class Benchify {
           return {
             files,
             bundled_files: bundledFiles,
-          } as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
+          } as FixerBundleOutput<T>;
         }
 
         // Otherwise, return just the files (maintains backward compatibility)
-        return files as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
+        return files as FixerOutput<T>;
       });
   }
 }

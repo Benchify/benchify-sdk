@@ -1,8 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type ClientOptions } from 'benchify/client';
-
 import { IncomingMessage } from 'node:http';
+import { ClientOptions } from 'benchify';
 
 export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> => {
   if (req.headers.authorization) {
@@ -17,7 +16,7 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
   }
 
   const apiKey =
-    req.headers['x-benchify-api-key'] instanceof Array ?
+    Array.isArray(req.headers['x-benchify-api-key']) ?
       req.headers['x-benchify-api-key'][0]
     : req.headers['x-benchify-api-key'];
   return { apiKey };
