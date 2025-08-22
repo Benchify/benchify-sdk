@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.29 (2025-08-22)
+
+Full Changelog: [v0.1.0-alpha.28...v0.1.0-alpha.29](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.28...v0.1.0-alpha.29)
+
+### Chores
+
+* sync repo ([4795b02](https://github.com/Benchify/benchify-sdk/commit/4795b02c3312dad027fade5d7454a63f86a0fdb2))
+
 ## 0.1.0-alpha.28 (2025-08-18)
 
 Full Changelog: [v0.1.0-alpha.27...v0.1.0-alpha.28](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.27...v0.1.0-alpha.28)
