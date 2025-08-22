@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.0-alpha.29 (2025-08-22)
+
+Full Changelog: [v0.1.0-alpha.28...v0.1.0-alpha.29](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.28...v0.1.0-alpha.29)
+
+### Features
+
+* **mcp:** add code execution tool ([755fc25](https://github.com/Benchify/benchify-sdk/commit/755fc251a02925bced5f73b942a961ed2abcbec1))
+* **mcp:** add option to infer mcp client ([12d1bef](https://github.com/Benchify/benchify-sdk/commit/12d1bef0f3c7429c6a5f82b840334ee48b3ad24d))
+* **mcp:** parse query string as mcp client options in mcp server ([3fb54a0](https://github.com/Benchify/benchify-sdk/commit/3fb54a0d51f77dd86d0e6c7666123058333f8ad9))
+
+
+### Chores
+
+* add package to package.json ([d006c77](https://github.com/Benchify/benchify-sdk/commit/d006c7716b0140470c57522d9cda009c872d8349))
+* **client:** qualify global Blob ([7af68ae](https://github.com/Benchify/benchify-sdk/commit/7af68aeed755b9dcd72440b5f5b22fe0b4c48ab6))
+* **internal:** codegen related update ([b197499](https://github.com/Benchify/benchify-sdk/commit/b197499d71d4f187ebd591cb5ac0ff88b813fb27))
+* **internal:** make mcp-server publishing public by defaut ([9bc0f6d](https://github.com/Benchify/benchify-sdk/commit/9bc0f6d9a2feef6b5de59bc4097912c60c45d53b))
+* **internal:** refactor array check ([2d8f4e0](https://github.com/Benchify/benchify-sdk/commit/2d8f4e0d383630c887ea1251c2718038a5c4f83b))
+* **mcp:** add cors to oauth metadata route ([f5540c3](https://github.com/Benchify/benchify-sdk/commit/f5540c32a926bbbb1cd96bece245428437d9b97c))
+* **mcp:** update package.json ([15b5198](https://github.com/Benchify/benchify-sdk/commit/15b5198f1de7d2bf0a84e0e1df2134db111b356f))
+* **mcp:** update types ([62ad8ad](https://github.com/Benchify/benchify-sdk/commit/62ad8ad1a5c60ac071af58d911e47dc9404fab7b))
+
 ## 0.1.0-alpha.28 (2025-08-18)
 
 Full Changelog: [v0.1.0-alpha.27...v0.1.0-alpha.28](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.27...v0.1.0-alpha.28)
