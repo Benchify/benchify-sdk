@@ -1,23 +1,32 @@
 {
-  "include": ["src", "tests", "examples"],
+  "include": [
+    "src",
+    "tests",
+    "examples"
+  ],
   "exclude": [],
   "compilerOptions": {
     "target": "es2020",
-    "lib": ["es2020"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "module": "commonjs",
+    "jsx": "react-jsx",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "benchify/*": ["src/*"],
-      "benchify": ["src/index.ts"]
+      "benchify/*": [
+        "src/*"
+      ],
+      "benchify": [
+        "src/index.ts"
+      ]
     },
     "noEmit": true,
-
     "resolveJsonModule": true,
-
     "forceConsistentCasingInFileNames": true,
-
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -32,7 +41,6 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "isolatedModules": false,
-
     "skipLibCheck": true
   }
 }
