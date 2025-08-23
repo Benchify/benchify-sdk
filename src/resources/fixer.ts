@@ -154,6 +154,13 @@ export namespace FixerRunResponse {
     bundled_files?: Array<FixerAPI.FileChange> | null;
 
     /**
+     * List of fix types that were actually applied during the fixer run
+     */
+    fix_types_used?: Array<
+      'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types'
+    >;
+
+    /**
      * Changes made by the fixer in the requested format
      */
     suggested_changes?: Data.DiffFormat | Data.ChangedFilesFormat | Data.AllFilesFormat | null;
