@@ -72,5 +72,8 @@
       "require": "./dist/*.js",
       "default": "./dist/*.mjs"
     }
+  },
+  "resolutions": {
+    "eventsource-parser": "^2.0.1"
   }
 }
