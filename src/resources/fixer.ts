@@ -157,7 +157,7 @@ export namespace FixerRunResponse {
      * List of fix types that were actually applied during the fixer run
      */
     fix_types_used?: Array<
-      'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types'
+      'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types' | 'sql'
     >;
 
     /**
@@ -239,7 +239,9 @@ export interface FixerRunParams {
   /**
    * Configuration for which fix types to apply
    */
-  fix_types?: Array<'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types'>;
+  fix_types?: Array<
+    'import_export' | 'string_literals' | 'css' | 'tailwind' | 'ai_fallback' | 'types' | 'sql'
+  >;
 
   /**
    * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
