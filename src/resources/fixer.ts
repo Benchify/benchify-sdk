@@ -171,6 +171,27 @@ export namespace FixerRunResponse {
      * Final per-file status after fixing
      */
     export interface Status {
+      composite_status:
+        | 'FIXED_EVERYTHING'
+        | 'FIXED_REQUESTED'
+        | 'PARTIALLY_FIXED'
+        | 'NO_REQUESTED_ISSUES'
+        | 'NO_ISSUES'
+        | 'FAILED';
+
+      /**
+       * Status of each file.
+       */
+      file_to_composite_status?: {
+        [key: string]:
+          | 'FIXED_EVERYTHING'
+          | 'FIXED_REQUESTED'
+          | 'PARTIALLY_FIXED'
+          | 'NO_REQUESTED_ISSUES'
+          | 'NO_ISSUES'
+          | 'FAILED';
+      };
+
       /**
        * Fix status of each file sent.
        */
