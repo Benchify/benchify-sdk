@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.1.0-alpha.29 (2025-08-27)
+
+Full Changelog: [v0.1.0-alpha.28...v0.1.0-alpha.29](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.28...v0.1.0-alpha.29)
+
+### Features
+
+* **api:** api update ([a7f4fa4](https://github.com/Benchify/benchify-sdk/commit/a7f4fa49b12811c5b45c7d1106bb0a194938b3cc))
+* **api:** api update ([b4f11b0](https://github.com/Benchify/benchify-sdk/commit/b4f11b0b83416db38a7767a5858d48ab9a8c9fc0))
+* **api:** api update ([38747c5](https://github.com/Benchify/benchify-sdk/commit/38747c5a7b6241bc5144a1ae0af708ed8236b8ee))
+* **api:** api update ([fc01a18](https://github.com/Benchify/benchify-sdk/commit/fc01a18f18b51626bafdd72ec5322c9df7965e4d))
+* **mcp:** add code execution tool ([81dbbc1](https://github.com/Benchify/benchify-sdk/commit/81dbbc1120a53666bc849222bfaa97a042037db3))
+* **mcp:** add option to infer mcp client ([e96f2cc](https://github.com/Benchify/benchify-sdk/commit/e96f2cc4919c0f0ed4ff231b0177fd3e29aee26d))
+* **mcp:** parse query string as mcp client options in mcp server ([f433674](https://github.com/Benchify/benchify-sdk/commit/f43367491aa93dcd169255f68185e61624c469d7))
+
+
+### Chores
+
+* add package to package.json ([86e1600](https://github.com/Benchify/benchify-sdk/commit/86e16003c89a8a074877f3f99a88764054a7b670))
+* **client:** qualify global Blob ([cf0e914](https://github.com/Benchify/benchify-sdk/commit/cf0e914437d46e7e487342b787609510e000c6c7))
+* **internal:** codegen related update ([e39bf24](https://github.com/Benchify/benchify-sdk/commit/e39bf24121fc7c6f2fa3af52dbaa9258b5906b8b))
+* **internal:** codegen related update ([7845dc9](https://github.com/Benchify/benchify-sdk/commit/7845dc988e9ae9172b71e2197fdbd2a114d022e1))
+* **internal:** make mcp-server publishing public by defaut ([42d367b](https://github.com/Benchify/benchify-sdk/commit/42d367b995290bddea44be37b3a1101c953a85e2))
+* **internal:** refactor array check ([bf84811](https://github.com/Benchify/benchify-sdk/commit/bf848112c88eaaca4dc66fd2f5f362c4483d97f2))
+* **mcp:** add cors to oauth metadata route ([69f8ed9](https://github.com/Benchify/benchify-sdk/commit/69f8ed9400f90a527a8292e836db37efd2f518fd))
+* **mcp:** update package.json ([4b31433](https://github.com/Benchify/benchify-sdk/commit/4b314331060d3ea6303a3cb979be62b388d2718b))
+* **mcp:** update types ([c36e01a](https://github.com/Benchify/benchify-sdk/commit/c36e01a70ef156aa2a672840b6de2cc461e37355))
+* update CI script ([2c69e9c](https://github.com/Benchify/benchify-sdk/commit/2c69e9cb0790f403cdf0f3764ad25a779015346b))
+* update CI script ([18fa772](https://github.com/Benchify/benchify-sdk/commit/18fa772d92992ea937272db4a17a75389403ef2e))
+
 ## 0.1.0-alpha.28 (2025-08-18)
 
 Full Changelog: [v0.1.0-alpha.27...v0.1.0-alpha.28](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.27...v0.1.0-alpha.28)
