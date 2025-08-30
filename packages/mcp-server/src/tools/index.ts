@@ -5,6 +5,7 @@ import { Metadata, Endpoint, HandlerFunction } from './types';
 export { Metadata, Endpoint, HandlerFunction };
 
 import run_fixer from './fixer/run-fixer';
+import run_fix_local from './fixer/run-fix-local';
 
 export const endpoints: Endpoint[] = [];
 
@@ -13,6 +14,7 @@ function addEndpoint(endpoint: Endpoint) {
 }
 
 addEndpoint(run_fixer);
+addEndpoint(run_fix_local);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';
