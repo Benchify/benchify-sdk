@@ -2,7 +2,7 @@ import { spawnSync } from "child_process";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { glob } from "glob";
-import ignore = require("ignore");
+import ignore from "ignore";
 
 import { maybeFilter } from 'benchify-mcp/filtering';
 import { Metadata, asTextContentResult } from 'benchify-mcp/tools/types';
@@ -297,10 +297,29 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
     }
 
     const data = resp.data ?? {};
-    const format = data?.suggested_changes?.format || apply_format;
-    const changed = data?.suggested_changes?.changed_files ?? [];
-    const diff = data?.suggested_changes?.diff ?? "";
-    const allFiles = data?.suggested_changes?.files ?? [];
+    const suggestedChanges = data?.suggested_changes;
+    
+    // Handle the union type properly based on response format
+    let format = apply_format;
+    let changed: any[] = [];
+    let diff = "";
+    let allFiles: any[] = [];
+    
+    if (suggestedChanges) {
+      if ('diff' in suggestedChanges) {
+        // DiffFormat
+        format = 'DIFF';
+        diff = suggestedChanges.diff ?? "";
+      } else if ('changed_files' in suggestedChanges) {
+        // ChangedFilesFormat
+        format = 'CHANGED_FILES';
+        changed = suggestedChanges.changed_files ?? [];
+      } else if ('all_files' in suggestedChanges) {
+        // AllFilesFormat
+        format = 'ALL_FILES';
+        allFiles = suggestedChanges.all_files ?? [];
+      }
+    }
 
     // Optionally write to disk
     let applied = false;
@@ -331,7 +350,7 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
         format, 
         changed_files: changed, 
         diff, 
-        files: allFiles 
+        all_files: allFiles 
       },
       applied,
       write_errors
