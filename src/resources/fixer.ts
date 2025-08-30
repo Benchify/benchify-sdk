@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import * as FixerAPI from './fixer';
+import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -11,13 +12,95 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const fixer = await client.fixer.create({
+   * const response = await client.fixer.run({
    *   files: [{ contents: 'contents', path: 'x' }],
    * });
    * ```
    */
-  create(body: FixerCreateParams, options?: RequestOptions): APIPromise<FixerCreateResponse> {
+  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
+  }
+}
+
+/**
+ * Result of running diagnostics
+ */
+export interface DiagnosticResponse {
+  /**
+   * Diagnostics grouped by file
+   */
+  file_to_diagnostics?: { [key: string]: Array<DiagnosticResponse.FileToDiagnostic> };
+}
+
+export namespace DiagnosticResponse {
+  /**
+   * Enhanced diagnostic model for external API
+   */
+  export interface FileToDiagnostic {
+    /**
+     * File where diagnostic occurs
+     */
+    file_path: string;
+
+    /**
+     * Location of the diagnostic
+     */
+    location: FileToDiagnostic.Location;
+
+    /**
+     * Diagnostic message
+     */
+    message: string;
+
+    /**
+     * Type of the diagnostic
+     */
+    type:
+      | 'type_error'
+      | 'string_literal'
+      | 'import_export'
+      | 'implicit_any'
+      | 'implicit_any_array'
+      | 'invalid_jsx'
+      | 'css'
+      | 'unclassified';
+
+    /**
+     * Code given by the diagnostic generator
+     */
+    code?: number | null;
+
+    /**
+     * Surrounding code context
+     */
+    context?: string | null;
+  }
+
+  export namespace FileToDiagnostic {
+    /**
+     * Location of the diagnostic
+     */
+    export interface Location {
+      /**
+       * Column number (1-based)
+       */
+      column: number | null;
+
+      /**
+       * Line number (1-based)
+       */
+      line: number | null;
+
+      /**
+       * Span of the error
+       */
+      span: number;
+
+      /**
+       * Position of the first character of the error location in the source code
+       */
+      starting_character_position: number | null;
+    }
   }
 }
 
@@ -37,31 +120,26 @@ export interface FileChange {
 }
 
 /**
- * Enumeration of available fix types
- */
-export type FixTypeName = 'import_export' | 'string_literals' | 'css' | 'ai_fallback' | 'types' | 'sql';
-
-/**
  * Wrapped response model for benchify-api compatibility
  */
-export interface FixerCreateResponse {
+export interface FixerRunResponse {
   /**
    * The actual response data
    */
-  data: FixerCreateResponse.Data;
+  data: FixerRunResponse.Data;
 
   /**
    * The error from the API query
    */
-  error?: FixerCreateResponse.Error | null;
+  error?: FixerRunResponse.Error | null;
 
   /**
    * Meta information
    */
-  meta?: FixerCreateResponse.Meta;
+  meta?: Shared.ResponseMeta;
 }
 
-export namespace FixerCreateResponse {
+export namespace FixerRunResponse {
   /**
    * The actual response data
    */
@@ -79,7 +157,7 @@ export namespace FixerCreateResponse {
     /**
      * List of fix types that were actually applied during the fixer run
      */
-    fix_types_used?: Array<FixerAPI.FixTypeName>;
+    fix_types_used?: Array<'import_export' | 'string_literals' | 'css' | 'ai_fallback' | 'types' | 'sql'>;
 
     /**
      * Changes made by the fixer in the requested format
@@ -193,28 +271,13 @@ export namespace FixerCreateResponse {
      */
     suggestions?: Array<string>;
   }
-
-  /**
-   * Meta information
-   */
-  export interface Meta {
-    /**
-     * Customer tracking identifier
-     */
-    external_id?: string | null;
-
-    /**
-     * Unique trace identifier for the request
-     */
-    trace_id?: string | null;
-  }
 }
 
-export interface FixerCreateParams {
+export interface FixerRunParams {
   /**
    * List of files to process
    */
-  files: Array<FixerCreateParams.File>;
+  files: Array<FixerRunParams.File>;
 
   /**
    * Whether to bundle the project (experimental)
@@ -224,17 +287,17 @@ export interface FixerCreateParams {
   /**
    * Configuration for which fix types to apply
    */
-  fix_types?: Array<FixTypeName>;
+  fix_types?: Array<'import_export' | 'string_literals' | 'css' | 'ai_fallback' | 'types' | 'sql'>;
 
   /**
    * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
    */
-  fixes?: FixerCreateParams.Fixes | null;
+  fixes?: FixerRunParams.Fixes | null;
 
   /**
    * Meta information for API requests
    */
-  meta?: FixerCreateParams.Meta | null;
+  meta?: FixerRunParams.Meta | null;
 
   /**
    * Format for the response (diff, changed_files, or all_files)
@@ -247,7 +310,7 @@ export interface FixerCreateParams {
   template_id?: string | null;
 }
 
-export namespace FixerCreateParams {
+export namespace FixerRunParams {
   /**
    * Model for file data in requests
    */
@@ -311,9 +374,9 @@ export namespace FixerCreateParams {
 
 export declare namespace Fixer {
   export {
+    type DiagnosticResponse as DiagnosticResponse,
     type FileChange as FileChange,
-    type FixTypeName as FixTypeName,
-    type FixerCreateResponse as FixerCreateResponse,
-    type FixerCreateParams as FixerCreateParams,
+    type FixerRunResponse as FixerRunResponse,
+    type FixerRunParams as FixerRunParams,
   };
 }

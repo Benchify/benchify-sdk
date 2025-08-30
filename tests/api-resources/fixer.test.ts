@@ -9,8 +9,8 @@ const client = new Benchify({
 
 describe('resource fixer', () => {
   // Prism tests are disabled
-  test.skip('create: only required params', async () => {
-    const responsePromise = client.fixer.create({ files: [{ contents: 'contents', path: 'x' }] });
+  test.skip('run: only required params', async () => {
+    const responsePromise = client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,8 +21,8 @@ describe('resource fixer', () => {
   });
 
   // Prism tests are disabled
-  test.skip('create: required and optional params', async () => {
-    const response = await client.fixer.create({
+  test.skip('run: required and optional params', async () => {
+    const response = await client.fixer.run({
       files: [{ contents: 'contents', path: 'x' }],
       bundle: true,
       fix_types: ['import_export'],

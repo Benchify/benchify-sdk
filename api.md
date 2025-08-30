@@ -1,11 +1,17 @@
+# Shared
+
+Types:
+
+- <code><a href="./src/resources/shared.ts">ResponseMeta</a></code>
+
 # Fixer
 
 Types:
 
+- <code><a href="./src/resources/fixer.ts">DiagnosticResponse</a></code>
 - <code><a href="./src/resources/fixer.ts">FileChange</a></code>
-- <code><a href="./src/resources/fixer.ts">FixTypeName</a></code>
-- <code><a href="./src/resources/fixer.ts">FixerCreateResponse</a></code>
+- <code><a href="./src/resources/fixer.ts">FixerRunResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">create</a>({ ...params }) -> FixerCreateResponse</code>
+- <code title="post /v1/fixer">client.fixer.<a href="./src/resources/fixer.ts">run</a>({ ...params }) -> FixerRunResponse</code>
