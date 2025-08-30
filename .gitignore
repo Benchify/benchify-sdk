@@ -7,6 +7,4 @@ dist
 dist-deno
 /*.tgz
 .idea/
-bun.lockb
-package-lock.json
-package.json
+

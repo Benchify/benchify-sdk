@@ -16,8 +16,7 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import * as FixerAPI from './resources/fixer';
-import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { FileChange, FixTypeName, Fixer, FixerCreateParams, FixerCreateResponse } from './resources/fixer';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -105,21 +104,6 @@ export interface ClientOptions {
    */
   logger?: Logger | undefined;
 }
-
-// Add the conditional return type before the Benchify class
-type ResponseFormat = 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
-
-type FixerOutput<T extends ResponseFormat> =
-  T extends 'ALL_FILES' ? Array<FixerAPI.FileChange>
-  : T extends 'CHANGED_FILES' ? Array<FixerAPI.FileChange>
-  : T extends 'DIFF' ? string
-  : never;
-
-// Type for bundle-enabled responses
-type FixerBundleOutput<T extends ResponseFormat> = {
-  files: FixerOutput<T>;
-  bundled_files: Array<FixerAPI.FileChange>;
-};
 
 /**
  * API Client for interfacing with the Benchify API.
@@ -731,95 +715,6 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
-  /**
-   * Process all files using the fixer with a simplified interface.
-   *
-   * @param files - Array of files to process
-   * @param options - Optional parameters for the fixer run
-   * @returns Promise resolving to the appropriate format based on response_format and bundle flag
-   *
-   * @example
-   * ```ts
-   * // Get all files
-   * const allFiles = await client.runFixer([
-   *   { path: "src/index.ts", contents: "export const hello = 'world';" },
-   *   { path: "src/utils.ts", contents: "export function helper() {}" }
-   * ], { response_format: 'ALL_FILES' });
-   *
-   * // Get only changed files
-   * const changedFiles = await client.runFixer([
-   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
-   * ], { response_format: 'CHANGED_FILES' });
-   *
-   * // Get diff format
-   * const diff = await client.runFixer([
-   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
-   * ], { response_format: 'DIFF' });
-   *
-   * // Get bundled files alongside regular files
-   * const bundleResult = await client.runFixer([
-   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
-   * ], { response_format: 'ALL_FILES', bundle: true });
-   * // Returns: { files: FileChange[], bundled_files: FileChange[] }
-   * ```
-   */
-  async runFixer<T extends ResponseFormat = 'ALL_FILES', B extends boolean = false>(
-    files: API.FixerRunParams.File[],
-    options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: B },
-  ): Promise<B extends true ? FixerBundleOutput<T> : FixerOutput<T>> {
-    // Default to ALL_FILES if no format specified
-    const responseFormat = options?.response_format || ('ALL_FILES' as T);
-    const bundleEnabled = options?.bundle || false;
-
-    // Call the underlying fixer.run method with the converted files
-    return this.fixer
-      .run({
-        files: files,
-        response_format: responseFormat,
-        ...options,
-      })
-      .then((response) => {
-        const changes = response.data.suggested_changes;
-        const bundledFiles = response.data.bundled_files;
-
-        let files: FixerOutput<T>;
-
-        switch (responseFormat) {
-          case 'DIFF': {
-            const diffFormat = changes as FixerAPI.FixerRunResponse.Data.DiffFormat;
-            files = (diffFormat.diff ?? '') as FixerOutput<T>;
-            break;
-          }
-          case 'CHANGED_FILES': {
-            const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-            files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
-            break;
-          }
-          case 'ALL_FILES': {
-            const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
-            break;
-          }
-          default: {
-            // Fallback to all files if format is somehow invalid
-            const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
-            break;
-          }
-        }
-
-        // If bundle is enabled, return both files and bundled_files
-        if (bundleEnabled && bundledFiles) {
-          return {
-            files,
-            bundled_files: bundledFiles,
-          } as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
-        }
-
-        // Otherwise, return just the files (maintains backward compatibility)
-        return files as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
-      });
-  }
 }
 
 Benchify.Fixer = Fixer;
@@ -829,11 +724,9 @@ export declare namespace Benchify {
 
   export {
     Fixer as Fixer,
-    type DiagnosticResponse as DiagnosticResponse,
     type FileChange as FileChange,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
+    type FixTypeName as FixTypeName,
+    type FixerCreateResponse as FixerCreateResponse,
+    type FixerCreateParams as FixerCreateParams,
   };
-
-  export type ResponseMeta = API.ResponseMeta;
 }

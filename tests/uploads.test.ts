@@ -67,10 +67,9 @@ describe('toFile', () => {
   it('is assignable to File and Blob', async () => {
     const input = new File(['foo'], 'input.jsonl', { type: 'jsonl' });
     const result = await toFile(input);
-    const file = result; // Let TypeScript infer the type
+    const file: File = result;
     const blob: Blob = result;
-    void file;
-    void blob;
+    void file, blob;
   });
 });
 

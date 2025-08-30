@@ -20,5 +20,3 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './core/error';
-
-export { BundleRenderer, type BundleFile } from './lib/bundle-renderer';
