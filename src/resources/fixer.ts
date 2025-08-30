@@ -150,9 +150,9 @@ export namespace FixerRunResponse {
     status: Data.Status;
 
     /**
-     * Bundled files
+     * Information about the bundling process and results
      */
-    bundled_files?: Array<FixerAPI.FileChange> | null;
+    bundle?: Data.Bundle | null;
 
     /**
      * List of fix types that were actually applied during the fixer run
@@ -190,11 +190,39 @@ export namespace FixerRunResponse {
           | 'NO_ISSUES'
           | 'FAILED';
       };
+    }
+
+    /**
+     * Information about the bundling process and results
+     */
+    export interface Bundle {
+      /**
+       * The detected project/build system type
+       */
+      build_system:
+        | 'OLIVE_TEMPLATE'
+        | 'VITE_SUBDIR'
+        | 'VITE_ROOT'
+        | 'NEXT'
+        | 'ESBUILD'
+        | 'WEBPACK'
+        | 'PARCEL'
+        | 'UNKNOWN';
 
       /**
-       * Fix status of each file sent.
+       * Overall status of the bundling operation
        */
-      file_to_status?: { [key: string]: 'FIXED' | 'PARTIALLY_FIXED' | 'FAILED' | 'NO_ISSUES_FOUND' };
+      status: 'SUCCESS' | 'FAILED' | 'NOT_ATTEMPTED' | 'PARTIAL_SUCCESS';
+
+      /**
+       * Template path used for bundling
+       */
+      template_path: string;
+
+      /**
+       * Successfully bundled files
+       */
+      files?: Array<FixerAPI.FileChange>;
     }
 
     export interface DiffFormat {
