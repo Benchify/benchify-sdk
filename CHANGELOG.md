@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.0-alpha.31 (2025-08-30)
+
+Full Changelog: [v0.1.0-alpha.30...v0.1.0-alpha.31](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.30...v0.1.0-alpha.31)
+
+### Features
+
+* **api:** api update ([71950d4](https://github.com/Benchify/benchify-sdk/commit/71950d4a486c13a2d340b4435bd38ea95818509f))
+* **api:** api update ([0b54412](https://github.com/Benchify/benchify-sdk/commit/0b54412645ea31a760e808ccc8b200b0ed83d133))
+* **api:** manual updates ([2fa6bb1](https://github.com/Benchify/benchify-sdk/commit/2fa6bb127b0e078cbea3b48d575991e1e0d91f6c))
+
+
+### Chores
+
+* **internal:** update global Error reference ([5d41869](https://github.com/Benchify/benchify-sdk/commit/5d41869a935aefd75b05f2cc97ca36d7f4587a64))
+* remove custom code ([56b3f0e](https://github.com/Benchify/benchify-sdk/commit/56b3f0e5074778b1d23556f4087ce4a07ffab3cb))
+* update SDK settings ([937b2de](https://github.com/Benchify/benchify-sdk/commit/937b2de681c734f4b0d378491233fc494ca9052c))
+
 ## 0.1.0-alpha.30 (2025-08-27)
 
 Full Changelog: [v0.1.0-alpha.29...v0.1.0-alpha.30](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.29...v0.1.0-alpha.30)
