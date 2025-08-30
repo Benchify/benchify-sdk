@@ -5,7 +5,7 @@ const path = require('path');
 const distDir =
   process.env['DIST_PATH'] ?
     path.resolve(process.env['DIST_PATH'])
-  : path.resolve(__dirname, '..', '..', 'dist');
+    : path.resolve(__dirname, '..', '..', 'dist');
 
 async function* walk(dir) {
   for await (const d of await fs.promises.opendir(dir)) {
@@ -16,6 +16,13 @@ async function* walk(dir) {
 }
 
 async function postprocess() {
+  // Remove source TypeScript files to avoid module resolution conflicts
+  const srcDir = path.join(distDir, 'src');
+  if (fs.existsSync(srcDir)) {
+    console.error('Removing source files from dist/src to prevent module resolution conflicts...');
+    await fs.promises.rm(srcDir, { recursive: true, force: true });
+  }
+
   for await (const file of walk(distDir)) {
     if (!/(\.d)?[cm]?ts$/.test(file)) continue;
 
@@ -79,7 +86,7 @@ async function postprocess() {
     'dist/package.json',
     JSON.stringify(
       Object.assign(
-        /** @type {Record<String, unknown>} */ (
+        /** @type {Record<String, unknown>} */(
           JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'))
         ),
         {
