@@ -5,7 +5,7 @@ const path = require('path');
 const distDir =
   process.env['DIST_PATH'] ?
     path.resolve(process.env['DIST_PATH'])
-    : path.resolve(__dirname, '..', '..', 'dist');
+  : path.resolve(__dirname, '..', '..', 'dist');
 
 async function* walk(dir) {
   for await (const d of await fs.promises.opendir(dir)) {
@@ -86,7 +86,7 @@ async function postprocess() {
     'dist/package.json',
     JSON.stringify(
       Object.assign(
-        /** @type {Record<String, unknown>} */(
+        /** @type {Record<String, unknown>} */ (
           JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'))
         ),
         {

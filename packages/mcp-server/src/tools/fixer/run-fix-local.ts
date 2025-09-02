@@ -1,8 +1,8 @@
-import { spawnSync } from "child_process";
-import { promises as fs } from "fs";
-import * as path from "path";
-import { glob } from "glob";
-import ignore = require("ignore");
+import { spawnSync } from 'child_process';
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import { glob } from 'glob';
+import * as ignore from 'ignore';
 
 import { maybeFilter } from 'benchify-mcp/filtering';
 import { Metadata, asTextContentResult } from 'benchify-mcp/tools/types';
@@ -40,7 +40,8 @@ export const tool: Tool = {
             type: 'string',
             enum: ['staged', 'globs', 'changedSince', 'files'],
             title: 'Selection Mode',
-            description: 'How to select files: staged (git staged), globs (glob patterns), changedSince (git diff), or files (explicit list)',
+            description:
+              'How to select files: staged (git staged), globs (glob patterns), changedSince (git diff), or files (explicit list)',
             default: 'staged',
           },
           globs: {
@@ -137,39 +138,41 @@ export const tool: Tool = {
 
 // Git helper functions
 function git(root: string, args: string[]) {
-  return spawnSync("git", args, { cwd: root, encoding: "utf8" });
+  return spawnSync('git', args, { cwd: root, encoding: 'utf8' });
 }
 
 function stagedPaths(root: string) {
-  const out = git(root, ["diff", "--name-only", "--cached"]);
-  return out.status === 0 ? out.stdout.split("\n").filter(Boolean) : [];
+  const out = git(root, ['diff', '--name-only', '--cached']);
+  return out.status === 0 ? out.stdout.split('\n').filter(Boolean) : [];
 }
 
 function changedSince(root: string, since: string) {
-  const out = git(root, ["diff", "--name-only", since]);
-  return out.status === 0 ? out.stdout.split("\n").filter(Boolean) : [];
+  const out = git(root, ['diff', '--name-only', since]);
+  return out.status === 0 ? out.stdout.split('\n').filter(Boolean) : [];
 }
 
 // File selection and processing functions
-async function pickFiles(root: string, sel: any, exts = [".ts", ".tsx", ".js", ".jsx"]) {
+async function pickFiles(root: string, sel: any, exts = ['.ts', '.tsx', '.js', '.jsx']) {
   let candidates: string[] = [];
-  
-  if (sel.mode === "staged") {
+
+  if (sel.mode === 'staged') {
     candidates = stagedPaths(root);
-  } else if (sel.mode === "changedSince") {
-    candidates = changedSince(root, sel.changedSince || "HEAD");
-  } else if (sel.mode === "globs") {
-    candidates = await glob(sel.globs ?? ["**/*.{ts,tsx,js,jsx}"], { cwd: root, nodir: true });
-  } else if (sel.mode === "files") {
+  } else if (sel.mode === 'changedSince') {
+    candidates = changedSince(root, sel.changedSince || 'HEAD');
+  } else if (sel.mode === 'globs') {
+    candidates = await glob(sel.globs ?? ['**/*.{ts,tsx,js,jsx}'], { cwd: root, nodir: true });
+  } else if (sel.mode === 'files') {
     candidates = sel.files ?? [];
   }
 
-  const ig = ignore().add(sel.ignore ?? ["node_modules/**", ".git/**", ".next/**", "dist/**", "build/**"]);
+  const ig = ignore
+    .default()
+    .add(sel.ignore ?? ['node_modules/**', '.git/**', '.next/**', 'dist/**', 'build/**']);
   const filtered = candidates
-    .map(p => path.normalize(p))
-    .filter(p => !ig.ignores(p))
-    .filter(p => exts.indexOf(path.extname(p)) !== -1);
-  
+    .map((p) => path.normalize(p))
+    .filter((p) => !ig.ignores(p))
+    .filter((p) => exts.indexOf(path.extname(p)) !== -1);
+
   return filtered.filter((item, pos) => filtered.indexOf(item) === pos);
 }
 
@@ -180,20 +183,20 @@ async function readProjectFiles(root: string, files: string[], limits: any) {
 
   const out: { path: string; contents: string }[] = [];
   let total = 0;
-  
+
   for (const rel of files.slice(0, maxCount)) {
     const abs = path.join(root, rel);
     try {
       const stat = await fs.stat(abs);
       if (!stat.isFile()) continue;
       if (stat.size === 0 || stat.size > maxFile) continue;
-      
-      const contents = await fs.readFile(abs, "utf8");
+
+      const contents = await fs.readFile(abs, 'utf8');
       if (!contents.trim()) continue;
-      
-      const nextTotal = total + Buffer.byteLength(contents, "utf8");
+
+      const nextTotal = total + Buffer.byteLength(contents, 'utf8');
       if (nextTotal > maxTotal) break;
-      
+
       out.push({ path: rel, contents });
       total = nextTotal;
     } catch (e) {
@@ -201,7 +204,7 @@ async function readProjectFiles(root: string, files: string[], limits: any) {
       continue;
     }
   }
-  
+
   return out;
 }
 
@@ -227,12 +230,12 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
     // Optional auto-context
     if (context?.autoIncludeConfigs) {
       const configFiles = [
-        "tsconfig.json",
-        "tailwind.config.ts",
-        "tailwind.config.js", 
-        "postcss.config.js",
-        "postcss.config.ts",
-        "package.json"
+        'tsconfig.json',
+        'tailwind.config.ts',
+        'tailwind.config.js',
+        'postcss.config.js',
+        'postcss.config.ts',
+        'package.json',
       ];
       for (const f of configFiles) {
         if (files.indexOf(f) === -1) {
@@ -247,37 +250,37 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
     }
 
     const toSend = await readProjectFiles(root, files, limits);
-    
+
     if (toSend.length === 0) {
       const result = {
-        summary: { 
-          files_examined: 0, 
-          files_changed: 0, 
-          fixes_enabled: [], 
-          duration_ms: 0 
+        summary: {
+          files_examined: 0,
+          files_changed: 0,
+          fixes_enabled: [],
+          duration_ms: 0,
         },
-        suggested_changes: { 
+        suggested_changes: {
           format: apply_format,
           changed_files: [],
-          diff: "",
-          files: []
+          diff: '',
+          all_files: [],
         },
         applied: false,
-        write_errors: []
+        write_errors: [],
       };
       return asTextContentResult(await maybeFilter(jq_filter, result));
     }
 
     // Determine fixes based on preset
     let fixConfig;
-    if (preset === "full") {
-      fixConfig = fixes || { 
+    if (preset === 'full') {
+      fixConfig = fixes || {
         css: true,
-        imports: true, 
+        imports: true,
         react: true,
         stringLiterals: true,
         tailwind: true,
-        tsSuggestions: true
+        tsSuggestions: true,
       };
     } else {
       fixConfig = { stringLiterals: true, ...(fixes || {}) };
@@ -289,7 +292,7 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
       files: toSend,
       fixes: fixConfig,
       response_format: apply_format,
-      ...rest
+      ...rest,
     });
 
     if (resp.error) {
@@ -297,22 +300,41 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
     }
 
     const data = resp.data ?? {};
-    const format = data?.suggested_changes?.format || apply_format;
-    const changed = data?.suggested_changes?.changed_files ?? [];
-    const diff = data?.suggested_changes?.diff ?? "";
-    const allFiles = data?.suggested_changes?.files ?? [];
+    const suggestedChanges = data?.suggested_changes;
+
+    // Handle the union type properly based on response format
+    let format = apply_format;
+    let changed: any[] = [];
+    let diff = '';
+    let allFiles: any[] = [];
+
+    if (suggestedChanges) {
+      if ('diff' in suggestedChanges) {
+        // DiffFormat
+        format = 'DIFF';
+        diff = suggestedChanges.diff ?? '';
+      } else if ('changed_files' in suggestedChanges) {
+        // ChangedFilesFormat
+        format = 'CHANGED_FILES';
+        changed = suggestedChanges.changed_files ?? [];
+      } else if ('all_files' in suggestedChanges) {
+        // AllFilesFormat
+        format = 'ALL_FILES';
+        allFiles = suggestedChanges.all_files ?? [];
+      }
+    }
 
     // Optionally write to disk
     let applied = false;
     const write_errors: string[] = [];
-    
-    if (apply === "server" && format !== "DIFF") {
-      const filesToWrite = format === "ALL_FILES" ? allFiles : changed;
+
+    if (apply === 'server' && format !== 'DIFF') {
+      const filesToWrite = format === 'ALL_FILES' ? allFiles : changed;
       for (const f of filesToWrite) {
         try {
           const abs = path.join(root, f.path);
           await fs.mkdir(path.dirname(abs), { recursive: true });
-          await fs.writeFile(abs, f.contents, "utf8");
+          await fs.writeFile(abs, f.contents, 'utf8');
         } catch (e: any) {
           write_errors.push(`${f.path}: ${e?.message || e}`);
         }
@@ -324,21 +346,20 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
       summary: {
         files_examined: toSend.length,
         files_changed: changed.length || allFiles.length,
-        fixes_enabled: preset === "full" ? Object.keys(fixConfig) : ["stringLiterals"],
-        duration_ms: Date.now() - startTime
+        fixes_enabled: preset === 'full' ? Object.keys(fixConfig) : ['stringLiterals'],
+        duration_ms: Date.now() - startTime,
       },
-      suggested_changes: { 
-        format, 
-        changed_files: changed, 
-        diff, 
-        files: allFiles 
+      suggested_changes: {
+        format,
+        changed_files: changed,
+        diff,
+        all_files: allFiles,
       },
       applied,
-      write_errors
+      write_errors,
     };
 
     return asTextContentResult(await maybeFilter(jq_filter, result));
-
   } catch (error: any) {
     throw new Error(`Failed to run local fixer: ${error.message}`);
   }
