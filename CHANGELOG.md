@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.0-alpha.33 (2025-09-03)
+
+Full Changelog: [v0.1.0-alpha.32...v0.1.0-alpha.33](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.32...v0.1.0-alpha.33)
+
+### Features
+
+* **api:** api update ([4f42e41](https://github.com/Benchify/benchify-sdk/commit/4f42e411a13478a8dd3058c05fd9ef1d714fa7bf))
+* **mcp:** allow setting logging level ([c14a9f4](https://github.com/Benchify/benchify-sdk/commit/c14a9f4afb837c02580ddd5f28f3d345abb8d910))
+* **mcp:** expose client options in `streamableHTTPApp` ([8726f50](https://github.com/Benchify/benchify-sdk/commit/8726f50ce83e56759f5b0fcf6e37440f7a192771))
+
+
+### Chores
+
+* **internal:** codegen related update ([0ebc2ee](https://github.com/Benchify/benchify-sdk/commit/0ebc2ee712dbb87dec0bab5f7451bd2c5e7910c6))
+
 ## 0.1.0-alpha.32 (2025-09-02)
 
 Full Changelog: [v0.1.0-alpha.31...v0.1.0-alpha.32](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.31...v0.1.0-alpha.32)
