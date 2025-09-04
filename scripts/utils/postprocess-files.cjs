@@ -5,7 +5,7 @@ const path = require('path');
 const distDir =
   process.env['DIST_PATH'] ?
     path.resolve(process.env['DIST_PATH'])
-  : path.resolve(__dirname, '..', '..', 'dist');
+    : path.resolve(__dirname, '..', '..', 'dist');
 
 async function* walk(dir) {
   for await (const d of await fs.promises.opendir(dir)) {
@@ -42,8 +42,12 @@ async function postprocess() {
     }
   }
 
+  // Read the existing package.json to preserve conditional exports
+  const existingPkg = JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'));
+  const existingMainExport = existingPkg.exports?.['.'];
+
   const newExports = {
-    '.': {
+    '.': existingMainExport || {
       require: {
         types: './index.d.ts',
         default: './index.js',
@@ -86,7 +90,7 @@ async function postprocess() {
     'dist/package.json',
     JSON.stringify(
       Object.assign(
-        /** @type {Record<String, unknown>} */ (
+        /** @type {Record<String, unknown>} */(
           JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'))
         ),
         {
