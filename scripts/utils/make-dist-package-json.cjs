@@ -9,6 +9,19 @@ function processExportMap(m) {
 }
 processExportMap(pkgJson.exports);
 
+// Special handling for conditional exports - ensure the node condition comes first
+if (pkgJson.exports && pkgJson.exports['.'] && pkgJson.exports['.'].node) {
+  const mainExports = pkgJson.exports['.'];
+  const nodeExports = mainExports.node;
+  delete mainExports.node;
+
+  // Reconstruct with node condition first
+  pkgJson.exports['.'] = {
+    node: nodeExports,
+    ...mainExports,
+  };
+}
+
 for (const key of ['types', 'main', 'module']) {
   if (typeof pkgJson[key] === 'string') pkgJson[key] = pkgJson[key].replace(/^(\.\/)?dist\//, './');
 }

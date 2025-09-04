@@ -54,8 +54,16 @@
   },
   "exports": {
     ".": {
+      "node": {
+        "import": "./dist/index.node.mjs",
+        "require": "./dist/index.node.js"
+      },
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./helpers": {
+      "import": "./dist/helpers.mjs",
+      "require": "./dist/helpers.js"
     },
     "./*.mjs": {
       "default": "./dist/*.mjs"
