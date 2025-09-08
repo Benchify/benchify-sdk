@@ -2,7 +2,7 @@
   "name": "benchify",
   "version": "0.1.0-alpha.33",
   "description": "The official TypeScript library for the Benchify API",
-  "author": "Benchify <>",
+  "author": "Benchify <support@benchify.com>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
