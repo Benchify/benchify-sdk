@@ -42,8 +42,12 @@ async function postprocess() {
     }
   }
 
+  // Read the existing package.json to preserve conditional exports
+  const existingPkg = JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'));
+  const existingMainExport = existingPkg.exports?.['.'];
+
   const newExports = {
-    '.': {
+    '.': existingMainExport || {
       require: {
         types: './index.d.ts',
         default: './index.js',

@@ -1,29 +1,17 @@
 {
-  "include": [
-    "src",
-    "tests",
-    "examples"
-  ],
+  "include": ["src", "tests", "examples"],
   "exclude": [],
   "compilerOptions": {
     "target": "es2020",
-    "lib": [
-      "es2020",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["es2020", "dom", "dom.iterable"],
     "module": "commonjs",
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "benchify/*": [
-        "src/*"
-      ],
-      "benchify": [
-        "src/index.ts"
-      ]
+      "benchify/*": ["src/*"],
+      "benchify": ["src/index.ts"]
     },
     "noEmit": true,
     "resolveJsonModule": true,
