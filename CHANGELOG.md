@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.0-alpha.34 (2025-09-08)
+
+Full Changelog: [v0.1.0-alpha.33...v0.1.0-alpha.34](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.33...v0.1.0-alpha.34)
+
+### Features
+
+* **api:** manual updates ([ca10e5e](https://github.com/Benchify/benchify-sdk/commit/ca10e5e088dd4eb575e89a4adc73dbb2d5579e64))
+
+
+### Bug Fixes
+
+* **mcp:** fix query options parsing ([c9f5da0](https://github.com/Benchify/benchify-sdk/commit/c9f5da0a4e37cc3f8d85770739a458f3d7d558ad))
+
+
+### Chores
+
+* ci build action ([6a8bd17](https://github.com/Benchify/benchify-sdk/commit/6a8bd1798be728d3f055f2737181dde98c2b9ac2))
+* **internal:** codegen related update ([0446a68](https://github.com/Benchify/benchify-sdk/commit/0446a68b08678bd89e2be186d933246a040a71a8))
+* **internal:** codegen related update ([10a0689](https://github.com/Benchify/benchify-sdk/commit/10a0689eb2ddfdd189672768c04ca3c43ca3e9d3))
+
 ## 0.1.0-alpha.33 (2025-09-03)
 
 Full Changelog: [v0.1.0-alpha.32...v0.1.0-alpha.33](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.32...v0.1.0-alpha.33)
