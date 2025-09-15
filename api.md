@@ -9,7 +9,6 @@ Types:
 Types:
 
 - <code><a href="./src/resources/fixer.ts">DiagnosticResponse</a></code>
-- <code><a href="./src/resources/fixer.ts">FileChange</a></code>
 - <code><a href="./src/resources/fixer.ts">FixerRunResponse</a></code>
 
 Methods:
