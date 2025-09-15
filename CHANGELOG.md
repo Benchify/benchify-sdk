@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.35 (2025-09-15)
+
+Full Changelog: [v0.1.0-alpha.34...v0.1.0-alpha.35](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.34...v0.1.0-alpha.35)
+
+### Features
+
+* **api:** api update ([2662110](https://github.com/Benchify/benchify-sdk/commit/2662110a5fc4562e4ccdac6df3e022be8ab2d378))
+
+
+### Bug Fixes
+
+* coerce nullable values to undefined ([428c6e8](https://github.com/Benchify/benchify-sdk/commit/428c6e83fe1f7eebe1f9f5f2d770f9778aa94370))
+
+
+### Chores
+
+* **internal:** codegen related update ([68a4b15](https://github.com/Benchify/benchify-sdk/commit/68a4b1555609d4e50d38f05e27ed07790a433749))
+* **mcp:** upload dxt as release asset ([1730eb8](https://github.com/Benchify/benchify-sdk/commit/1730eb83c7db5e8a66b2991a564c259d33643d12))
+
 ## 0.1.0-alpha.34 (2025-09-08)
 
 Full Changelog: [v0.1.0-alpha.33...v0.1.0-alpha.34](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.33...v0.1.0-alpha.34)
