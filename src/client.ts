@@ -17,7 +17,7 @@ import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import * as FixerAPI from './resources/fixer';
-import { DiagnosticResponse, FileChange, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { DiagnosticResponse, Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -830,7 +830,6 @@ export declare namespace Benchify {
   export {
     Fixer as Fixer,
     type DiagnosticResponse as DiagnosticResponse,
-    type FileChange as FileChange,
     type FixerRunResponse as FixerRunResponse,
     type FixerRunParams as FixerRunParams,
   };

@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as FixerAPI from './fixer';
 import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
@@ -103,21 +102,6 @@ export namespace DiagnosticResponse {
       starting_character_position: number | null;
     }
   }
-}
-
-/**
- * Model for a single file change
- */
-export interface FileChange {
-  /**
-   * Contents of the file
-   */
-  contents: string;
-
-  /**
-   * Path of the file
-   */
-  path: string;
 }
 
 /**
@@ -225,7 +209,24 @@ export namespace FixerRunResponse {
       /**
        * Successfully bundled files
        */
-      files?: Array<FixerAPI.FileChange>;
+      files?: Array<Bundle.File>;
+    }
+
+    export namespace Bundle {
+      /**
+       * Model for a single file change
+       */
+      export interface File {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
     }
 
     export interface DiffFormat {
@@ -239,14 +240,48 @@ export namespace FixerRunResponse {
       /**
        * List of changed files with their new contents
        */
-      changed_files?: Array<FixerAPI.FileChange> | null;
+      changed_files?: Array<ChangedFilesFormat.ChangedFile> | null;
+    }
+
+    export namespace ChangedFilesFormat {
+      /**
+       * Model for a single file change
+       */
+      export interface ChangedFile {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
     }
 
     export interface AllFilesFormat {
       /**
        * List of all files with their current contents
        */
-      all_files?: Array<FixerAPI.FileChange> | null;
+      all_files?: Array<AllFilesFormat.AllFile> | null;
+    }
+
+    export namespace AllFilesFormat {
+      /**
+       * Model for a single file change
+       */
+      export interface AllFile {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
     }
   }
 
@@ -378,7 +413,6 @@ export namespace FixerRunParams {
 export declare namespace Fixer {
   export {
     type DiagnosticResponse as DiagnosticResponse,
-    type FileChange as FileChange,
     type FixerRunResponse as FixerRunResponse,
     type FixerRunParams as FixerRunParams,
   };
