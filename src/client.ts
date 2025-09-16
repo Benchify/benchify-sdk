@@ -110,15 +110,15 @@ export interface ClientOptions {
 type ResponseFormat = 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
 
 type FixerOutput<T extends ResponseFormat> =
-  T extends 'ALL_FILES' ? Array<FixerAPI.FileChange>
-  : T extends 'CHANGED_FILES' ? Array<FixerAPI.FileChange>
+  T extends 'ALL_FILES' ? Array<FixerAPI.File>
+  : T extends 'CHANGED_FILES' ? Array<FixerAPI.File>
   : T extends 'DIFF' ? string
   : never;
 
 // Type for bundle-enabled responses
 type FixerBundleOutput<T extends ResponseFormat> = {
   files: FixerOutput<T>;
-  bundled_files: Array<FixerAPI.FileChange>;
+  bundled_files: Array<FixerAPI.File>;
 };
 
 /**

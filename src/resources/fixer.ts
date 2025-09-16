@@ -417,3 +417,6 @@ export declare namespace Fixer {
     type FixerRunParams as FixerRunParams,
   };
 }
+
+// Export File type for convenience
+export type File = FixerRunParams.File;
