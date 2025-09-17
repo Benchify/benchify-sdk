@@ -184,27 +184,9 @@ export namespace FixerRunResponse {
      */
     export interface Bundle {
       /**
-       * The detected project/build system type
-       */
-      build_system:
-        | 'OLIVE_TEMPLATE'
-        | 'VITE_SUBDIR'
-        | 'VITE_ROOT'
-        | 'NEXT'
-        | 'ESBUILD'
-        | 'WEBPACK'
-        | 'PARCEL'
-        | 'UNKNOWN';
-
-      /**
        * Overall status of the bundling operation
        */
       status: 'SUCCESS' | 'FAILED' | 'NOT_ATTEMPTED' | 'PARTIAL_SUCCESS';
-
-      /**
-       * Template path used for bundling
-       */
-      template_path: string;
 
       /**
        * Successfully bundled files
