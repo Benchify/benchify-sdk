@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-alpha.36 (2025-09-17)
+
+Full Changelog: [v0.1.0-alpha.35...v0.1.0-alpha.36](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.35...v0.1.0-alpha.36)
+
+### Features
+
+* **api:** api update ([c177e54](https://github.com/Benchify/benchify-sdk/commit/c177e54357912c9f374164e0952f9a8e45b9778c))
+* **api:** manual updates ([49d4b2e](https://github.com/Benchify/benchify-sdk/commit/49d4b2e20989ac0276ad73791f159379f4785e54))
+
+
+### Bug Fixes
+
+* **ci:** set permissions for DXT publish action ([d435f75](https://github.com/Benchify/benchify-sdk/commit/d435f75ae028c9459f228e626f55d3b824a7614f))
+
 ## 0.1.0-alpha.35 (2025-09-15)
 
 Full Changelog: [v0.1.0-alpha.34...v0.1.0-alpha.35](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.34...v0.1.0-alpha.35)
