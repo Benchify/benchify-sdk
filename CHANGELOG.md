@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.37 (2025-09-18)
+
+Full Changelog: [v0.1.0-alpha.36...v0.1.0-alpha.37](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.36...v0.1.0-alpha.37)
+
+### Chores
+
+* **mcp:** rename dxt to mcpb ([d742787](https://github.com/Benchify/benchify-sdk/commit/d742787ff9eecc5003b68122d1a61d3e2a0b1410))
+
 ## 0.1.0-alpha.36 (2025-09-17)
 
 Full Changelog: [v0.1.0-alpha.35...v0.1.0-alpha.36](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.35...v0.1.0-alpha.36)
