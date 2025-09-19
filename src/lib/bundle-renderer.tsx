@@ -84,7 +84,7 @@ export function BundleRenderer({
       const mime = f.contentType ?? guessType(p);
       typeByPath.set(p, mime);
       const data = toUint8(f.contents);
-      const url = URL.createObjectURL(new Blob([data], { type: mime }));
+      const url = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: mime }));
       objectURLs.push(url);
       rawBlobUrlByPath.set(p, url);
     }
@@ -255,15 +255,15 @@ function cleanPath(p: string) {
   return p.replace(/^\/+/, '');
 }
 
-function toUint8(x: string | Uint8Array | ArrayBuffer) {
+function toUint8(x: string | Uint8Array | ArrayBuffer): Uint8Array {
   if (typeof x === 'string') return new TextEncoder().encode(x);
   if (x instanceof Uint8Array) return x;
-  return new Uint8Array(x);
+  return new Uint8Array(x as ArrayBuffer);
 }
 
 function getText(x: string | Uint8Array | ArrayBuffer) {
   if (typeof x === 'string') return x;
-  const u8 = x instanceof Uint8Array ? x : new Uint8Array(x);
+  const u8 = x instanceof Uint8Array ? x : new Uint8Array(x as ArrayBuffer);
   return new TextDecoder().decode(u8);
 }
 

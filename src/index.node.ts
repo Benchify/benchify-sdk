@@ -23,4 +23,4 @@ export {
 export { BundleRenderer, type BundleFile } from './lib/bundle-renderer';
 
 // Node.js-only helper utilities (uses fs module)
-export { collectFiles, applyChanges, type FileData } from './helpers';
+export { collectFiles, applyChanges, type FileData } from './lib/helpers';
