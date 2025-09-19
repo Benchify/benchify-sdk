@@ -8,6 +8,7 @@ dist-deno
 /*.tgz
 .idea/
 dist-bundle
+*.mcpb
 *.dxt
 bun.lockb
 package-lock.json
