@@ -63,6 +63,26 @@
         "default": "./dist/index.js"
       }
     },
+    "./helpers": {
+      "import": {
+        "types": "./dist/helpers.d.mts",
+        "default": "./dist/helpers.mjs"
+      },
+      "require": {
+        "types": "./dist/helpers.d.ts",
+        "default": "./dist/helpers.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/lib/bundle-renderer.d.mts",
+        "default": "./dist/lib/bundle-renderer.mjs"
+      },
+      "require": {
+        "types": "./dist/lib/bundle-renderer.d.ts",
+        "default": "./dist/lib/bundle-renderer.js"
+      }
+    },
     "./*.mjs": {
       "default": "./dist/*.mjs"
     },

@@ -1,29 +1,5 @@
-// Conditionally load Node.js modules to avoid errors in browser environments
-let fs: any;
-let path: any;
-let process: any;
-
-try {
-  fs = require('fs');
-  path = require('path');
-  process = require('process');
-} catch (err) {
-  // Node.js modules not available - will throw helpful error when functions are used
-  fs = null;
-  path = null;
-  process = null;
-}
-
-function ensureNodeEnvironment(functionName: string) {
-  if (!fs || !path || !process) {
-    throw new Error(
-      `${functionName} requires Node.js environment and is not available in browsers.\n` +
-        'This function uses Node.js filesystem APIs (fs, path) which are not available in browser environments.\n' +
-        'Please use this function only in Node.js server-side code.',
-    );
-  }
-}
-
+import fs from 'fs';
+import path from 'path';
 import { minimatch } from 'minimatch';
 
 export interface FileData {
@@ -83,14 +59,11 @@ function walkDirectory(dir: string, basePath: string, patterns: string[], ignore
 }
 
 export async function collectFiles({
-  basePath,
+  basePath = process.cwd(),
   patterns = DEFAULT_PATTERNS,
   ignore = DEFAULT_IGNORE,
 }: { basePath?: string; patterns?: string[]; ignore?: string[] } = {}): Promise<FileData[]> {
-  ensureNodeEnvironment('collectFiles');
-
-  const defaultBasePath = basePath || process.cwd();
-  const resolvedBasePath = path.resolve(defaultBasePath);
+  const resolvedBasePath = path.resolve(basePath);
   const filePaths = walkDirectory(resolvedBasePath, resolvedBasePath, patterns, ignore);
 
   const files: FileData[] = [];
@@ -113,13 +86,16 @@ export async function collectFiles({
   return files;
 }
 
-export function applyChanges({ files, basePath }: { files: FileData[]; basePath?: string }): void {
-  ensureNodeEnvironment('applyChanges');
-
-  const defaultBasePath = basePath || process.cwd();
+export function applyChanges({
+  files,
+  basePath = process.cwd(),
+}: {
+  files: FileData[];
+  basePath?: string;
+}): void {
   for (const file of files) {
     try {
-      const fullPath = path.resolve(defaultBasePath, file.path);
+      const fullPath = path.resolve(basePath, file.path);
       const dirPath = path.dirname(fullPath);
 
       fs.mkdirSync(dirPath, { recursive: true });
