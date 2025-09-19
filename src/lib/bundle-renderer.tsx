@@ -1,4 +1,22 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+// Conditionally load React to avoid errors when React is not installed
+let React: any;
+let useEffect: typeof import('react').useEffect;
+let useMemo: typeof import('react').useMemo;
+let useRef: typeof import('react').useRef;
+
+try {
+  const ReactModule = require('react');
+  React = ReactModule.default || ReactModule;
+  useEffect = ReactModule.useEffect;
+  useMemo = ReactModule.useMemo;
+  useRef = ReactModule.useRef;
+} catch (err) {
+  // React not available - will throw helpful error when component is used
+  React = null;
+  useEffect = null as any;
+  useMemo = null as any;
+  useRef = null as any;
+}
 
 export type BundleFile = {
   path: string; // e.g., "index.html", "assets/chunk-XYZ.js"
@@ -28,6 +46,15 @@ export function BundleRenderer({
   sandbox = 'allow-scripts allow-same-origin',
   title = 'vite-bundle-iframe',
 }: Props) {
+  if (!React) {
+    throw new Error(
+      'BundleRenderer requires React to be installed. Please install React:\n' +
+      '  npm install react\n' +
+      '  # or\n' +
+      '  yarn add react'
+    );
+  }
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Normalize and index files by clean path
@@ -136,13 +163,13 @@ export function BundleRenderer({
 
     if (!indexHtmlPath) {
       console.error('[ViteBundleIframe] No index.html found in bundle');
-      return () => {};
+      return () => { };
     }
 
     const indexFile = normalized[indexHtmlPath];
     if (!indexFile) {
       console.error('[ViteBundleIframe] Index HTML file not found in normalized bundle');
-      return () => {};
+      return () => { };
     }
 
     let html = getText(indexFile.contents);
@@ -206,7 +233,7 @@ export function BundleRenderer({
       for (const u of objectURLs) {
         try {
           URL.revokeObjectURL(u);
-        } catch {}
+        } catch { }
       }
     };
   }, [normalized]);
