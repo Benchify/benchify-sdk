@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-alpha.39 (2025-09-19)
+
+Full Changelog: [v0.1.0-alpha.38...v0.1.0-alpha.39](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.38...v0.1.0-alpha.39)
+
+### Features
+
+* **mcp:** add docs search tool ([a114efe](https://github.com/Benchify/benchify-sdk/commit/a114efebc3efb016f64f7f3fca6bb0dae26c87a3))
+
+
+### Chores
+
+* **codegen:** internal codegen update ([4ef6bd2](https://github.com/Benchify/benchify-sdk/commit/4ef6bd2572d3b3cb0d36eefed9ec2fd380826dec))
+* **internal:** gitignore .mcpb files ([a3d62ae](https://github.com/Benchify/benchify-sdk/commit/a3d62ae9360a5a4eab320aedfef10253bfec8a7f))
+
 ## 0.1.0-alpha.38 (2025-09-19)
 
 Full Changelog: [v0.1.0-alpha.37...v0.1.0-alpha.38](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.37...v0.1.0-alpha.38)
