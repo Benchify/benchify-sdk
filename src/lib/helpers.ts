@@ -18,8 +18,8 @@ function ensureNodeEnvironment(functionName: string) {
   if (!fs || !path || !process) {
     throw new Error(
       `${functionName} requires Node.js environment and is not available in browsers.\n` +
-      'This function uses Node.js filesystem APIs (fs, path) which are not available in browser environments.\n' +
-      'Please use this function only in Node.js server-side code.'
+        'This function uses Node.js filesystem APIs (fs, path) which are not available in browser environments.\n' +
+        'Please use this function only in Node.js server-side code.',
     );
   }
 }
@@ -113,13 +113,7 @@ export async function collectFiles({
   return files;
 }
 
-export function applyChanges({
-  files,
-  basePath,
-}: {
-  files: FileData[];
-  basePath?: string;
-}): void {
+export function applyChanges({ files, basePath }: { files: FileData[]; basePath?: string }): void {
   ensureNodeEnvironment('applyChanges');
 
   const defaultBasePath = basePath || process.cwd();
