@@ -49,9 +49,9 @@ export function BundleRenderer({
   if (!React) {
     throw new Error(
       'BundleRenderer requires React to be installed. Please install React:\n' +
-      '  npm install react\n' +
-      '  # or\n' +
-      '  yarn add react'
+        '  npm install react\n' +
+        '  # or\n' +
+        '  yarn add react',
     );
   }
 
@@ -163,13 +163,13 @@ export function BundleRenderer({
 
     if (!indexHtmlPath) {
       console.error('[ViteBundleIframe] No index.html found in bundle');
-      return () => { };
+      return () => {};
     }
 
     const indexFile = normalized[indexHtmlPath];
     if (!indexFile) {
       console.error('[ViteBundleIframe] Index HTML file not found in normalized bundle');
-      return () => { };
+      return () => {};
     }
 
     let html = getText(indexFile.contents);
@@ -233,7 +233,7 @@ export function BundleRenderer({
       for (const u of objectURLs) {
         try {
           URL.revokeObjectURL(u);
-        } catch { }
+        } catch {}
       }
     };
   }, [normalized]);
