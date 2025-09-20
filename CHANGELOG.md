@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.42 (2025-09-20)
+
+Full Changelog: [v0.1.0-alpha.41...v0.1.0-alpha.42](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.41...v0.1.0-alpha.42)
+
+### Chores
+
+* do not install brew dependencies in ./scripts/bootstrap by default ([3a74f8a](https://github.com/Benchify/benchify-sdk/commit/3a74f8adc12c689c9e9f97ca0ec6036bdbeb111b))
+
 ## 0.1.0-alpha.41 (2025-09-19)
 
 Full Changelog: [v0.1.0-alpha.40...v0.1.0-alpha.41](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.40...v0.1.0-alpha.41)
