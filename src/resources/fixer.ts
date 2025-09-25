@@ -57,8 +57,8 @@ export namespace DiagnosticResponse {
      */
     type:
       | 'type_error'
-      | 'string_literal'
-      | 'import_export'
+      | 'parsing'
+      | 'dependency'
       | 'implicit_any'
       | 'implicit_any_array'
       | 'invalid_jsx'
@@ -158,9 +158,7 @@ export namespace FixerRunResponse {
     /**
      * List of fix types that were actually applied during the fixer run
      */
-    fix_types_used?: Array<
-      'import_export' | 'string_literals' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'
-    >;
+    fix_types_used?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
     /**
      * Changes made by the fixer in the requested format
@@ -272,7 +270,7 @@ export interface FixerRunParams {
   /**
    * Configuration for which fix types to apply
    */
-  fix_types?: Array<'import_export' | 'string_literals' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
+  fix_types?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
   /**
    * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.

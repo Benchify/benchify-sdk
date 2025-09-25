@@ -25,7 +25,7 @@ describe('resource fixer', () => {
     const response = await client.fixer.run({
       files: [{ contents: 'contents', path: 'x' }],
       bundle: true,
-      fix_types: ['import_export'],
+      fix_types: ['dependency'],
       fixes: {
         css: true,
         imports: true,
