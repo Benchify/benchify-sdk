@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.0-alpha.42 (2025-09-26)
+
+Full Changelog: [v0.1.0-alpha.41...v0.1.0-alpha.42](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.41...v0.1.0-alpha.42)
+
+### Features
+
+* **api:** api update ([7c8eb23](https://github.com/Benchify/benchify-sdk/commit/7c8eb236bea5e761479b83b4dd6a77d0c795d1ab))
+* **api:** api update ([35c1d78](https://github.com/Benchify/benchify-sdk/commit/35c1d789818ad9dfd2c08bd603b1f8707ec6ac94))
+* **mcp:** add option for including docs tools ([f2bf5f0](https://github.com/Benchify/benchify-sdk/commit/f2bf5f080360bfb7c7a661a8300a2d5e0a5ce1ba))
+* **mcp:** enable experimental docs search tool ([ce4d554](https://github.com/Benchify/benchify-sdk/commit/ce4d5549d78804464925d6463a0ef5ad6b4d6066))
+
+
+### Performance Improvements
+
+* faster formatting ([6e72b3b](https://github.com/Benchify/benchify-sdk/commit/6e72b3bde9a27dc1c37f98a39ac2c2ff4fee8d1f))
+
+
+### Chores
+
+* do not install brew dependencies in ./scripts/bootstrap by default ([3a74f8a](https://github.com/Benchify/benchify-sdk/commit/3a74f8adc12c689c9e9f97ca0ec6036bdbeb111b))
+* **internal:** remove deprecated `compilerOptions.baseUrl` from tsconfig.json ([ec6b433](https://github.com/Benchify/benchify-sdk/commit/ec6b433036254b9aa0a455eefcfc18bbf52ff4ef))
+
 ## 0.1.0-alpha.41 (2025-09-19)
 
 Full Changelog: [v0.1.0-alpha.40...v0.1.0-alpha.41](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.40...v0.1.0-alpha.41)
