@@ -25,15 +25,7 @@ describe('resource fixer', () => {
     const response = await client.fixer.run({
       files: [{ contents: 'contents', path: 'x' }],
       bundle: true,
-      fix_types: ['dependency'],
-      fixes: {
-        css: true,
-        imports: true,
-        react: true,
-        stringLiterals: true,
-        tailwind: true,
-        tsSuggestions: true,
-      },
+      fixes: ['dependency'],
       meta: { external_id: 'external_id' },
       response_format: 'DIFF',
       template_id: 'template_id',
