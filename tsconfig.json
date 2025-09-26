@@ -8,10 +8,9 @@
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": "./",
     "paths": {
-      "benchify/*": ["src/*"],
-      "benchify": ["src/index.ts"]
+      "benchify/*": ["./src/*"],
+      "benchify": ["./src/index.ts"]
     },
     "noEmit": true,
     "resolveJsonModule": true,
