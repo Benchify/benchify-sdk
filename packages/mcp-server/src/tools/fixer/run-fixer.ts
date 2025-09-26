@@ -50,52 +50,15 @@ export const tool: Tool = {
         title: 'Bundle',
         description: 'Whether to bundle the project (experimental)',
       },
-      fix_types: {
+      fixes: {
         type: 'array',
-        title: 'Fix Types',
+        title: 'Fixes',
         description: 'Configuration for which fix types to apply',
         items: {
           type: 'string',
           title: 'FixTypeName',
           description: 'Enumeration of available fix types',
           enum: ['dependency', 'parsing', 'css', 'ai_fallback', 'types', 'ui', 'sql'],
-        },
-      },
-      fixes: {
-        type: 'object',
-        title: 'FixConfigObject',
-        description: 'DEPRECATED: legacy boolean flags for which fixes to apply.',
-        properties: {
-          css: {
-            type: 'boolean',
-            title: 'Css',
-            description: 'Whether to fix CSS issues',
-          },
-          imports: {
-            type: 'boolean',
-            title: 'Imports',
-            description: 'Whether to fix import issues',
-          },
-          react: {
-            type: 'boolean',
-            title: 'React',
-            description: 'Whether to fix React issues',
-          },
-          stringLiterals: {
-            type: 'boolean',
-            title: 'Stringliterals',
-            description: 'Whether to fix string literal issues',
-          },
-          tailwind: {
-            type: 'boolean',
-            title: 'Tailwind',
-            description: 'Whether to fix Tailwind issues',
-          },
-          tsSuggestions: {
-            type: 'boolean',
-            title: 'Tssuggestions',
-            description: 'Whether to fix TypeScript suggestions',
-          },
         },
       },
       meta: {

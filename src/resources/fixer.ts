@@ -270,12 +270,7 @@ export interface FixerRunParams {
   /**
    * Configuration for which fix types to apply
    */
-  fix_types?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
-
-  /**
-   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
-   */
-  fixes?: FixerRunParams.Fixes | null;
+  fixes?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
   /**
    * Meta information for API requests
@@ -307,41 +302,6 @@ export namespace FixerRunParams {
      * Path to the file
      */
     path: string;
-  }
-
-  /**
-   * @deprecated DEPRECATED: legacy boolean flags for which fixes to apply.
-   */
-  export interface Fixes {
-    /**
-     * @deprecated Whether to fix CSS issues
-     */
-    css?: boolean | null;
-
-    /**
-     * @deprecated Whether to fix import issues
-     */
-    imports?: boolean | null;
-
-    /**
-     * @deprecated Whether to fix React issues
-     */
-    react?: boolean | null;
-
-    /**
-     * @deprecated Whether to fix string literal issues
-     */
-    stringLiterals?: boolean | null;
-
-    /**
-     * @deprecated Whether to fix Tailwind issues
-     */
-    tailwind?: boolean | null;
-
-    /**
-     * @deprecated Whether to fix TypeScript suggestions
-     */
-    tsSuggestions?: boolean | null;
   }
 
   /**
