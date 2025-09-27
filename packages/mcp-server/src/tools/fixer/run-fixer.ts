@@ -73,6 +73,12 @@ export const tool: Tool = {
           },
         },
       },
+      mode: {
+        type: 'string',
+        title: 'FixerMode',
+        description: "Fixer operating mode: 'project' expects full project, 'files' expects subset",
+        enum: ['project', 'files'],
+      },
       response_format: {
         type: 'string',
         title: 'ResponseFormat',

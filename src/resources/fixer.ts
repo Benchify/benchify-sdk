@@ -278,6 +278,11 @@ export interface FixerRunParams {
   meta?: FixerRunParams.Meta | null;
 
   /**
+   * Fixer operating mode: 'project' expects full project, 'files' expects subset
+   */
+  mode?: 'project' | 'files';
+
+  /**
    * Format for the response (diff, changed_files, or all_files)
    */
   response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
