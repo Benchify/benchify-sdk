@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.43 (2025-09-27)
+
+Full Changelog: [v0.1.0-alpha.42...v0.1.0-alpha.43](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.42...v0.1.0-alpha.43)
+
+### Chores
+
+* **internal:** fix incremental formatting in some cases ([850fb73](https://github.com/Benchify/benchify-sdk/commit/850fb7388809374c4819be0580c93f4a95cfd9b0))
+* **mcp:** allow pointing `docs_search` tool at other URLs ([78c4483](https://github.com/Benchify/benchify-sdk/commit/78c44833fe7d1f08e060a1532dfeeb6589753c47))
+
 ## 0.1.0-alpha.42 (2025-09-26)
 
 Full Changelog: [v0.1.0-alpha.41...v0.1.0-alpha.42](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.41...v0.1.0-alpha.42)
