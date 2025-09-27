@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-alpha.44 (2025-09-27)
+
+Full Changelog: [v0.1.0-alpha.43...v0.1.0-alpha.44](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.43...v0.1.0-alpha.44)
+
+### Features
+
+* **api:** api update ([d42048e](https://github.com/Benchify/benchify-sdk/commit/d42048e7436639c6fdce8aa0f78f780bafa99aa7))
+
+
+### Chores
+
+* **internal:** codegen related update ([64cb734](https://github.com/Benchify/benchify-sdk/commit/64cb734d77badb80921025327111cfd7ef4ebc5c))
+* **internal:** ignore .eslintcache ([5e522d4](https://github.com/Benchify/benchify-sdk/commit/5e522d469ba68e2fd66006a003ac7aa9bd614696))
+
 ## 0.1.0-alpha.43 (2025-09-27)
 
 Full Changelog: [v0.1.0-alpha.42...v0.1.0-alpha.43](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.42...v0.1.0-alpha.43)
