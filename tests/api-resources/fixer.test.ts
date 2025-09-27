@@ -27,6 +27,7 @@ describe('resource fixer', () => {
       bundle: true,
       fixes: ['dependency'],
       meta: { external_id: 'external_id' },
+      mode: 'project',
       response_format: 'DIFF',
       template_id: 'template_id',
     });
