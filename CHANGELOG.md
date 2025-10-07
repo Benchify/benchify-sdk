@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0-alpha.45 (2025-10-07)
+
+Full Changelog: [v0.1.0-alpha.44...v0.1.0-alpha.45](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.44...v0.1.0-alpha.45)
+
+### Features
+
+* **api:** api update ([2c862e5](https://github.com/Benchify/benchify-sdk/commit/2c862e50c3908168004400961f4a7f8dcee9be79))
+
+
+### Bug Fixes
+
+* **mcp:** fix cli argument parsing logic ([4c64777](https://github.com/Benchify/benchify-sdk/commit/4c64777670c01a7c2f546b17e00d338547f30d97))
+
+
+### Chores
+
+* **internal:** use npm pack for build uploads ([5e71632](https://github.com/Benchify/benchify-sdk/commit/5e71632b68d77de8ba44f55cdd12bae9639de2bf))
+* **internal:** version bump ([bbf5bb2](https://github.com/Benchify/benchify-sdk/commit/bbf5bb2fd1da090675496994f281be9823d6e5b5))
+* **jsdoc:** fix [@link](https://github.com/link) annotations to refer only to parts of the package‘s public interface ([aa2be89](https://github.com/Benchify/benchify-sdk/commit/aa2be89b037e57aa40e1a9ef32da9153f3b1a57d))
+* update lockfile ([72dbf90](https://github.com/Benchify/benchify-sdk/commit/72dbf902b125d0c6b385878fd9e8a23d53ea0092))
+
 ## 0.1.0-alpha.44 (2025-09-27)
 
 Full Changelog: [v0.1.0-alpha.43...v0.1.0-alpha.44](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.43...v0.1.0-alpha.44)
