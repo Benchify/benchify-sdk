@@ -206,4 +206,4 @@ The following tools are available in this MCP server.
 
 ### Resource `fixer`:
 
-- `run_fixer` (`write`): Handle fixer requests to process and fix TypeScript files.
+- `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.

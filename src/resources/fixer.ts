@@ -8,13 +8,12 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Fixer extends APIResource {
   /**
-   * Handle fixer requests to process and fix TypeScript files.
+   * Handle fixer requests - supports both legacy (embedded files) and new
+   * (manifest+blobs) formats.
    *
    * @example
    * ```ts
-   * const response = await client.fixer.run({
-   *   files: [{ contents: 'contents', path: 'x' }],
-   * });
+   * const response = await client.fixer.run();
    * ```
    */
   run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
@@ -258,14 +257,24 @@ export namespace FixerRunResponse {
 
 export interface FixerRunParams {
   /**
-   * List of files to process
-   */
-  files: Array<FixerRunParams.File>;
-
-  /**
    * Whether to bundle the project (experimental)
    */
   bundle?: boolean;
+
+  /**
+   * List of files to process (legacy format)
+   */
+  files?: Array<FixerRunParams.File> | null;
+
+  /**
+   * Base64-encoded compressed file contents (packed format)
+   */
+  files_data?: string | null;
+
+  /**
+   * File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]
+   */
+  files_manifest?: Array<{ [key: string]: unknown }> | null;
 
   /**
    * Configuration for which fix types to apply
@@ -295,11 +304,11 @@ export interface FixerRunParams {
 
 export namespace FixerRunParams {
   /**
-   * Model for file data in requests
+   * Model for file data - clean and simple
    */
   export interface File {
     /**
-     * Original contents of the file before any modifications
+     * File contents
      */
     contents: string;
 

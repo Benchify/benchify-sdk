@@ -9,8 +9,8 @@ const client = new Benchify({
 
 describe('resource fixer', () => {
   // Prism tests are disabled
-  test.skip('run: only required params', async () => {
-    const responsePromise = client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] });
+  test.skip('run', async () => {
+    const responsePromise = client.fixer.run({});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -18,18 +18,5 @@ describe('resource fixer', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // Prism tests are disabled
-  test.skip('run: required and optional params', async () => {
-    const response = await client.fixer.run({
-      files: [{ contents: 'contents', path: 'x' }],
-      bundle: true,
-      fixes: ['dependency'],
-      meta: { external_id: 'external_id' },
-      mode: 'project',
-      response_format: 'DIFF',
-      template_id: 'template_id',
-    });
   });
 });
