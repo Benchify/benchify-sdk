@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.46 (2025-10-09)
+
+Full Changelog: [v0.1.0-alpha.45...v0.1.0-alpha.46](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.45...v0.1.0-alpha.46)
+
+### Features
+
+* **api:** api update ([acfd997](https://github.com/Benchify/benchify-sdk/commit/acfd99735cae60e5d80bb42c1b693647bab5fca0))
+
+
+### Chores
+
+* extract some types in mcp docs ([1c11d76](https://github.com/Benchify/benchify-sdk/commit/1c11d760c6b8c0b59e3c676b34b54d7b9cf133a3))
+
 ## 0.1.0-alpha.45 (2025-10-07)
 
 Full Changelog: [v0.1.0-alpha.44...v0.1.0-alpha.45](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.44...v0.1.0-alpha.45)
