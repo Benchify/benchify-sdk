@@ -26,7 +26,7 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const response = await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] });
+const response = await client.fixer.run();
 
 console.log(response.data);
 ```
@@ -43,8 +43,7 @@ const client = new Benchify({
   apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
 });
 
-const params: Benchify.FixerRunParams = { files: [{ contents: 'contents', path: 'x' }] };
-const response: Benchify.FixerRunResponse = await client.fixer.run(params);
+const response: Benchify.FixerRunResponse = await client.fixer.run();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -57,17 +56,15 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const response = await client.fixer
-  .run({ files: [{ contents: 'contents', path: 'x' }] })
-  .catch(async (err) => {
-    if (err instanceof Benchify.APIError) {
-      console.log(err.status); // 400
-      console.log(err.name); // BadRequestError
-      console.log(err.headers); // {server: 'nginx', ...}
-    } else {
-      throw err;
-    }
-  });
+const response = await client.fixer.run().catch(async (err) => {
+  if (err instanceof Benchify.APIError) {
+    console.log(err.status); // 400
+    console.log(err.name); // BadRequestError
+    console.log(err.headers); // {server: 'nginx', ...}
+  } else {
+    throw err;
+  }
+});
 ```
 
 Error codes are as follows:
@@ -99,7 +96,7 @@ const client = new Benchify({
 });
 
 // Or, configure per-request:
-await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }, {
+await client.fixer.run({
   maxRetries: 5,
 });
 ```
@@ -116,7 +113,7 @@ const client = new Benchify({
 });
 
 // Override per-request:
-await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }, {
+await client.fixer.run({
   timeout: 5 * 1000,
 });
 ```
@@ -139,13 +136,11 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Benchify();
 
-const response = await client.fixer.run({ files: [{ contents: 'contents', path: 'x' }] }).asResponse();
+const response = await client.fixer.run().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: response, response: raw } = await client.fixer
-  .run({ files: [{ contents: 'contents', path: 'x' }] })
-  .withResponse();
+const { data: response, response: raw } = await client.fixer.run().withResponse();
 console.log(raw.headers.get('X-My-Header'));
 console.log(response.data);
 ```
