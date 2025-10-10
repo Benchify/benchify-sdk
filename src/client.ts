@@ -30,7 +30,7 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
-import { filesToPackageBlob, type FileData } from './lib/helpers';
+import { filesToPackageBlob, packageBlobToFiles, type FileData } from './lib/helpers';
 
 export interface ClientOptions {
   /**
@@ -273,7 +273,7 @@ export class Benchify {
     const url =
       isAbsoluteURL(path) ?
         new URL(path)
-      : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
+        : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
 
     const defaultQuery = this.defaultQuery();
     if (!isEmptyObj(defaultQuery)) {
@@ -290,7 +290,7 @@ export class Benchify {
   /**
    * Used as a callback for mutating the given `FinalRequestOptions` object.
    */
-  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {}
+  protected async prepareOptions(options: FinalRequestOptions): Promise<void> { }
 
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -301,7 +301,7 @@ export class Benchify {
   protected async prepareRequest(
     request: RequestInit,
     { url, options }: { url: string; options: FinalRequestOptions },
-  ): Promise<void> {}
+  ): Promise<void> { }
 
   get<Rsp>(path: string, opts?: PromiseOrValue<RequestOptions>): APIPromise<Rsp> {
     return this.methodRequest('get', path, opts);
@@ -430,9 +430,8 @@ export class Benchify {
       throw new Errors.APIConnectionError({ cause: response });
     }
 
-    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${
-      response.ok ? 'succeeded' : 'failed'
-    } with status ${response.status} in ${headersTime - startTime}ms`;
+    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${response.ok ? 'succeeded' : 'failed'
+      } with status ${response.status} in ${headersTime - startTime}ms`;
 
     if (!response.ok) {
       const shouldRetry = await this.shouldRetry(response);
@@ -786,7 +785,7 @@ export class Benchify {
       })
       .then((response) => {
         const changes = response.data.suggested_changes;
-        const bundledFiles = response.data.bundle?.files;
+        const bundle = response.data.bundle;
 
         let files: FixerOutput<T>;
 
@@ -798,19 +797,61 @@ export class Benchify {
           }
           case 'CHANGED_FILES': {
             const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-            files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
+            // Check for blob format first
+            if (changedFormat.changed_files_data && changedFormat.changed_files_manifest) {
+              const decodedFiles = packageBlobToFiles({
+                files_data: changedFormat.changed_files_data,
+                files_manifest: changedFormat.changed_files_manifest as Array<{ path: string; size: number }>,
+              });
+              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            } else {
+              // Fall back to regular array format
+              files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
+            }
             break;
           }
           case 'ALL_FILES': {
             const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
+            // Check for blob format first
+            if (allFilesFormat.all_files_data && allFilesFormat.all_files_manifest) {
+              const decodedFiles = packageBlobToFiles({
+                files_data: allFilesFormat.all_files_data,
+                files_manifest: allFilesFormat.all_files_manifest as Array<{ path: string; size: number }>,
+              });
+              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            } else {
+              // Fall back to regular array format
+              files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
+            }
             break;
           }
           default: {
             // Fallback to all files if format is somehow invalid
             const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
+            if (fallbackFormat.all_files_data && fallbackFormat.all_files_manifest) {
+              const decodedFiles = packageBlobToFiles({
+                files_data: fallbackFormat.all_files_data,
+                files_manifest: fallbackFormat.all_files_manifest as Array<{ path: string; size: number }>,
+              });
+              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            } else {
+              files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
+            }
             break;
+          }
+        }
+
+        // Handle bundled files - check for blob format first
+        let bundledFiles: Array<FixerAPI.File> | undefined;
+        if (bundle) {
+          if (bundle.files_data && bundle.files_manifest) {
+            const decodedBundleFiles = packageBlobToFiles({
+              files_data: bundle.files_data,
+              files_manifest: bundle.files_manifest as Array<{ path: string; size: number }>,
+            });
+            bundledFiles = decodedBundleFiles.map((f) => ({ path: f.path, contents: f.contents }));
+          } else {
+            bundledFiles = bundle.files;
           }
         }
 
