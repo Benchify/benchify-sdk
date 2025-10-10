@@ -22,6 +22,7 @@ import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
 import { readEnv } from './internal/utils/env';
+import { convertFilesToPackageBlob, convertPackageBlobToFiles } from './helpers';
 import {
   type LogLevel,
   type Logger,
@@ -272,7 +273,7 @@ export class Benchify {
     const url =
       isAbsoluteURL(path) ?
         new URL(path)
-      : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
+        : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
 
     const defaultQuery = this.defaultQuery();
     if (!isEmptyObj(defaultQuery)) {
@@ -289,7 +290,7 @@ export class Benchify {
   /**
    * Used as a callback for mutating the given `FinalRequestOptions` object.
    */
-  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {}
+  protected async prepareOptions(options: FinalRequestOptions): Promise<void> { }
 
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -300,7 +301,7 @@ export class Benchify {
   protected async prepareRequest(
     request: RequestInit,
     { url, options }: { url: string; options: FinalRequestOptions },
-  ): Promise<void> {}
+  ): Promise<void> { }
 
   get<Rsp>(path: string, opts?: PromiseOrValue<RequestOptions>): APIPromise<Rsp> {
     return this.methodRequest('get', path, opts);
@@ -429,9 +430,8 @@ export class Benchify {
       throw new Errors.APIConnectionError({ cause: response });
     }
 
-    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${
-      response.ok ? 'succeeded' : 'failed'
-    } with status ${response.status} in ${headersTime - startTime}ms`;
+    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${response.ok ? 'succeeded' : 'failed'
+      } with status ${response.status} in ${headersTime - startTime}ms`;
 
     if (!response.ok) {
       const shouldRetry = await this.shouldRetry(response);
@@ -733,6 +733,7 @@ export class Benchify {
   fixer: API.Fixer = new API.Fixer(this);
   /**
    * Process all files using the fixer with a simplified interface.
+   * Now uses efficient package blob format for improved performance.
    *
    * @param files - Array of files to process
    * @param options - Optional parameters for the fixer run
@@ -771,11 +772,16 @@ export class Benchify {
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
 
-    // Call the underlying fixer.run method with the converted files
+    // Convert files to package blob format for efficient transport
+    const packageBlob = convertFilesToPackageBlob(files);
+
+    // Call the underlying fixer.run method with package blob format
     return this.fixer
       .run({
-        files: files,
+        files_data: packageBlob.files_data,
+        files_manifest: packageBlob.files_manifest as unknown as Array<{ [key: string]: unknown }>,
         response_format: responseFormat,
+        response_encoding: 'blob', // Request blob format for responses too
         ...options,
       })
       .then((response) => {
@@ -792,27 +798,63 @@ export class Benchify {
           }
           case 'CHANGED_FILES': {
             const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-            files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
+            // Handle both blob and regular formats
+            if (changedFormat.changed_files_data && changedFormat.changed_files_manifest) {
+              // Convert from blob format
+              files = convertPackageBlobToFiles(
+                changedFormat.changed_files_data,
+                changedFormat.changed_files_manifest as Array<{ path: string; size: number }>
+              ) as FixerOutput<T>;
+            } else {
+              files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
+            }
             break;
           }
           case 'ALL_FILES': {
             const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
+            // Handle both blob and regular formats
+            if (allFilesFormat.all_files_data && allFilesFormat.all_files_manifest) {
+              // Convert from blob format
+              files = convertPackageBlobToFiles(
+                allFilesFormat.all_files_data,
+                allFilesFormat.all_files_manifest as Array<{ path: string; size: number }>
+              ) as FixerOutput<T>;
+            } else {
+              files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
+            }
             break;
           }
           default: {
             // Fallback to all files if format is somehow invalid
             const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
+            if (fallbackFormat.all_files_data && fallbackFormat.all_files_manifest) {
+              files = convertPackageBlobToFiles(
+                fallbackFormat.all_files_data,
+                fallbackFormat.all_files_manifest as Array<{ path: string; size: number }>
+              ) as FixerOutput<T>;
+            } else {
+              files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
+            }
             break;
           }
         }
 
         // If bundle is enabled, return both files and bundled_files
-        if (bundleEnabled && bundledFiles) {
+        if (bundleEnabled) {
+          let processedBundledFiles = bundledFiles || [];
+
+          // Handle bundled files blob format if present
+          const bundle = response.data.bundle;
+          if (bundle?.files_data && bundle?.files_manifest && !bundledFiles) {
+            processedBundledFiles = convertPackageBlobToFiles(
+              bundle.files_data,
+              bundle.files_manifest as Array<{ path: string; size: number }>
+            );
+          }
+
           return {
             files,
-            bundled_files: bundledFiles,
+            bundled_files: processedBundledFiles,
           } as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
         }
 

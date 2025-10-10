@@ -5,11 +5,13 @@ import * as FixerAPI from './fixer';
 import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
+import { convertFilesToPackageBlob } from '../helpers';
 
 export class Fixer extends APIResource {
   /**
    * Handle fixer requests - supports both legacy (embedded files) and new
-   * (manifest+blobs) formats.
+   * (manifest+blobs) formats. Automatically converts legacy files to efficient
+   * package blob format for better performance.
    *
    * @example
    * ```ts
@@ -17,6 +19,23 @@ export class Fixer extends APIResource {
    * ```
    */
   run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
+    // If files are provided but no package blob format is specified,
+    // automatically convert to package blob format for better performance
+    if (body.files && !body.files_data && !body.files_manifest) {
+      const packageBlob = convertFilesToPackageBlob(body.files);
+
+      // Create new body with package blob format, removing the files array
+      const optimizedBody: FixerRunParams = {
+        ...body,
+        files_data: packageBlob.files_data,
+        files_manifest: packageBlob.files_manifest as unknown as Array<{ [key: string]: unknown }>,
+        response_encoding: body.response_encoding || 'blob', // Default to blob response too
+        files: null, // Remove the files array to use blob format
+      };
+
+      return this._client.post('/v1/fixer', { body: optimizedBody, ...options });
+    }
+
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
@@ -55,15 +74,15 @@ export namespace DiagnosticResponse {
      * Type of the diagnostic
      */
     type:
-      | 'type_error'
-      | 'parsing'
-      | 'dependency'
-      | 'implicit_any'
-      | 'implicit_any_array'
-      | 'invalid_jsx'
-      | 'css'
-      | 'ui'
-      | 'unclassified';
+    | 'type_error'
+    | 'parsing'
+    | 'dependency'
+    | 'implicit_any'
+    | 'implicit_any_array'
+    | 'invalid_jsx'
+    | 'css'
+    | 'ui'
+    | 'unclassified';
 
     /**
      * Code given by the diagnostic generator
@@ -171,24 +190,24 @@ export namespace FixerRunResponse {
      */
     export interface Status {
       composite_status:
-        | 'FIXED_EVERYTHING'
-        | 'FIXED_REQUESTED'
-        | 'PARTIALLY_FIXED'
-        | 'NO_REQUESTED_ISSUES'
-        | 'NO_ISSUES'
-        | 'FAILED';
+      | 'FIXED_EVERYTHING'
+      | 'FIXED_REQUESTED'
+      | 'PARTIALLY_FIXED'
+      | 'NO_REQUESTED_ISSUES'
+      | 'NO_ISSUES'
+      | 'FAILED';
 
       /**
        * Status of each file.
        */
       file_to_composite_status?: {
         [key: string]:
-          | 'FIXED_EVERYTHING'
-          | 'FIXED_REQUESTED'
-          | 'PARTIALLY_FIXED'
-          | 'NO_REQUESTED_ISSUES'
-          | 'NO_ISSUES'
-          | 'FAILED';
+        | 'FIXED_EVERYTHING'
+        | 'FIXED_REQUESTED'
+        | 'PARTIALLY_FIXED'
+        | 'NO_REQUESTED_ISSUES'
+        | 'NO_ISSUES'
+        | 'FAILED';
       };
     }
 
