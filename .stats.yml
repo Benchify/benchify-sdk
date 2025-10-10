@@ -1,4 +1,4 @@
 configured_endpoints: 1
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/benchify%2Fbenchify-c7794f53e55dc766d60efd4ced5c43d87eeadb74636ad53c8ee8aab9c93fb0bc.yml
-openapi_spec_hash: ce61ad41715c1be5778222cf9faeb75f
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/benchify%2Fbenchify-14ae8d55c49b9e3af6395c4264be2655f8bdcc34fa0a968b3b9ebe08fcbb37e0.yml
+openapi_spec_hash: 8eacc620abb2dd9821556adff79c5aab
 config_hash: 19ac74b1c339ebc5e4750f04b3467acb
