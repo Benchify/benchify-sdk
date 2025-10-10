@@ -205,6 +205,16 @@ export namespace FixerRunResponse {
        * Successfully bundled files
        */
       files?: Array<FixerAPI.FixerFile>;
+
+      /**
+       * Base64-encoded compressed file contents (blob format)
+       */
+      files_data?: string | null;
+
+      /**
+       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
+       */
+      files_manifest?: Array<{ [key: string]: unknown }> | null;
     }
 
     export interface DiffFormat {
@@ -219,6 +229,16 @@ export namespace FixerRunResponse {
        * List of changed files with their new contents
        */
       changed_files?: Array<FixerAPI.FixerFile> | null;
+
+      /**
+       * Base64-encoded compressed file contents (blob format)
+       */
+      changed_files_data?: string | null;
+
+      /**
+       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
+       */
+      changed_files_manifest?: Array<{ [key: string]: unknown }> | null;
     }
 
     export interface AllFilesFormat {
@@ -226,6 +246,16 @@ export namespace FixerRunResponse {
        * List of all files with their current contents
        */
       all_files?: Array<FixerAPI.FixerFile> | null;
+
+      /**
+       * Base64-encoded compressed file contents (blob format)
+       */
+      all_files_data?: string | null;
+
+      /**
+       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
+       */
+      all_files_manifest?: Array<{ [key: string]: unknown }> | null;
     }
   }
 
@@ -290,6 +320,11 @@ export interface FixerRunParams {
    * Fixer operating mode: 'project' expects full project, 'files' expects subset
    */
   mode?: 'project' | 'files';
+
+  /**
+   * Response encoding format: 'json' (default) or 'blob'
+   */
+  response_encoding?: 'json' | 'blob';
 
   /**
    * Format for the response (diff, changed_files, or all_files)
