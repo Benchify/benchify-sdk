@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { minimatch } from 'minimatch';
+import { gzipSync, gunzipSync } from 'zlib';
 
 export interface FileData {
   path: string;
@@ -104,4 +105,87 @@ export function applyChanges({
       continue;
     }
   }
+}
+
+/**
+ * Package blob data structure for sending files in compressed format
+ */
+export interface PackageBlob {
+  files_data: string;
+  files_manifest: Array<{ path: string; size: number }>;
+}
+
+/**
+ * Convert files to package blob format (compressed base64 data + manifest)
+ * This is the format expected by the Benchify API for efficient file transfer
+ */
+export function filesToPackageBlob(files: FileData[]): PackageBlob {
+  // Create a combined buffer with all file contents
+  // Format: [path_length][path][content_length][content]... (repeated for each file)
+  const chunks: Buffer[] = [];
+  const manifest: Array<{ path: string; size: number }> = [];
+
+  for (const file of files) {
+    const pathBuffer = Buffer.from(file.path, 'utf8');
+    const contentBuffer = Buffer.from(file.contents, 'utf8');
+
+    // Add path length (4 bytes), path, content length (4 bytes), content
+    const pathLengthBuffer = Buffer.allocUnsafe(4);
+    pathLengthBuffer.writeUInt32LE(pathBuffer.length, 0);
+
+    const contentLengthBuffer = Buffer.allocUnsafe(4);
+    contentLengthBuffer.writeUInt32LE(contentBuffer.length, 0);
+
+    chunks.push(pathLengthBuffer, pathBuffer, contentLengthBuffer, contentBuffer);
+
+    manifest.push({
+      path: file.path,
+      size: contentBuffer.length,
+    });
+  }
+
+  // Combine all chunks and compress
+  const combinedBuffer = Buffer.concat(chunks);
+  const compressedBuffer = gzipSync(combinedBuffer);
+  const base64Data = compressedBuffer.toString('base64');
+
+  return {
+    files_data: base64Data,
+    files_manifest: manifest,
+  };
+}
+
+/**
+ * Convert package blob format back to files (for testing/debugging)
+ */
+export function packageBlobToFiles(blob: PackageBlob): FileData[] {
+  const compressedBuffer = Buffer.from(blob.files_data, 'base64');
+  const decompressedBuffer = gunzipSync(compressedBuffer);
+
+  const files: FileData[] = [];
+  let offset = 0;
+
+  while (offset < decompressedBuffer.length) {
+    // Read path length
+    const pathLength = decompressedBuffer.readUInt32LE(offset);
+    offset += 4;
+
+    // Read path
+    const pathBuffer = decompressedBuffer.subarray(offset, offset + pathLength);
+    const path = pathBuffer.toString('utf8');
+    offset += pathLength;
+
+    // Read content length
+    const contentLength = decompressedBuffer.readUInt32LE(offset);
+    offset += 4;
+
+    // Read content
+    const contentBuffer = decompressedBuffer.subarray(offset, offset + contentLength);
+    const contents = contentBuffer.toString('utf8');
+    offset += contentLength;
+
+    files.push({ path, contents });
+  }
+
+  return files;
 }

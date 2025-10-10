@@ -30,6 +30,7 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
+import { filesToPackageBlob, type FileData } from './lib/helpers';
 
 export interface ClientOptions {
   /**
@@ -771,10 +772,15 @@ export class Benchify {
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
 
-    // Call the underlying fixer.run method with the converted files
+    // Convert files to package blob format for efficient transfer
+    const fileData: FileData[] = files.map((f) => ({ path: f.path, contents: f.contents }));
+    const packageBlob = filesToPackageBlob(fileData);
+
+    // Call the underlying fixer.run method with package blob format
     return this.fixer
       .run({
-        files: files,
+        files_data: packageBlob.files_data,
+        files_manifest: packageBlob.files_manifest,
         response_format: responseFormat,
         ...options,
       })
