@@ -117,35 +117,33 @@ export interface PackageBlob {
 
 /**
  * Convert files to package blob format (compressed base64 data + manifest)
- * This is the format expected by the Benchify API for efficient file transfer
+ * Uses character-based counting to match Python's len() and string slicing
  */
 export function filesToPackageBlob(files: FileData[]): PackageBlob {
-  // Create a combined buffer with all file contents
-  // Format: [path_length][path][content_length][content]... (repeated for each file)
-  const chunks: Buffer[] = [];
+  // Simple concatenation format - no binary length prefixes
+  // Files are joined as UTF-8 strings, manifest tracks boundaries
+  let combinedContent = '';
   const manifest: Array<{ path: string; size: number }> = [];
+  let currentOffset = 0;
 
   for (const file of files) {
-    const pathBuffer = Buffer.from(file.path, 'utf8');
-    const contentBuffer = Buffer.from(file.contents, 'utf8');
+    // Use character count to match Python's len() behavior
+    const contentLength = file.contents.length;
 
-    // Add path length (4 bytes), path, content length (4 bytes), content
-    const pathLengthBuffer = Buffer.allocUnsafe(4);
-    pathLengthBuffer.writeUInt32LE(pathBuffer.length, 0);
+    // Add content to combined string
+    combinedContent += file.contents;
 
-    const contentLengthBuffer = Buffer.allocUnsafe(4);
-    contentLengthBuffer.writeUInt32LE(contentBuffer.length, 0);
-
-    chunks.push(pathLengthBuffer, pathBuffer, contentLengthBuffer, contentBuffer);
-
+    // Track file in manifest with character count (matches Python len())
     manifest.push({
       path: file.path,
-      size: contentBuffer.length,
+      size: contentLength,
     });
+
+    currentOffset += contentLength;
   }
 
-  // Combine all chunks and compress
-  const combinedBuffer = Buffer.concat(chunks);
+  // Convert to buffer, compress, and encode
+  const combinedBuffer = Buffer.from(combinedContent, 'utf8');
   const compressedBuffer = gzipSync(combinedBuffer);
   const base64Data = compressedBuffer.toString('base64');
 
@@ -157,34 +155,29 @@ export function filesToPackageBlob(files: FileData[]): PackageBlob {
 
 /**
  * Convert package blob format back to files (for testing/debugging)
+ * Uses character-based slicing to match Python's string behavior
  */
 export function packageBlobToFiles(blob: PackageBlob): FileData[] {
   const compressedBuffer = Buffer.from(blob.files_data, 'base64');
   const decompressedBuffer = gunzipSync(compressedBuffer);
 
+  // Convert back to UTF-8 string
+  const combinedContent = decompressedBuffer.toString('utf8');
+
   const files: FileData[] = [];
-  let offset = 0;
+  let characterOffset = 0;
 
-  while (offset < decompressedBuffer.length) {
-    // Read path length
-    const pathLength = decompressedBuffer.readUInt32LE(offset);
-    offset += 4;
+  for (const manifestEntry of blob.files_manifest) {
+    // Use character-based slicing to match Python's string slicing behavior
+    // Manifest now contains character counts, not byte counts
+    const contents = combinedContent.slice(characterOffset, characterOffset + manifestEntry.size);
 
-    // Read path
-    const pathBuffer = decompressedBuffer.subarray(offset, offset + pathLength);
-    const path = pathBuffer.toString('utf8');
-    offset += pathLength;
+    files.push({
+      path: manifestEntry.path,
+      contents: contents,
+    });
 
-    // Read content length
-    const contentLength = decompressedBuffer.readUInt32LE(offset);
-    offset += 4;
-
-    // Read content
-    const contentBuffer = decompressedBuffer.subarray(offset, offset + contentLength);
-    const contents = contentBuffer.toString('utf8');
-    offset += contentLength;
-
-    files.push({ path, contents });
+    characterOffset += manifestEntry.size;
   }
 
   return files;
