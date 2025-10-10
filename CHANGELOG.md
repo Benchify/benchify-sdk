@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-alpha.49 (2025-10-10)
+
+Full Changelog: [v0.1.0-alpha.48...v0.1.0-alpha.49](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.48...v0.1.0-alpha.49)
+
 ## 0.1.0-alpha.48 (2025-10-10)
 
 Full Changelog: [v0.1.0-alpha.47...v0.1.0-alpha.48](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.47...v0.1.0-alpha.48)
