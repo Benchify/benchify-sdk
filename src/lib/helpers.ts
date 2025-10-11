@@ -116,34 +116,28 @@ export interface PackageBlob {
 }
 
 /**
- * Convert files to package blob format (compressed base64 data + manifest)
- * Uses character-based counting to match Python's len() and string slicing
+ * Convert files to package blob format using BYTE-based processing
+ * This eliminates JavaScript vs Python character counting discrepancies
  */
 export function filesToPackageBlob(files: FileData[]): PackageBlob {
-  // Simple concatenation format - no binary length prefixes
-  // Files are joined as UTF-8 strings, manifest tracks boundaries
-  let combinedContent = '';
+  // Work with BYTES throughout, not strings
   const manifest: Array<{ path: string; size: number }> = [];
-  let currentOffset = 0;
+  const fileBuffers: Buffer[] = [];
 
   for (const file of files) {
-    // Use character count to match Python's len() behavior
-    const contentLength = file.contents.length;
+    // CRITICAL: Use BYTE length, not character length
+    const contentBuffer = Buffer.from(file.contents, 'utf8');
+    const byteSize = contentBuffer.length;  // This is UTF-8 byte count
 
-    // Add content to combined string
-    combinedContent += file.contents;
-
-    // Track file in manifest with character count (matches Python len())
+    fileBuffers.push(contentBuffer);
     manifest.push({
       path: file.path,
-      size: contentLength,
+      size: byteSize,  // Store byte count, not character count
     });
-
-    currentOffset += contentLength;
   }
 
-  // Convert to buffer, compress, and encode
-  const combinedBuffer = Buffer.from(combinedContent, 'utf8');
+  // Concatenate ALL file buffers into single byte array
+  const combinedBuffer = Buffer.concat(fileBuffers);
   const compressedBuffer = gzipSync(combinedBuffer);
   const base64Data = compressedBuffer.toString('base64');
 
@@ -154,30 +148,30 @@ export function filesToPackageBlob(files: FileData[]): PackageBlob {
 }
 
 /**
- * Convert package blob format back to files (for testing/debugging)
- * Uses character-based slicing to match Python's string behavior
+ * Convert package blob back to files using BYTE-based slicing
  */
 export function packageBlobToFiles(blob: PackageBlob): FileData[] {
   const compressedBuffer = Buffer.from(blob.files_data, 'base64');
-  const decompressedBuffer = gunzipSync(compressedBuffer);
-
-  // Convert back to UTF-8 string
-  const combinedContent = decompressedBuffer.toString('utf8');
+  const rawBytes = gunzipSync(compressedBuffer);  // Keep as bytes!
 
   const files: FileData[] = [];
-  let characterOffset = 0;
+  let byteOffset = 0;
 
   for (const manifestEntry of blob.files_manifest) {
-    // Use character-based slicing to match Python's string slicing behavior
-    // Manifest now contains character counts, not byte counts
-    const contents = combinedContent.slice(characterOffset, characterOffset + manifestEntry.size);
+    const byteSize = manifestEntry.size;  // This is UTF-8 byte count
+
+    // Slice RAW BYTES first
+    const fileBytes = rawBytes.subarray(byteOffset, byteOffset + byteSize);
+
+    // THEN decode to string
+    const contents = fileBytes.toString('utf8');
 
     files.push({
       path: manifestEntry.path,
       contents: contents,
     });
 
-    characterOffset += manifestEntry.size;
+    byteOffset += byteSize;
   }
 
   return files;
