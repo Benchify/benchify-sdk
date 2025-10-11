@@ -127,12 +127,12 @@ export function filesToPackageBlob(files: FileData[]): PackageBlob {
   for (const file of files) {
     // CRITICAL: Use BYTE length, not character length
     const contentBuffer = Buffer.from(file.contents, 'utf8');
-    const byteSize = contentBuffer.length;  // This is UTF-8 byte count
+    const byteSize = contentBuffer.length; // This is UTF-8 byte count
 
     fileBuffers.push(contentBuffer);
     manifest.push({
       path: file.path,
-      size: byteSize,  // Store byte count, not character count
+      size: byteSize, // Store byte count, not character count
     });
   }
 
@@ -152,13 +152,13 @@ export function filesToPackageBlob(files: FileData[]): PackageBlob {
  */
 export function packageBlobToFiles(blob: PackageBlob): FileData[] {
   const compressedBuffer = Buffer.from(blob.files_data, 'base64');
-  const rawBytes = gunzipSync(compressedBuffer);  // Keep as bytes!
+  const rawBytes = gunzipSync(compressedBuffer); // Keep as bytes!
 
   const files: FileData[] = [];
   let byteOffset = 0;
 
   for (const manifestEntry of blob.files_manifest) {
-    const byteSize = manifestEntry.size;  // This is UTF-8 byte count
+    const byteSize = manifestEntry.size; // This is UTF-8 byte count
 
     // Slice RAW BYTES first
     const fileBytes = rawBytes.subarray(byteOffset, byteOffset + byteSize);
