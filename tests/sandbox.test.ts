@@ -158,7 +158,7 @@ describe('Sandbox', () => {
 
       const callArgs = mockSandboxAPI.create.mock.calls[0][0];
       expect(callArgs.packed).toBeInstanceOf(Blob);
-      expect(callArgs.packed.type).toBe('application/octet-stream');
+      expect(callArgs.packed.type).toBe('application/gzip');
     });
 
     it('should handle Uint8Array file contents', async () => {
@@ -395,7 +395,7 @@ describe('SandboxHandle', () => {
       expect(callArgs.manifest).toBeDefined();
 
       // Verify packed blob is correct type
-      expect(callArgs.packed.type).toBe('application/octet-stream');
+      expect(callArgs.packed.type).toBe('application/gzip');
     });
 
     it('should handle 409 conflict with retry', async () => {
