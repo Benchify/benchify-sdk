@@ -20,7 +20,8 @@
       "command": "node",
       "args": ["${__dirname}/index.js"],
       "env": {
-        "BENCHIFY_API_KEY": "${user_config.BENCHIFY_API_KEY}"
+        "BENCHIFY_API_KEY": "${user_config.BENCHIFY_API_KEY}",
+        "BENCHIFY_BEARER_TOKEN": "${user_config.BENCHIFY_BEARER_TOKEN}"
       }
     }
   },
@@ -28,7 +29,13 @@
     "BENCHIFY_API_KEY": {
       "title": "api_key",
       "description": "Benchify API Key. Obtain a key from the [Benchify web portal](https://app.benchify.com) under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.",
-      "required": true,
+      "required": false,
+      "type": "string"
+    },
+    "BENCHIFY_BEARER_TOKEN": {
+      "title": "bearer_token",
+      "description": "JWT token-based authentication",
+      "required": false,
       "type": "string"
     }
   },
