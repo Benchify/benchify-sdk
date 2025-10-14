@@ -205,17 +205,14 @@ export class SandboxHandle {
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: del.path })))
       : undefined;
 
-    // Determine if we should use packed format
-    const totalSize = changedFiles.reduce((acc, file) => acc + Buffer.from(file.contents).length, 0);
-    const shouldUsePacked = changedFiles.length > 0 && (changedFiles.length > 10 || totalSize > 50000); // 50KB threshold
-
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
     const proposedTreeHash = this._computeTreeHash(newManifest);
     const idempotencyKey = this._generateIdempotencyKey(currentTreeHash, proposedTreeHash);
 
+    // Always use packed format when there are file changes for consistency
     let packed: Blob | undefined;
-    if (shouldUsePacked && changedFiles.length > 0) {
+    if (changedFiles.length > 0) {
       const packageBlob = filesToPackageBlob(changedFiles);
       packed = new Blob([JSON.stringify(packageBlob)], { type: 'application/json' });
     }
