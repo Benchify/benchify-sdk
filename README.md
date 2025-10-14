@@ -64,17 +64,37 @@ import Benchify, { toFile } from 'benchify';
 const client = new Benchify();
 
 // If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.sandboxes.create({ packed: fs.createReadStream('/path/to/file') });
+await client.sandboxes.create({
+  packed: fs.createReadStream('/path/to/file'),
+  'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+  'Idempotency-Key': 'xxxxxxxx',
+});
 
 // Or if you have the web `File` API you can pass a `File` instance:
-await client.sandboxes.create({ packed: new File(['my bytes'], 'file') });
+await client.sandboxes.create({
+  packed: new File(['my bytes'], 'file'),
+  'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+  'Idempotency-Key': 'xxxxxxxx',
+});
 
 // You can also pass a `fetch` `Response`:
-await client.sandboxes.create({ packed: await fetch('https://somesite/file') });
+await client.sandboxes.create({
+  packed: await fetch('https://somesite/file'),
+  'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+  'Idempotency-Key': 'xxxxxxxx',
+});
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
-await client.sandboxes.create({ packed: await toFile(Buffer.from('my bytes'), 'file') });
-await client.sandboxes.create({ packed: await toFile(new Uint8Array([0, 1, 2]), 'file') });
+await client.sandboxes.create({
+  packed: await toFile(Buffer.from('my bytes'), 'file'),
+  'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+  'Idempotency-Key': 'xxxxxxxx',
+});
+await client.sandboxes.create({
+  packed: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+  'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+  'Idempotency-Key': 'xxxxxxxx',
+});
 ```
 
 ## Handling errors
