@@ -8,3 +8,11 @@ export {
   type FixerRunResponse,
   type FixerRunParams,
 } from './fixer';
+export {
+  Sandboxes,
+  type SandboxCreateResponse,
+  type SandboxRetrieveResponse,
+  type SandboxUpdateResponse,
+  type SandboxCreateParams,
+  type SandboxUpdateParams,
+} from './sandboxes';
