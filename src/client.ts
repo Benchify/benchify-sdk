@@ -911,8 +911,7 @@ export class Benchify {
         return files as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
       });
   }
-  sandboxes: API.Sandboxes = new API.Sandboxes(this)
-;
+  sandboxes: API.Sandboxes = new API.Sandboxes(this);
 }
 
 Benchify.Fixer = Fixer;
