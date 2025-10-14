@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
 import { type FileData, type BinaryFileData, filesToTarGzBlob, normalizePath } from './lib/helpers';
-import { type SandboxRetrieveResponse, type SandboxCreateResponse, type SandboxUpdateResponse } from './resources/sandboxes';
+import { type SandboxRetrieveResponse } from './resources/sandboxes';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
 
@@ -207,7 +207,7 @@ export class SandboxHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-        : undefined;
+      : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
@@ -423,7 +423,7 @@ export class Sandbox {
             },
             {} as Record<string, string>,
           )
-          : undefined,
+        : undefined,
         filteredFiles,
       );
     } catch (error) {
