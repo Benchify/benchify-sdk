@@ -233,7 +233,7 @@ export class Benchify {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    if (this.bearerToken && values.get('authorization')) {
+    if (this.apiKey && values.get('authorization')) {
       return;
     }
     if (nulls.has('authorization')) {
@@ -241,15 +241,15 @@ export class Benchify {
     }
 
     throw new Error(
-      'Could not resolve authentication method. Expected the bearerToken to be set. Or for the "Authorization" headers to be explicitly omitted',
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
     );
   }
 
   protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
-    if (this.bearerToken == null) {
+    if (this.apiKey == null) {
       return undefined;
     }
-    return buildHeaders([{ Authorization: `Bearer ${this.bearerToken}` }]);
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
