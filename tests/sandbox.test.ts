@@ -190,8 +190,8 @@ describe('Sandbox', () => {
       mockSandboxAPI.create.mockRejectedValueOnce(apiError);
 
       await expect(sandbox.create(testFiles)).rejects.toMatchObject({
-        code: 'APIERROR',
-        message: 'Bad request',
+        code: 'API',
+        message: '400 Bad request',
       });
     });
   });
@@ -294,16 +294,16 @@ describe('SandboxHandle', () => {
       expect(callArgs.packed).toBeUndefined();
     });
 
-    it('should use packed format for large changes', async () => {
-      // Create changes that exceed the threshold
-      const changes: FileChange[] = Array.from({ length: 15 }, (_, i) => ({
+    it('should use packed format for file changes', async () => {
+      // Create multiple changes to verify packing works
+      const changes: FileChange[] = Array.from({ length: 5 }, (_, i) => ({
         path: `src/file${i}.ts`,
         contents: `console.log("File ${i}");`,
       }));
 
       const mockResponse = {
         id: 'sandbox-123',
-        applied: 15,
+        applied: 5,
         etag: 'new-etag-789',
         phase: 'running' as const,
         restarted: false,
@@ -357,8 +357,8 @@ describe('SandboxHandle', () => {
       mockSandboxAPI.retrieve.mockResolvedValueOnce(statusResponse);
 
       await expect(handle.apply(changes)).rejects.toMatchObject({
-        code: 'CONFLICTERROR',
-        message: 'Conflict',
+        code: 'CONFLICT',
+        message: '409 Conflict',
       });
 
       expect(mockSandboxAPI.update).toHaveBeenCalledTimes(2);
@@ -404,8 +404,8 @@ describe('SandboxHandle', () => {
       mockSandboxAPI.delete.mockRejectedValueOnce(apiError);
 
       await expect(handle.destroy()).rejects.toMatchObject({
-        code: 'APIERROR',
-        message: 'Not found',
+        code: 'API',
+        message: '404 Not found',
       });
     });
   });
@@ -432,7 +432,7 @@ describe('SandboxHandle', () => {
 
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/old-file.ts"}]');
-      expect(callArgs.packed).toBeDefined(); // Should have packed data for add/update
+      expect(callArgs.packed).toBeDefined(); // Always pack when there are file changes for consistency
     });
   });
 
