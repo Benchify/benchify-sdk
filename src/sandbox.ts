@@ -213,8 +213,10 @@ export class SandboxHandle {
     // Always use packed format when there are file changes for consistency
     let packed: Blob | undefined;
     if (changedFiles.length > 0) {
+      // Convert to binary gzipped data for packed upload
       const packageBlob = filesToPackageBlob(changedFiles);
-      packed = new Blob([JSON.stringify(packageBlob)], { type: 'application/json' });
+      const gzippedBinary = Buffer.from(packageBlob.files_data, 'base64');
+      packed = new Blob([new Uint8Array(gzippedBinary)], { type: 'application/gzip' });
     }
 
     // Call update API
@@ -332,18 +334,14 @@ export class Sandbox {
     const idempotencyKey = this._generateIdempotencyKey('', treeHash);
 
     try {
+      // Convert base64 back to binary for packed upload
+      const gzippedBinary = Buffer.from(packageBlob.files_data, 'base64');
+      const packedBlob = new Blob([new Uint8Array(gzippedBinary)], { type: 'application/gzip' });
+
       const response = await this._client.sandboxes.create({
-        blob: {
-          files_data: packageBlob.files_data,
-          files_manifest: packageBlob.files_manifest,
-          format: 'gzip-base64' as const,
-        },
+        packed: packedBlob,
         ...(Object.keys(opts).length > 0 && {
-          options: {
-            options: {
-              ...opts,
-            },
-          },
+          options: JSON.stringify(opts),
         }),
         'Content-Hash': treeHash,
         'Idempotency-Key': idempotencyKey,
