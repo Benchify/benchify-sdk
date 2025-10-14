@@ -15,13 +15,9 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
     }
   }
 
-  const apiKey =
-    Array.isArray(req.headers['x-benchify-api-key']) ?
-      req.headers['x-benchify-api-key'][0]
-    : req.headers['x-benchify-api-key'];
   const bearerToken =
     Array.isArray(req.headers['x-benchify-bearer-token']) ?
       req.headers['x-benchify-bearer-token'][0]
     : req.headers['x-benchify-bearer-token'];
-  return { apiKey, bearerToken };
+  return { bearerToken };
 };
