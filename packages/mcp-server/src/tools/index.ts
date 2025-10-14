@@ -5,10 +5,6 @@ import { Metadata, Endpoint, HandlerFunction } from './types';
 export { Metadata, Endpoint, HandlerFunction };
 
 import run_fixer from './fixer/run-fixer';
-import create_sandboxes from './sandboxes/create-sandboxes';
-import retrieve_sandboxes from './sandboxes/retrieve-sandboxes';
-import update_sandboxes from './sandboxes/update-sandboxes';
-import delete_sandboxes from './sandboxes/delete-sandboxes';
 
 export const endpoints: Endpoint[] = [];
 
@@ -17,10 +13,6 @@ function addEndpoint(endpoint: Endpoint) {
 }
 
 addEndpoint(run_fixer);
-addEndpoint(create_sandboxes);
-addEndpoint(retrieve_sandboxes);
-addEndpoint(update_sandboxes);
-addEndpoint(delete_sandboxes);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';

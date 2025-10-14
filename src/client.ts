@@ -17,14 +17,7 @@ import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import { DiagnosticResponse, Fixer, FixerFile, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import {
-  SandboxCreateParams,
-  SandboxCreateResponse,
-  SandboxRetrieveResponse,
-  SandboxUpdateParams,
-  SandboxUpdateResponse,
-  Sandboxes,
-} from './resources/sandboxes';
+import { Sandboxes } from './resources/sandboxes';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -746,14 +739,7 @@ export declare namespace Benchify {
     type FixerRunParams as FixerRunParams,
   };
 
-  export {
-    Sandboxes as Sandboxes,
-    type SandboxCreateResponse as SandboxCreateResponse,
-    type SandboxRetrieveResponse as SandboxRetrieveResponse,
-    type SandboxUpdateResponse as SandboxUpdateResponse,
-    type SandboxCreateParams as SandboxCreateParams,
-    type SandboxUpdateParams as SandboxUpdateParams,
-  };
+  export { Sandboxes as Sandboxes };
 
   export type ResponseMeta = API.ResponseMeta;
 }

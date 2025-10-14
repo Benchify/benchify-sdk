@@ -135,7 +135,7 @@ Authorization can be provided via the `Authorization` header using the Bearer sc
 Additionally, authorization can be provided via the following headers:
 | Header | Equivalent client option | Security scheme |
 | -------------------- | ------------------------ | --------------- |
-| `x-benchify-api-key` | `apiKey` | bearerAuth |
+| `x-benchify-api-key` | `apiKey` | BearerAuth |
 
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
@@ -207,10 +207,3 @@ The following tools are available in this MCP server.
 ### Resource `fixer`:
 
 - `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.
-
-### Resource `sandboxes`:
-
-- `create_sandboxes` (`write`): Upload files or blob to create a new stack environment. For multi-service stacks, automatically detects and orchestrates multiple services.
-- `retrieve_sandboxes` (`read`): Retrieve current status and information about a stack and its services
-- `update_sandboxes` (`write`): Update stack files using packed blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
-- `delete_sandboxes` (`write`): Permanently destroy a stack and all its services, cleaning up resources
