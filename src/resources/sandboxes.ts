@@ -10,16 +10,8 @@ import { path } from '../internal/utils/path';
 
 export class Sandboxes extends APIResource {
   /**
-   * Upload a binary packed file (tar+gz or tar+zstd) to create a new stack
-   * environment. For multi-service stacks, automatically detects and orchestrates
-   * multiple services.
-   *
-   * @example
-   * ```ts
-   * const sandbox = await client.sandboxes.create({
-   *   packed: fs.createReadStream('path/to/file'),
-   * });
-   * ```
+   * Upload a binary tar.gz file to create a new stack environment. For multi-service
+   * stacks, automatically detects and orchestrates multiple services.
    */
   create(params: SandboxCreateParams, options?: RequestOptions): APIPromise<SandboxCreateResponse> {
     const { 'Content-Hash': contentHash, 'Idempotency-Key': idempotencyKey, ...body } = params;
@@ -30,10 +22,7 @@ export class Sandboxes extends APIResource {
           body,
           ...options,
           headers: buildHeaders([
-            {
-              ...(contentHash != null ? { 'Content-Hash': contentHash } : undefined),
-              ...(idempotencyKey != null ? { 'Idempotency-Key': idempotencyKey } : undefined),
-            },
+            { 'Content-Hash': contentHash, 'Idempotency-Key': idempotencyKey },
             options?.headers,
           ]),
         },
@@ -44,31 +33,26 @@ export class Sandboxes extends APIResource {
 
   /**
    * Retrieve current status and information about a stack and its services
-   *
-   * @example
-   * ```ts
-   * const sandbox = await client.sandboxes.retrieve('id');
-   * ```
    */
   retrieve(id: string, options?: RequestOptions): APIPromise<SandboxRetrieveResponse> {
     return this._client.get(path`/sandboxes/${id}`, options);
   }
 
   /**
-   * Update stack files using packed blobs and/or individual operations. For
+   * Update stack files using tar.gz blobs and/or individual operations. For
    * multi-service stacks, changes are routed to appropriate services.
-   *
-   * @example
-   * ```ts
-   * const sandbox = await client.sandboxes.update('id');
-   * ```
    */
   update(
     id: string,
     params: SandboxUpdateParams,
     options?: RequestOptions,
   ): APIPromise<SandboxUpdateResponse> {
-    const { 'Base-Etag': baseEtag, 'Idempotency-Key': idempotencyKey, ...body } = params;
+    const {
+      'Idempotency-Key': idempotencyKey,
+      'Base-Commit': baseCommit,
+      'Base-Etag': baseEtag,
+      ...body
+    } = params;
     return this._client.post(
       path`/sandboxes/${id}:patch`,
       multipartFormRequestOptions(
@@ -77,8 +61,9 @@ export class Sandboxes extends APIResource {
           ...options,
           headers: buildHeaders([
             {
+              'Idempotency-Key': idempotencyKey,
+              ...(baseCommit != null ? { 'Base-Commit': baseCommit } : undefined),
               ...(baseEtag != null ? { 'Base-Etag': baseEtag } : undefined),
-              ...(idempotencyKey != null ? { 'Idempotency-Key': idempotencyKey } : undefined),
             },
             options?.headers,
           ]),
@@ -90,11 +75,6 @@ export class Sandboxes extends APIResource {
 
   /**
    * Permanently destroy a stack and all its services, cleaning up resources
-   *
-   * @example
-   * ```ts
-   * await client.sandboxes.delete('id');
-   * ```
    */
   delete(id: string, options?: RequestOptions): APIPromise<void> {
     return this._client.delete(path`/sandboxes/${id}`, {
@@ -204,46 +184,63 @@ export interface SandboxUpdateResponse {
 
 export interface SandboxCreateParams {
   /**
-   * Body param: Binary packed file (tar+gz or tar+zstd) containing project files
+   * Body param: Binary gzipped tar archive containing project files
    */
   packed: Uploadable;
 
   /**
-   * Body param: JSON string with sandbox options (optional)
-   */
-  options?: string;
-
-  /**
    * Header param: SHA-256 hash of uploaded content for deduplication
    */
-  'Content-Hash'?: string;
+  'Content-Hash': string;
 
   /**
    * Header param: Unique key for idempotent requests
    */
-  'Idempotency-Key'?: string;
+  'Idempotency-Key': string;
+
+  /**
+   * Body param: Optional JSON metadata as string
+   */
+  manifest?: string;
+
+  /**
+   * Body param: Optional JSON configuration as string
+   */
+  options?: string;
 }
 
 export interface SandboxUpdateParams {
   /**
-   * Body param: JSON array of patch operations
+   * Header param: Unique key for idempotent requests
+   */
+  'Idempotency-Key': string;
+
+  /**
+   * Body param: JSON string containing patch metadata: { base, proposed, files:
+   * {...changed hashes...} }. Required when packed is present.
+   */
+  manifest?: string;
+
+  /**
+   * Body param: Optional JSON string containing array of patch operations
    */
   ops?: string;
 
   /**
-   * Body param: tar+zstd or tar+gz containing changed/added files
+   * Body param: Optional gzipped tar archive containing changed/added files
    */
   packed?: Uploadable;
 
   /**
-   * Header param: Current stack etag for conflict detection
+   * Header param: Current stack commit hash for conflict detection
    */
-  'Base-Etag'?: string;
+  'Base-Commit'?: string;
 
   /**
-   * Header param: Unique key for idempotent requests
+   * Header param: Alternative to Base-Commit. Current stack etag for conflict
+   * detection
    */
-  'Idempotency-Key'?: string;
+  'Base-Etag'?: string;
 }
 
 export declare namespace Sandboxes {

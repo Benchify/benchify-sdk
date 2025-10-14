@@ -18,25 +18,33 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'update_sandboxes',
   description:
-    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nUpdate stack files using packed blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/sandbox_update_response',\n  $defs: {\n    sandbox_update_response: {\n      type: 'object',\n      properties: {\n        id: {\n          type: 'string'\n        },\n        applied: {\n          type: 'number'\n        },\n        etag: {\n          type: 'string'\n        },\n        phase: {\n          type: 'string',\n          enum: [            'starting',\n            'building',\n            'deploying',\n            'running',\n            'failed',\n            'stopped'\n          ]\n        },\n        restarted: {\n          type: 'boolean'\n        },\n        affectedServices: {\n          type: 'array',\n          items: {\n            type: 'string'\n          }\n        },\n        warnings: {\n          type: 'array',\n          items: {\n            type: 'string'\n          }\n        }\n      },\n      required: [        'id',\n        'applied',\n        'etag',\n        'phase',\n        'restarted'\n      ]\n    }\n  }\n}\n```",
+    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nUpdate stack files using tar.gz blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/sandbox_update_response',\n  $defs: {\n    sandbox_update_response: {\n      type: 'object',\n      properties: {\n        id: {\n          type: 'string'\n        },\n        applied: {\n          type: 'number'\n        },\n        etag: {\n          type: 'string'\n        },\n        phase: {\n          type: 'string',\n          enum: [            'starting',\n            'building',\n            'deploying',\n            'running',\n            'failed',\n            'stopped'\n          ]\n        },\n        restarted: {\n          type: 'boolean'\n        },\n        affectedServices: {\n          type: 'array',\n          items: {\n            type: 'string'\n          }\n        },\n        warnings: {\n          type: 'array',\n          items: {\n            type: 'string'\n          }\n        }\n      },\n      required: [        'id',\n        'applied',\n        'etag',\n        'phase',\n        'restarted'\n      ]\n    }\n  }\n}\n```",
   inputSchema: {
     type: 'object',
     properties: {
       id: {
         type: 'string',
       },
+      'Idempotency-Key': {
+        type: 'string',
+      },
+      manifest: {
+        type: 'string',
+        description:
+          'JSON string containing patch metadata: { base, proposed, files: {...changed hashes...} }. Required when packed is present.',
+      },
       ops: {
         type: 'string',
-        description: 'JSON array of patch operations',
+        description: 'Optional JSON string containing array of patch operations',
       },
       packed: {
         type: 'string',
-        description: 'tar+zstd or tar+gz containing changed/added files',
+        description: 'Optional gzipped tar archive containing changed/added files',
       },
-      'Base-Etag': {
+      'Base-Commit': {
         type: 'string',
       },
-      'Idempotency-Key': {
+      'Base-Etag': {
         type: 'string',
       },
       jq_filter: {
@@ -46,7 +54,7 @@ export const tool: Tool = {
           'A jq filter to apply to the response to include certain fields. Consult the output schema in the tool description to see the fields that are available.\n\nFor example: to include only the `name` field in every object of a results array, you can provide ".results[].name".\n\nFor more information, see the [jq documentation](https://jqlang.org/manual/).',
       },
     },
-    required: ['id'],
+    required: ['id', 'Idempotency-Key'],
   },
   annotations: {},
 };
