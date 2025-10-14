@@ -207,3 +207,10 @@ The following tools are available in this MCP server.
 ### Resource `fixer`:
 
 - `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.
+
+### Resource `sandboxes`:
+
+- `create_sandboxes` (`write`): Upload files or blob to create a new stack environment. For multi-service stacks, automatically detects and orchestrates multiple services.
+- `retrieve_sandboxes` (`read`): Retrieve current status and information about a stack and its services
+- `update_sandboxes` (`write`): Update stack files using packed blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
+- `delete_sandboxes` (`write`): Permanently destroy a stack and all its services, cleaning up resources
