@@ -10,12 +10,15 @@ import { path } from '../internal/utils/path';
 
 export class Sandboxes extends APIResource {
   /**
-   * Upload files or blob to create a new stack environment. For multi-service
-   * stacks, automatically detects and orchestrates multiple services.
+   * Upload a binary packed file (tar+gz or tar+zstd) to create a new stack
+   * environment. For multi-service stacks, automatically detects and orchestrates
+   * multiple services.
    *
    * @example
    * ```ts
-   * const sandbox = await client.sandboxes.create();
+   * const sandbox = await client.sandboxes.create({
+   *   packed: fs.createReadStream('path/to/file'),
+   * });
    * ```
    */
   create(params: SandboxCreateParams, options?: RequestOptions): APIPromise<SandboxCreateResponse> {
@@ -201,19 +204,14 @@ export interface SandboxUpdateResponse {
 
 export interface SandboxCreateParams {
   /**
-   * Body param:
+   * Body param: Binary packed file (tar+gz or tar+zstd) containing project files
    */
-  blob?: SandboxCreateParams.Blob;
+  packed: Uploadable;
 
   /**
-   * Body param: Files to upload
+   * Body param: JSON string with sandbox options (optional)
    */
-  files?: Array<Uploadable>;
-
-  /**
-   * Body param:
-   */
-  options?: SandboxCreateParams.Options;
+  options?: string;
 
   /**
    * Header param: SHA-256 hash of uploaded content for deduplication
@@ -224,58 +222,6 @@ export interface SandboxCreateParams {
    * Header param: Unique key for idempotent requests
    */
   'Idempotency-Key'?: string;
-}
-
-export namespace SandboxCreateParams {
-  export interface Blob {
-    files_data: string;
-
-    files_manifest: Array<Blob.FilesManifest>;
-
-    compressedSize?: number;
-
-    format?: 'gzip-base64';
-  }
-
-  export namespace Blob {
-    export interface FilesManifest {
-      path: string;
-
-      size: number;
-    }
-  }
-
-  export interface Options {
-    options?: Options.Options;
-  }
-
-  export namespace Options {
-    export interface Options {
-      buildCommand?: string;
-
-      environment?: { [key: string]: string };
-
-      name?: string;
-
-      port?: number;
-
-      runtime?: Options.Runtime;
-
-      startCommand?: string;
-
-      subdomain?: string;
-    }
-
-    export namespace Options {
-      export interface Runtime {
-        framework?: 'react' | 'nextjs' | 'vue' | 'nuxt' | 'express' | 'fastify' | 'nest' | 'vite';
-
-        nodeVersion?: string;
-
-        packageManager?: 'npm' | 'yarn' | 'pnpm';
-      }
-    }
-  }
 }
 
 export interface SandboxUpdateParams {
