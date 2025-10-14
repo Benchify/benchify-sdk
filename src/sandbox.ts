@@ -206,7 +206,7 @@ export class SandboxHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-        : undefined;
+      : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
@@ -230,18 +230,20 @@ export class SandboxHandle {
 
       // Add binary tar.gz blob if there are file changes
       if (changedFiles.length > 0) {
-        // Convert to BinaryFileData for tar creation
-        const binaryFiles: BinaryFileData[] = changedFiles.map((file) => ({
-          path: file.path,
-          contents: file.contents,
-          // Don't include mode to use default
-        }));
+        // Convert to BinaryFileData for tar creation and sort for consistent ordering
+        const binaryFiles: BinaryFileData[] = changedFiles
+          .map((file) => ({
+            path: file.path,
+            contents: file.contents,
+            // Don't include mode to use default
+          }))
+          .sort((a, b) => a.path.localeCompare(b.path));
 
         params.packed = await filesToTarGzBlob(binaryFiles); // Binary tar.gz with application/octet-stream
 
-        // Build manifest: path → sha256(fileBytes)
+        // Build manifest: path → sha256(fileBytes) (same order as tarball)
         const manifest = {
-          files: changedFiles.map((file) => ({
+          files: binaryFiles.map((file) => ({
             path: file.path,
             hash: this._computeFileHash(file.contents),
           })),
@@ -374,12 +376,15 @@ export class Sandbox {
     const idempotencyKey = this._generateIdempotencyKey('', treeHash);
 
     try {
-      // Create binary tar.gz blob for packed field
-      const packed = await filesToTarGzBlob(normalizedFiles);
+      // Sort files for consistent ordering between manifest and tarball
+      const sortedFiles = normalizedFiles.sort((a, b) => a.path.localeCompare(b.path));
 
-      // Build manifest: path → sha256(fileBytes)
+      // Create binary tar.gz blob for packed field
+      const packed = await filesToTarGzBlob(sortedFiles);
+
+      // Build manifest: path → sha256(fileBytes) (same order as tarball)
       const manifest = {
-        files: normalizedFiles.map((file) => ({
+        files: sortedFiles.map((file) => ({
           path: file.path,
           hash: this._computeFileHash(file.contents),
         })),
@@ -423,7 +428,7 @@ export class Sandbox {
             },
             {} as Record<string, string>,
           )
-          : undefined,
+        : undefined,
         filteredFiles,
       );
     } catch (error) {
