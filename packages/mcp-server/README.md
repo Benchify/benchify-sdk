@@ -10,7 +10,6 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export BENCHIFY_API_KEY="My API Key"
-export BENCHIFY_BEARER_TOKEN="My Bearer Token"
 npx -y benchify-mcp@latest
 ```
 
@@ -28,8 +27,7 @@ For clients with a configuration JSON, it might look something like this:
       "command": "npx",
       "args": ["-y", "benchify-mcp", "--client=claude", "--tools=all"],
       "env": {
-        "BENCHIFY_API_KEY": "My API Key",
-        "BENCHIFY_BEARER_TOKEN": "My Bearer Token"
+        "BENCHIFY_API_KEY": "My API Key"
       }
     }
   }
