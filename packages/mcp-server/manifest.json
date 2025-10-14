@@ -1,7 +1,7 @@
 {
   "dxt_version": "0.2",
   "name": "benchify-mcp",
-  "version": "0.1.0-alpha.52",
+  "version": "0.1.0-alpha.53",
   "description": "The official MCP Server for the Benchify API",
   "author": {
     "name": "Benchify",
