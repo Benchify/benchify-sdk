@@ -51,9 +51,19 @@ describe('Sandbox', () => {
 
       expect(mockSandboxAPI.create).toHaveBeenCalledWith({
         packed: expect.any(Blob),
+        manifest: expect.any(String),
         'Content-Hash': expect.any(String),
         'Idempotency-Key': expect.any(String),
       });
+
+      // Verify manifest structure
+      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
+      const manifest = JSON.parse(callArgs.manifest);
+      expect(manifest).toHaveProperty('files');
+      expect(manifest).toHaveProperty('treeHash');
+      expect(manifest.files).toBeInstanceOf(Array);
+      expect(manifest.files[0]).toHaveProperty('path');
+      expect(manifest.files[0]).toHaveProperty('hash');
     });
 
     it('should create a stack sandbox with services', async () => {
@@ -118,6 +128,7 @@ describe('Sandbox', () => {
 
       expect(mockSandboxAPI.create).toHaveBeenCalledWith({
         packed: expect.any(Blob),
+        manifest: expect.any(String),
         options: expect.any(String),
         'Content-Hash': expect.any(String),
         'Idempotency-Key': expect.any(String),
@@ -147,7 +158,7 @@ describe('Sandbox', () => {
 
       const callArgs = mockSandboxAPI.create.mock.calls[0][0];
       expect(callArgs.packed).toBeInstanceOf(Blob);
-      expect(callArgs.packed.type).toBe('application/gzip');
+      expect(callArgs.packed.type).toBe('application/octet-stream');
     });
 
     it('should handle Uint8Array file contents', async () => {
@@ -180,6 +191,76 @@ describe('Sandbox', () => {
         code: 'API',
         message: '400 Bad request',
       });
+    });
+
+    it('should normalize file paths and reject dangerous paths', async () => {
+      const dangerousFiles: SandboxFile[] = [{ path: '/absolute/path.ts', contents: 'console.log("Bad");' }];
+
+      await expect(sandbox.create(dangerousFiles)).rejects.toThrow('Absolute paths not allowed');
+    });
+
+    it('should reject path traversal attempts', async () => {
+      const traversalFiles: SandboxFile[] = [
+        { path: 'src/../../../evil.ts', contents: 'console.log("Evil");' },
+      ];
+
+      await expect(sandbox.create(traversalFiles)).rejects.toThrow('Path traversal not allowed');
+    });
+
+    it('should normalize Windows-style paths', async () => {
+      const windowsFiles: SandboxFile[] = [
+        { path: 'src\\index.ts', contents: 'console.log("Windows");' },
+        { path: '.\\package.json', contents: '{}' },
+      ];
+
+      const mockResponse = {
+        id: 'sandbox-123',
+        url: 'https://sandbox.example.com',
+        kind: 'single' as const,
+        etag: 'etag-456',
+        contentHash: 'hash-789',
+        phase: 'running' as const,
+      };
+
+      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+
+      await sandbox.create(windowsFiles);
+
+      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
+      const manifest = JSON.parse(callArgs.manifest);
+
+      // Paths should be normalized to POSIX format and sorted
+      expect(manifest.files[0].path).toBe('package.json'); // Comes first alphabetically
+      expect(manifest.files[1].path).toBe('src/index.ts');
+    });
+
+    it('should generate deterministic output with sorted files', async () => {
+      const unsortedFiles: SandboxFile[] = [
+        { path: 'z-last.ts', contents: 'console.log("Last");' },
+        { path: 'a-first.ts', contents: 'console.log("First");' },
+        { path: 'm-middle.ts', contents: 'console.log("Middle");' },
+      ];
+
+      const mockResponse = {
+        id: 'sandbox-123',
+        url: 'https://sandbox.example.com',
+        kind: 'single' as const,
+        etag: 'etag-456',
+        contentHash: 'hash-789',
+        phase: 'running' as const,
+      };
+
+      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+
+      await sandbox.create(unsortedFiles);
+
+      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
+      const manifest = JSON.parse(callArgs.manifest);
+
+      // Files should be sorted by path in manifest
+      expect(manifest.files[0].path).toBe('a-first.ts');
+      expect(manifest.files[1].path).toBe('m-middle.ts');
+      expect(manifest.files[2].path).toBe('z-last.ts');
     });
   });
 });
@@ -253,10 +334,18 @@ describe('SandboxHandle', () => {
       expect(mockSandboxAPI.update).toHaveBeenCalledWith(
         'sandbox-123',
         expect.objectContaining({
+          packed: expect.any(Blob),
+          manifest: expect.any(String),
           'Base-Etag': 'etag-456',
           'Idempotency-Key': expect.any(String),
         }),
       );
+
+      // Verify manifest structure for updates
+      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const manifest = JSON.parse(callArgs.manifest);
+      expect(manifest).toHaveProperty('files');
+      expect(manifest).toHaveProperty('treeHash');
     });
 
     it('should handle file deletions only (no packed data)', async () => {
@@ -279,6 +368,7 @@ describe('SandboxHandle', () => {
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/unused.ts"}]');
       expect(callArgs.packed).toBeUndefined();
+      expect(callArgs.manifest).toBeUndefined();
     });
 
     it('should use packed format for file changes', async () => {
@@ -302,6 +392,10 @@ describe('SandboxHandle', () => {
 
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       expect(callArgs.packed).toBeDefined();
+      expect(callArgs.manifest).toBeDefined();
+
+      // Verify packed blob is correct type
+      expect(callArgs.packed.type).toBe('application/octet-stream');
     });
 
     it('should handle 409 conflict with retry', async () => {
@@ -373,6 +467,7 @@ describe('SandboxHandle', () => {
       // Should still make the API call, but with no packed data since no actual changes
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       expect(callArgs.packed).toBeUndefined();
+      expect(callArgs.manifest).toBeUndefined();
       expect(callArgs.ops).toBeUndefined();
     });
   });
@@ -420,6 +515,7 @@ describe('SandboxHandle', () => {
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/old-file.ts"}]');
       expect(callArgs.packed).toBeDefined(); // Always pack when there are file changes for consistency
+      expect(callArgs.manifest).toBeDefined(); // Should include manifest with file changes
     });
   });
 
@@ -455,6 +551,68 @@ describe('SandboxHandle', () => {
       await stackHandle.apply(changes);
 
       expect(mockSandboxAPI.update).toHaveBeenCalledWith('stack-123', expect.any(Object));
+    });
+  });
+
+  describe('path normalization in updates', () => {
+    it('should normalize paths in file changes', async () => {
+      const changes: FileChange[] = [
+        { path: 'src\\windows\\path.ts', contents: 'console.log("Windows path");' },
+        { path: './relative/path.ts', contents: 'console.log("Relative path");' },
+      ];
+
+      const mockResponse = {
+        id: 'sandbox-123',
+        applied: 2,
+        etag: 'new-etag-789',
+        phase: 'running' as const,
+        restarted: false,
+      };
+
+      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+
+      await handle.apply(changes);
+
+      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const manifest = JSON.parse(callArgs.manifest);
+
+      // Paths should be normalized to POSIX format
+      expect(manifest.files[0].path).toBe('relative/path.ts');
+      expect(manifest.files[1].path).toBe('src/windows/path.ts');
+    });
+
+    it('should reject dangerous paths in updates', async () => {
+      const changes: FileChange[] = [{ path: '../../../evil.ts', contents: 'console.log("Evil");' }];
+
+      // Path validation should throw before any API call is made
+      await expect(handle.apply(changes)).rejects.toMatchObject({
+        code: 'UNKNOWN_ERROR',
+        message: expect.stringContaining('Path traversal not allowed'),
+      });
+
+      // Verify no API call was made due to early validation failure
+      expect(mockSandboxAPI.update).not.toHaveBeenCalled();
+    });
+
+    it('should normalize deletion paths', async () => {
+      const changes: FileChange[] = [
+        { path: 'src\\to\\delete.ts' }, // Windows path deletion
+      ];
+
+      const mockResponse = {
+        id: 'sandbox-123',
+        applied: 1,
+        etag: 'new-etag-789',
+        phase: 'running' as const,
+        restarted: false,
+      };
+
+      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+
+      await handle.apply(changes);
+
+      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      expect(callArgs.ops).toBe('[{"op":"remove","path":"src/to/delete.ts"}]');
     });
   });
 });
