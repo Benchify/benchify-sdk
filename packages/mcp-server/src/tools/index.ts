@@ -9,11 +9,6 @@ import create_sandboxes from './sandboxes/create-sandboxes';
 import retrieve_sandboxes from './sandboxes/retrieve-sandboxes';
 import update_sandboxes from './sandboxes/update-sandboxes';
 import delete_sandboxes from './sandboxes/delete-sandboxes';
-
-import create_sandboxes from './sandboxes/create-sandboxes';
-import retrieve_sandboxes from './sandboxes/retrieve-sandboxes';
-import update_sandboxes from './sandboxes/update-sandboxes';
-import delete_sandboxes from './sandboxes/delete-sandboxes';
 import run_fix_local from './fixer/run-fix-local';
 
 export const endpoints: Endpoint[] = [];
@@ -23,11 +18,6 @@ function addEndpoint(endpoint: Endpoint) {
 }
 
 addEndpoint(run_fixer);
-addEndpoint(create_sandboxes);
-addEndpoint(retrieve_sandboxes);
-addEndpoint(update_sandboxes);
-addEndpoint(delete_sandboxes);
-
 addEndpoint(create_sandboxes);
 addEndpoint(retrieve_sandboxes);
 addEndpoint(update_sandboxes);

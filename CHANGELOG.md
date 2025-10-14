@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.53 (2025-10-14)
+
+Full Changelog: [v0.1.0-alpha.52...v0.1.0-alpha.53](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.52...v0.1.0-alpha.53)
+
+### Features
+
+* **api:** api update ([4f550ca](https://github.com/Benchify/benchify-sdk/commit/4f550ca935081ec0f7dd926eb176cd9dfc02ef83))
+* **api:** api update ([c35e18f](https://github.com/Benchify/benchify-sdk/commit/c35e18f4c3ad03068255c2526a0b0505dcb6d714))
+* **api:** manual updates ([6aded8d](https://github.com/Benchify/benchify-sdk/commit/6aded8d5d0453aee487a146693470a404ee963ef))
+* **api:** manual updates ([0e94827](https://github.com/Benchify/benchify-sdk/commit/0e9482764f4856167e02f809ba3d2cdf3dc449a4))
+* **api:** manual updates ([b3d9ebd](https://github.com/Benchify/benchify-sdk/commit/b3d9ebd25ab66d2d4f4edfc383b30cc664e081c8))
+* **api:** manual updates ([627e8c7](https://github.com/Benchify/benchify-sdk/commit/627e8c7d79e987eea1f93fa47b5264162e4f0e68))
+
 ## 0.1.0-alpha.52 (2025-10-14)
 
 Full Changelog: [v0.1.0-alpha.51...v0.1.0-alpha.52](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.51...v0.1.0-alpha.52)
