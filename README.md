@@ -64,17 +64,17 @@ import Benchify, { toFile } from 'benchify';
 const client = new Benchify();
 
 // If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.sandboxes.update('id', { packed: fs.createReadStream('/path/to/file') });
+await client.sandboxes.create({ packed: fs.createReadStream('/path/to/file') });
 
 // Or if you have the web `File` API you can pass a `File` instance:
-await client.sandboxes.update('id', { packed: new File(['my bytes'], 'file') });
+await client.sandboxes.create({ packed: new File(['my bytes'], 'file') });
 
 // You can also pass a `fetch` `Response`:
-await client.sandboxes.update('id', { packed: await fetch('https://somesite/file') });
+await client.sandboxes.create({ packed: await fetch('https://somesite/file') });
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
-await client.sandboxes.update('id', { packed: await toFile(Buffer.from('my bytes'), 'file') });
-await client.sandboxes.update('id', { packed: await toFile(new Uint8Array([0, 1, 2]), 'file') });
+await client.sandboxes.create({ packed: await toFile(Buffer.from('my bytes'), 'file') });
+await client.sandboxes.create({ packed: await toFile(new Uint8Array([0, 1, 2]), 'file') });
 ```
 
 ## Handling errors
