@@ -50,20 +50,7 @@ describe('Sandbox', () => {
       expect(handle.kind).toBe('single');
 
       expect(mockSandboxAPI.create).toHaveBeenCalledWith({
-        blob: expect.objectContaining({
-          files_data: expect.any(String),
-          files_manifest: expect.arrayContaining([
-            expect.objectContaining({
-              path: 'src/index.ts',
-              size: expect.any(Number),
-            }),
-            expect.objectContaining({
-              path: 'package.json',
-              size: expect.any(Number),
-            }),
-          ]),
-          format: 'gzip-base64',
-        }),
+        packed: expect.any(Blob),
         'Content-Hash': expect.any(String),
         'Idempotency-Key': expect.any(String),
       });
@@ -130,8 +117,8 @@ describe('Sandbox', () => {
       await sandbox.create(testFiles, options);
 
       expect(mockSandboxAPI.create).toHaveBeenCalledWith({
-        blob: expect.any(Object),
-        options: { options },
+        packed: expect.any(Blob),
+        options: expect.any(String),
         'Content-Hash': expect.any(String),
         'Idempotency-Key': expect.any(String),
       });
@@ -159,8 +146,8 @@ describe('Sandbox', () => {
       await sandbox.create(filesWithIgnored);
 
       const callArgs = mockSandboxAPI.create.mock.calls[0][0];
-      expect(callArgs.blob.files_manifest).toHaveLength(1);
-      expect(callArgs.blob.files_manifest[0].path).toBe('src/index.ts');
+      expect(callArgs.packed).toBeInstanceOf(Blob);
+      expect(callArgs.packed.type).toBe('application/gzip');
     });
 
     it('should handle Uint8Array file contents', async () => {
