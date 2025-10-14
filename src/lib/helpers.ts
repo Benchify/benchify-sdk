@@ -2,10 +2,17 @@ import fs from 'fs';
 import path from 'path';
 import { minimatch } from 'minimatch';
 import { gzipSync, gunzipSync } from 'zlib';
+import * as tar from 'tar-stream';
 
 export interface FileData {
   path: string;
   contents: string;
+}
+
+export interface BinaryFileData {
+  path: string;
+  contents: string | Uint8Array;
+  mode?: string; // Optional file mode (e.g., '0755' for executable)
 }
 
 const DEFAULT_PATTERNS = [
@@ -126,7 +133,8 @@ export function filesToPackageBlob(files: FileData[]): PackageBlob {
 
   for (const file of files) {
     // CRITICAL: Use BYTE length, not character length
-    const contentBuffer = Buffer.from(file.contents, 'utf8');
+    const contentBuffer =
+      typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf8') : Buffer.from(file.contents);
     const byteSize = contentBuffer.length; // This is UTF-8 byte count
 
     fileBuffers.push(contentBuffer);
@@ -175,4 +183,97 @@ export function packageBlobToFiles(blob: PackageBlob): FileData[] {
   }
 
   return files;
+}
+
+/**
+ * Normalize path to POSIX format and remove ./ and // patterns
+ * Throws on absolute paths or path traversal attempts
+ */
+export function normalizePath(path: string): string {
+  // Convert backslashes to forward slashes
+  let normalized = path.replace(/\\/g, '/');
+
+  // Remove leading ./
+  normalized = normalized.replace(/^\.\//, '');
+
+  // Remove double slashes
+  normalized = normalized.replace(/\/+/g, '/');
+
+  // Remove trailing slash unless it's the root
+  if (normalized.length > 1 && normalized.endsWith('/')) {
+    normalized = normalized.slice(0, -1);
+  }
+
+  // Path safety checks
+  if (normalized.startsWith('/')) {
+    throw new Error(`Absolute paths not allowed: ${path}`);
+  }
+  if (normalized.includes('../')) {
+    throw new Error(`Path traversal not allowed: ${path}`);
+  }
+
+  return normalized;
+}
+
+/**
+ * Create a tar.gz blob from files using tar-stream (battle-tested and reliable)
+ * Handles binary safety, deterministic output, and proper USTAR format
+ */
+export async function filesToTarGzBlob(
+  files: BinaryFileData[],
+  options?: {
+    buildTime?: number;
+  },
+): Promise<Blob> {
+  // Normalize all paths once and sort for deterministic output
+  const normalizedFiles = files
+    .map((file) => ({
+      ...file,
+      path: normalizePath(file.path),
+    }))
+    .sort((a, b) => a.path.localeCompare(b.path));
+
+  // Create tar pack stream
+  const pack = tar.pack();
+  const chunks: Buffer[] = [];
+
+  // Collect tar data
+  pack.on('data', (chunk: Buffer) => {
+    chunks.push(chunk);
+  });
+
+  // Add files to tar stream
+  for (const file of normalizedFiles) {
+    // Handle binary-safe content
+    const contentBuffer =
+      typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf8') : Buffer.from(file.contents);
+
+    // Add entry with proper headers
+    const entry = pack.entry({
+      name: file.path,
+      size: contentBuffer.length,
+      mode: file.mode ? parseInt(file.mode, 8) : 0o644,
+      mtime: options?.buildTime ? new Date(options.buildTime * 1000) : new Date(0), // Deterministic timestamp
+      type: 'file',
+    });
+
+    entry.write(contentBuffer);
+    entry.end();
+  }
+
+  // Finalize tar stream
+  pack.finalize();
+
+  // Wait for all data to be collected
+  await new Promise<void>((resolve) => {
+    pack.on('end', resolve);
+  });
+
+  // Combine tar data
+  const tarData = Buffer.concat(chunks);
+
+  // Compress with gzip
+  const gzippedData = gzipSync(tarData);
+
+  return new Blob([new Uint8Array(gzippedData)], { type: 'application/octet-stream' });
 }

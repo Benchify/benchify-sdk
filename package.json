@@ -34,6 +34,7 @@
     "@types/jest": "^29.4.0",
     "@types/node": "^20.17.6",
     "@types/react": "^18.0.0",
+    "@types/tar-stream": "^3.1.4",
     "@typescript-eslint/eslint-plugin": "8.31.1",
     "@typescript-eslint/parser": "8.31.1",
     "eslint": "^9.20.1",
@@ -95,7 +96,8 @@
     }
   },
   "dependencies": {
-    "minimatch": "^9.0.3"
+    "minimatch": "^9.0.3",
+    "tar-stream": "^3.1.7"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
