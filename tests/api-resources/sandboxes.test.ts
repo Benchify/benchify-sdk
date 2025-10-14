@@ -2,11 +2,7 @@
 
 import Benchify from 'benchify';
 
-const client = new Benchify({
-  apiKey: 'My API Key',
-  bearerToken: 'My Bearer Token',
-  baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
-});
+const client = new Benchify({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
 
 describe('resource sandboxes', () => {
   // Prism tests are disabled

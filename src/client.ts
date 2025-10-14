@@ -40,14 +40,9 @@ import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Benchify API Key. Obtain a key from the [Benchify web portal](https://app.benchify.com) under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
+   * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
    */
   apiKey?: string | null | undefined;
-
-  /**
-   * JWT token-based authentication
-   */
-  bearerToken?: string | null | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
@@ -123,7 +118,6 @@ export interface ClientOptions {
  */
 export class Benchify {
   apiKey: string | null;
-  bearerToken: string | null;
 
   baseURL: string;
   maxRetries: number;
@@ -141,7 +135,6 @@ export class Benchify {
    * API Client for interfacing with the Benchify API.
    *
    * @param {string | null | undefined} [opts.apiKey=process.env['BENCHIFY_API_KEY'] ?? null]
-   * @param {string | null | undefined} [opts.bearerToken=process.env['BENCHIFY_BEARER_TOKEN'] ?? null]
    * @param {string} [opts.baseURL=process.env['BENCHIFY_BASE_URL'] ?? https://api.benchify.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
@@ -153,12 +146,10 @@ export class Benchify {
   constructor({
     baseURL = readEnv('BENCHIFY_BASE_URL'),
     apiKey = readEnv('BENCHIFY_API_KEY') ?? null,
-    bearerToken = readEnv('BENCHIFY_BEARER_TOKEN') ?? null,
     ...opts
   }: ClientOptions = {}) {
     const options: ClientOptions = {
       apiKey,
-      bearerToken,
       ...opts,
       baseURL: baseURL || `https://api.benchify.com`,
     };
@@ -181,7 +172,6 @@ export class Benchify {
     this._options = options;
 
     this.apiKey = apiKey;
-    this.bearerToken = bearerToken;
   }
 
   /**
@@ -198,7 +188,6 @@ export class Benchify {
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
-      bearerToken: this.bearerToken,
       ...options,
     });
     return client;
