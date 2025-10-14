@@ -22,9 +22,7 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Benchify from 'benchify';
 
-const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
-});
+const client = new Benchify();
 
 const response = await client.fixer.run();
 
@@ -39,9 +37,7 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Benchify from 'benchify';
 
-const client = new Benchify({
-  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
-});
+const client = new Benchify();
 
 const response: Benchify.FixerRunResponse = await client.fixer.run();
 ```
