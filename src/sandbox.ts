@@ -3,7 +3,7 @@
 import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
-import { filesToPackageBlob, type FileData } from './lib/helpers';
+import { type FileData, type BinaryFileData, filesToTarGzBlob, normalizePath } from './lib/helpers';
 import { type SandboxRetrieveResponse } from './resources/sandboxes';
 import { APIError, ConflictError } from './core/error';
 
@@ -99,8 +99,9 @@ export class SandboxHandle {
     // Build initial file manifest
     if (initialFiles) {
       for (const file of initialFiles) {
+        const normalizedPath = normalizePath(file.path);
         const normalized = this._normalizeFileContents(file.contents);
-        this._fileManifest[file.path] = this._computeFileHash(normalized);
+        this._fileManifest[normalizedPath] = this._computeFileHash(normalized);
       }
     }
   }
@@ -180,52 +181,91 @@ export class SandboxHandle {
     for (const change of updates) {
       if (change.contents === undefined) continue;
 
+      const normalizedPath = normalizePath(change.path);
       const normalized = this._normalizeFileContents(change.contents);
       const newHash = this._computeFileHash(normalized);
-      const currentHash = newManifest[change.path];
+      const currentHash = newManifest[normalizedPath];
 
       // Only include if file is actually changed
       if (newHash !== currentHash) {
         changedFiles.push({
-          path: change.path,
+          path: normalizedPath,
           contents: normalized,
         });
-        newManifest[change.path] = newHash;
+        newManifest[normalizedPath] = newHash;
       }
     }
 
     // Remove deleted files from manifest
     for (const deletion of deletions) {
-      delete newManifest[deletion.path];
+      const normalizedPath = normalizePath(deletion.path);
+      delete newManifest[normalizedPath];
     }
 
     // Build operations JSON for deletions
     const ops =
       deletions.length > 0 ?
-        JSON.stringify(deletions.map((del) => ({ op: 'remove', path: del.path })))
-      : undefined;
+        JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
+        : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
     const proposedTreeHash = this._computeTreeHash(newManifest);
     const idempotencyKey = this._generateIdempotencyKey(currentTreeHash, proposedTreeHash);
 
-    // Always use packed format when there are file changes for consistency
-    let packed: Blob | undefined;
-    if (changedFiles.length > 0) {
-      // Convert to binary gzipped data for packed upload
-      const packageBlob = filesToPackageBlob(changedFiles);
-      const gzippedBinary = Buffer.from(packageBlob.files_data, 'base64');
-      packed = new Blob([new Uint8Array(gzippedBinary)], { type: 'application/gzip' });
+    // Build parameters for API when there are changes
+    let requestData: any;
+    if (changedFiles.length > 0 || ops) {
+      // Build parameters - multipartFormRequestOptions will create FormData internally
+      const params: {
+        packed?: Blob;
+        manifest?: string;
+        ops?: string;
+        'Base-Etag': string;
+        'Idempotency-Key': string;
+      } = {
+        'Base-Etag': this._etag,
+        'Idempotency-Key': idempotencyKey,
+      };
+
+      // Add binary tar.gz blob if there are file changes
+      if (changedFiles.length > 0) {
+        // Convert to BinaryFileData for tar creation
+        const binaryFiles: BinaryFileData[] = changedFiles.map((file) => ({
+          path: file.path,
+          contents: file.contents,
+          // Don't include mode to use default
+        }));
+
+        params.packed = await filesToTarGzBlob(binaryFiles); // Binary tar.gz with application/octet-stream
+
+        // Build manifest: path → sha256(fileBytes)
+        const manifest = {
+          files: changedFiles.map((file) => ({
+            path: file.path,
+            hash: this._computeFileHash(file.contents),
+          })),
+          treeHash: proposedTreeHash,
+        };
+        params.manifest = JSON.stringify(manifest);
+      }
+
+      // Add operations as JSON string if present
+      if (ops) {
+        params.ops = ops;
+      }
+
+      requestData = params;
+    } else {
+      // No changes, send minimal update with headers
+      requestData = {
+        'Base-Etag': this._etag,
+        'Idempotency-Key': idempotencyKey,
+      };
     }
 
-    // Call update API
-    const response = await this._client.sandboxes.update(this._id, {
-      ...(packed && { packed }),
-      ...(ops && { ops }),
-      'Base-Etag': this._etag,
-      'Idempotency-Key': idempotencyKey,
-    });
+    // API client will build FormData with multipart/form-data; boundary=... automatically
+    const response = await this._client.sandboxes.update(this._id, requestData);
 
     // Update our state
     this._etag = response.etag;
@@ -244,8 +284,10 @@ export class SandboxHandle {
     return Buffer.from(contents).toString('utf-8');
   }
 
-  private _computeFileHash(contents: string): string {
-    return createHash('sha256').update(Buffer.from(contents, 'utf-8')).digest('hex');
+  private _computeFileHash(contents: string | Uint8Array): string {
+    // Hash file bytes directly (not tar bytes)
+    const buffer = typeof contents === 'string' ? Buffer.from(contents, 'utf-8') : Buffer.from(contents);
+    return createHash('sha256').update(buffer).digest('hex');
   }
 
   private _computeTreeHash(manifest: Record<string, string>): string {
@@ -312,40 +354,59 @@ export class Sandbox {
     const filteredFiles = this._filterFiles(files);
 
     // Normalize file contents and compute hashes
-    const normalizedFiles: FileData[] = [];
+    const normalizedFiles: BinaryFileData[] = [];
     const fileManifest: Record<string, string> = {};
 
     for (const file of filteredFiles) {
-      const normalized = this._normalizeFileContents(file.contents);
+      const normalizedPath = normalizePath(file.path);
       normalizedFiles.push({
-        path: file.path,
-        contents: normalized,
+        path: normalizedPath,
+        contents: file.contents, // Keep as string | Uint8Array for binary safety
+        // Don't include mode to use default
       });
-      fileManifest[file.path] = this._computeFileHash(normalized);
+      fileManifest[normalizedPath] = this._computeFileHash(file.contents);
     }
 
     // Compute tree hash for content hash
     const treeHash = this._computeTreeHash(fileManifest);
 
-    // Build packed tar+gzip blob
-    const packageBlob = filesToPackageBlob(normalizedFiles);
-
     // Generate idempotency key
     const idempotencyKey = this._generateIdempotencyKey('', treeHash);
 
     try {
-      // Convert base64 back to binary for packed upload
-      const gzippedBinary = Buffer.from(packageBlob.files_data, 'base64');
-      const packedBlob = new Blob([new Uint8Array(gzippedBinary)], { type: 'application/gzip' });
+      // Create binary tar.gz blob for packed field
+      const packed = await filesToTarGzBlob(normalizedFiles);
 
-      const response = await this._client.sandboxes.create({
-        packed: packedBlob,
-        ...(Object.keys(opts).length > 0 && {
-          options: JSON.stringify(opts),
-        }),
+      // Build manifest: path → sha256(fileBytes)
+      const manifest = {
+        files: normalizedFiles.map((file) => ({
+          path: file.path,
+          hash: this._computeFileHash(file.contents),
+        })),
+        treeHash: treeHash,
+      };
+
+      // Build parameters for API - multipartFormRequestOptions will create FormData internally
+      const params: {
+        packed: Blob;
+        manifest: string;
+        options?: string;
+        'Content-Hash': string;
+        'Idempotency-Key': string;
+      } = {
+        packed, // Binary tar.gz blob with application/octet-stream Content-Type
+        manifest: JSON.stringify(manifest), // JSON string field in multipart
         'Content-Hash': treeHash,
         'Idempotency-Key': idempotencyKey,
-      });
+      };
+
+      // Add options as JSON string if present
+      if (Object.keys(opts).length > 0) {
+        params.options = JSON.stringify(opts);
+      }
+
+      // API client will build FormData with multipart/form-data; boundary=... automatically
+      const response = await this._client.sandboxes.create(params);
 
       return new SandboxHandle(
         this._client,
@@ -362,7 +423,7 @@ export class Sandbox {
             },
             {} as Record<string, string>,
           )
-        : undefined,
+          : undefined,
         filteredFiles,
       );
     } catch (error) {
@@ -383,8 +444,10 @@ export class Sandbox {
     return Buffer.from(contents).toString('utf-8');
   }
 
-  private _computeFileHash(contents: string): string {
-    return createHash('sha256').update(Buffer.from(contents, 'utf-8')).digest('hex');
+  private _computeFileHash(contents: string | Uint8Array): string {
+    // Hash file bytes directly (not tar bytes)
+    const buffer = typeof contents === 'string' ? Buffer.from(contents, 'utf-8') : Buffer.from(contents);
+    return createHash('sha256').update(buffer).digest('hex');
   }
 
   private _computeTreeHash(manifest: Record<string, string>): string {
