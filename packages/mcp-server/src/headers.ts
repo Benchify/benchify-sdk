@@ -9,7 +9,7 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
     const value = req.headers.authorization.slice(scheme.length + 1);
     switch (scheme) {
       case 'Bearer':
-        return { apiKey: req.headers.authorization.slice('Bearer '.length) };
+        return { bearerToken: req.headers.authorization.slice('Bearer '.length) };
       default:
         throw new Error(`Unsupported authorization scheme`);
     }
@@ -19,5 +19,9 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
     Array.isArray(req.headers['x-benchify-api-key']) ?
       req.headers['x-benchify-api-key'][0]
     : req.headers['x-benchify-api-key'];
-  return { apiKey };
+  const bearerToken =
+    Array.isArray(req.headers['x-benchify-bearer-token']) ?
+      req.headers['x-benchify-bearer-token'][0]
+    : req.headers['x-benchify-bearer-token'];
+  return { apiKey, bearerToken };
 };

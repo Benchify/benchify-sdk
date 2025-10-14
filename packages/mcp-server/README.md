@@ -10,6 +10,7 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export BENCHIFY_API_KEY="My API Key"
+export BENCHIFY_BEARER_TOKEN="My Bearer Token"
 npx -y benchify-mcp@latest
 ```
 
@@ -27,7 +28,8 @@ For clients with a configuration JSON, it might look something like this:
       "command": "npx",
       "args": ["-y", "benchify-mcp", "--client=claude", "--tools=all"],
       "env": {
-        "BENCHIFY_API_KEY": "My API Key"
+        "BENCHIFY_API_KEY": "My API Key",
+        "BENCHIFY_BEARER_TOKEN": "My Bearer Token"
       }
     }
   }
@@ -134,8 +136,9 @@ Authorization can be provided via the `Authorization` header using the Bearer sc
 
 Additionally, authorization can be provided via the following headers:
 | Header | Equivalent client option | Security scheme |
-| -------------------- | ------------------------ | --------------- |
+| ------------------------- | ------------------------ | --------------- |
 | `x-benchify-api-key` | `apiKey` | ApiKeyAuth |
+| `x-benchify-bearer-token` | `bearerToken` | bearerAuth |
 
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
