@@ -4,8 +4,9 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
 import { type FileData, type BinaryFileData, filesToTarGzBlob, normalizePath } from './lib/helpers';
-import { type SandboxRetrieveResponse } from './resources/sandboxes';
+import { type SandboxRetrieveResponse, type SandboxCreateResponse, type SandboxUpdateResponse } from './resources/sandboxes';
 import { APIError, ConflictError } from './core/error';
+import { toFile, type Uploadable } from './core/uploads';
 
 /**
  * File input with path and contents
@@ -206,40 +207,35 @@ export class SandboxHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-      : undefined;
+        : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
     const proposedTreeHash = this._computeTreeHash(newManifest);
     const idempotencyKey = this._generateIdempotencyKey(currentTreeHash, proposedTreeHash);
 
-    // Build parameters for API when there are changes
-    let requestData: any;
+    // Build request parameters - Stainless will detect Blob and create multipart FormData
+    let requestParams: any;
     if (changedFiles.length > 0 || ops) {
-      // Build parameters - multipartFormRequestOptions will create FormData internally
-      const params: {
-        packed?: Blob;
-        manifest?: string;
-        ops?: string;
-        'Base-Etag': string;
-        'Idempotency-Key': string;
-      } = {
+      // Convert to BinaryFileData for tar creation and sort for consistent ordering
+      const binaryFiles: BinaryFileData[] = changedFiles
+        .map((file) => ({
+          path: file.path,
+          contents: file.contents,
+          // Don't include mode to use default
+        }))
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+      // Build parameters - Stainless will detect Blob and create multipart FormData
+      requestParams = {
         'Base-Etag': this._etag,
         'Idempotency-Key': idempotencyKey,
       };
 
-      // Add binary tar.gz blob if there are file changes
+      // Add binary tar.gz file if there are file changes
       if (changedFiles.length > 0) {
-        // Convert to BinaryFileData for tar creation and sort for consistent ordering
-        const binaryFiles: BinaryFileData[] = changedFiles
-          .map((file) => ({
-            path: file.path,
-            contents: file.contents,
-            // Don't include mode to use default
-          }))
-          .sort((a, b) => a.path.localeCompare(b.path));
-
-        params.packed = await filesToTarGzBlob(binaryFiles); // Binary tar.gz with application/octet-stream
+        const packedBlob = await filesToTarGzBlob(binaryFiles); // Binary tar.gz
+        requestParams.packed = await toFile(packedBlob, 'changes.tar.gz', { type: 'application/gzip' }); // Convert to File for Uploadable interface
 
         // Build manifest: path → sha256(fileBytes) (same order as tarball)
         const manifest = {
@@ -249,25 +245,23 @@ export class SandboxHandle {
           })),
           treeHash: proposedTreeHash,
         };
-        params.manifest = JSON.stringify(manifest);
+        requestParams.manifest = JSON.stringify(manifest);
       }
 
       // Add operations as JSON string if present
       if (ops) {
-        params.ops = ops;
+        requestParams.ops = ops;
       }
-
-      requestData = params;
     } else {
-      // No changes, send minimal update with headers
-      requestData = {
+      // No changes, send minimal update with headers only
+      requestParams = {
         'Base-Etag': this._etag,
         'Idempotency-Key': idempotencyKey,
       };
     }
 
-    // API client will build FormData with multipart/form-data; boundary=... automatically
-    const response = await this._client.sandboxes.update(this._id, requestData);
+    // The generated client already handles multipart conversion properly
+    const response = await this._client.sandboxes.update(this._id, requestParams);
 
     // Update our state
     this._etag = response.etag;
@@ -379,8 +373,9 @@ export class Sandbox {
       // Sort files for consistent ordering between manifest and tarball
       const sortedFiles = normalizedFiles.sort((a, b) => a.path.localeCompare(b.path));
 
-      // Create binary tar.gz blob for packed field
-      const packed = await filesToTarGzBlob(sortedFiles);
+      // Create binary tar.gz blob and convert to File for Uploadable interface
+      const packedBlob = await filesToTarGzBlob(sortedFiles);
+      const packed = await toFile(packedBlob, 'sandbox.tar.gz', { type: 'application/gzip' });
 
       // Build manifest: path → sha256(fileBytes) (same order as tarball)
       const manifest = {
@@ -391,16 +386,16 @@ export class Sandbox {
         treeHash: treeHash,
       };
 
-      // Build parameters for API - multipartFormRequestOptions will create FormData internally
+      // Build parameters for API - Stainless will detect File and create multipart FormData
       const params: {
-        packed: Blob;
+        packed: Uploadable;
         manifest: string;
         options?: string;
         'Content-Hash': string;
         'Idempotency-Key': string;
       } = {
-        packed, // Binary tar.gz blob with application/octet-stream Content-Type
-        manifest: JSON.stringify(manifest), // JSON string field in multipart
+        packed, // Binary tar.gz file - Stainless will detect this and use multipart
+        manifest: JSON.stringify(manifest), // JSON string field
         'Content-Hash': treeHash,
         'Idempotency-Key': idempotencyKey,
       };
@@ -410,7 +405,7 @@ export class Sandbox {
         params.options = JSON.stringify(opts);
       }
 
-      // API client will build FormData with multipart/form-data; boundary=... automatically
+      // The generated client already handles multipart conversion properly
       const response = await this._client.sandboxes.create(params);
 
       return new SandboxHandle(
@@ -428,7 +423,7 @@ export class Sandbox {
             },
             {} as Record<string, string>,
           )
-        : undefined,
+          : undefined,
         filteredFiles,
       );
     } catch (error) {
