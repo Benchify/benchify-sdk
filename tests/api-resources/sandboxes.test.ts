@@ -12,6 +12,8 @@ describe('resource sandboxes', () => {
   test.skip('create: only required params', async () => {
     const responsePromise = client.sandboxes.create({
       packed: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+      'Idempotency-Key': 'xxxxxxxx',
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -26,9 +28,10 @@ describe('resource sandboxes', () => {
   test.skip('create: required and optional params', async () => {
     const response = await client.sandboxes.create({
       packed: await toFile(Buffer.from('# my file contents'), 'README.md'),
-      options: '{"timeout": 300, "subdomain": "my-app"}',
-      'Content-Hash': '210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
-      'Idempotency-Key': 'Idempotency-Key',
+      'Content-Hash': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+      'Idempotency-Key': 'xxxxxxxx',
+      manifest: 'manifest',
+      options: 'options',
     });
   });
 
@@ -45,8 +48,8 @@ describe('resource sandboxes', () => {
   });
 
   // Prism tests are disabled
-  test.skip('update', async () => {
-    const responsePromise = client.sandboxes.update('id', {});
+  test.skip('update: only required params', async () => {
+    const responsePromise = client.sandboxes.update('id', { 'Idempotency-Key': 'xxxxxxxx' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -54,6 +57,18 @@ describe('resource sandboxes', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('update: required and optional params', async () => {
+    const response = await client.sandboxes.update('id', {
+      'Idempotency-Key': 'xxxxxxxx',
+      manifest: 'manifest',
+      ops: 'ops',
+      packed: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      'Base-Commit': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+      'Base-Etag': 'sha256:210b9798eb53baa4e69d31c1071cf03d212b8ad0ca30cf321e0ea82e120aac26',
+    });
   });
 
   // Prism tests are disabled
