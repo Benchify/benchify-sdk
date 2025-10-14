@@ -6,6 +6,14 @@ export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
 export { Benchify, type ClientOptions } from './client';
 export {
+  Sandbox,
+  SandboxHandle,
+  type SandboxFile,
+  type FileChange,
+  type SandboxCreateOptions,
+  type SandboxError,
+} from './sandbox';
+export {
   BenchifyError,
   APIError,
   APIConnectionError,

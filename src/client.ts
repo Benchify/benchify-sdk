@@ -26,6 +26,13 @@ import {
   SandboxUpdateResponse,
   Sandboxes,
 } from './resources/sandboxes';
+import {
+  Sandbox,
+  type SandboxFile,
+  type FileChange,
+  type SandboxCreateOptions,
+  type SandboxError,
+} from './sandbox';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -883,6 +890,7 @@ export class Benchify {
       });
   }
   sandboxes: API.Sandboxes = new API.Sandboxes(this);
+  sandbox: Sandbox = new Sandbox(this);
 }
 
 Benchify.Fixer = Fixer;
@@ -907,6 +915,10 @@ export declare namespace Benchify {
     type SandboxCreateParams as SandboxCreateParams,
     type SandboxUpdateParams as SandboxUpdateParams,
   };
+
+  export { Sandbox as Sandbox };
+
+  export type { SandboxFile, FileChange, SandboxCreateOptions, SandboxError };
 
   export type ResponseMeta = API.ResponseMeta;
 }
