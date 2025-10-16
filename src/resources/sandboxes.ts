@@ -120,7 +120,7 @@ export namespace SandboxCreateResponse {
   export interface Runtime {
     nodeVersion: string;
 
-    packageManager: 'npm' | 'yarn' | 'pnpm';
+    packageManager: 'npm' | 'yarn' | 'pnpm' | 'bun';
 
     port: number;
 
