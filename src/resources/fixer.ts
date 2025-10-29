@@ -128,6 +128,33 @@ export namespace FixerRunResponse {
     }
 
     /**
+     * Response format when requesting DIFF format
+     */
+    export interface DiffFormat {
+      diff?: string | null;
+      diff_data?: string | null;
+      diff_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    /**
+     * Response format when requesting CHANGED_FILES format
+     */
+    export interface ChangedFilesFormat {
+      changed_files?: Array<SuggestedChanges.ChangedFile> | null;
+      changed_files_data?: string | null;
+      changed_files_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    /**
+     * Response format when requesting ALL_FILES format
+     */
+    export interface AllFilesFormat {
+      all_files?: Array<SuggestedChanges.AllFile> | null;
+      all_files_data?: string | null;
+      all_files_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    /**
      * Suggested changes to fix the issues
      */
     export interface SuggestedChanges {

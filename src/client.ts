@@ -18,7 +18,14 @@ import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import * as FixerAPI from './resources/fixer';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import { Sandboxes } from './resources/sandboxes';
+import {
+  Sandboxes,
+  SandboxCreateResponse,
+  SandboxRetrieveResponse,
+  SandboxUpdateResponse,
+  SandboxCreateParams,
+  SandboxUpdateParams,
+} from './resources/sandboxes';
 import {
   Sandbox,
   type SandboxFile,
@@ -876,7 +883,6 @@ export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
   export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
-
 
   export {
     Sandboxes as Sandboxes,
