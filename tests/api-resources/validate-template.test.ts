@@ -7,10 +7,10 @@ const client = new Benchify({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource fixer', () => {
+describe('resource validateTemplate', () => {
   // Prism tests are disabled
-  test.skip('run', async () => {
-    const responsePromise = client.fixer.run();
+  test.skip('validate', async () => {
+    const responsePromise = client.validateTemplate.validate();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,26 +21,17 @@ describe('resource fixer', () => {
   });
 
   // Prism tests are disabled
-  test.skip('run: request options and params are passed correctly', async () => {
+  test.skip('validate: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.fixer.run(
+      client.validateTemplate.validate(
         {
-          bundle: false,
-          event_id: 'event_id',
-          files: [
-            { contents: "export const hello = 'world';", path: 'src/index.ts' },
-            { contents: 'export function helper() {}', path: 'src/utils.ts' },
-          ],
-          files_data: 'files_data',
-          files_manifest: [{ foo: 'bar' }],
-          fixes: ['dependency'],
           meta: { external_id: 'external_id' },
-          mode: 'project',
-          response_encoding: 'json',
-          response_format: 'ALL_FILES',
+          response_format: 'DIFF',
           template_id: 'template_id',
           template_path: 'template_path',
+          templateId: 'templateId',
+          templateName: 'templateName',
         },
         { path: '/_stainless_unknown_path' },
       ),

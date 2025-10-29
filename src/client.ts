@@ -49,7 +49,7 @@ import { packTarZst, unpackTarZst, type BinaryFileData } from './lib/helpers';
 
 export interface ClientOptions {
   /**
-   * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
+   * Defaults to process.env['BENCHIFY_API_KEY'].
    */
   apiKey?: string | null | undefined;
 
@@ -229,7 +229,23 @@ export class Benchify {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    return;
+    if (this.apiKey && values.get('authorization')) {
+      return;
+    }
+    if (nulls.has('authorization')) {
+      return;
+    }
+
+    throw new Error(
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
+    );
+  }
+
+  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    if (this.apiKey == null) {
+      return undefined;
+    }
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
@@ -669,6 +685,7 @@ export class Benchify {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
+      await this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -888,7 +905,9 @@ export class Benchify {
 }
 
 Benchify.Fixer = Fixer;
-Benchify.Sandboxes = Sandboxes;
+Benchify.Stacks = Stacks;
+Benchify.FixStringLiterals = FixStringLiterals;
+Benchify.ValidateTemplate = ValidateTemplate;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
