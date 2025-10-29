@@ -58,6 +58,41 @@ export class Stacks extends APIResource {
   }
 
   /**
+   * Update stack files using manifest + bundle format and/or individual operations.
+   * For multi-service stacks, changes are routed to appropriate services.
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.update('stk_abc123', {
+   *   bundle: fs.createReadStream('path/to/file'),
+   *   manifest: fs.createReadStream('path/to/file'),
+   *   'idempotency-key': 'key-12345678',
+   *   'base-etag': 'etag-current',
+   * });
+   * ```
+   */
+  update(id: string, params: StackUpdateParams, options?: RequestOptions): APIPromise<StackUpdateResponse> {
+    const { 'idempotency-key': idempotencyKey, 'base-etag': baseEtag, ...body } = params;
+    return this._client.patch(
+      path`/v1/stacks/${id}`,
+      multipartFormRequestOptions(
+        {
+          body,
+          ...options,
+          headers: buildHeaders([
+            {
+              'idempotency-key': idempotencyKey,
+              ...(baseEtag != null ? { 'base-etag': baseEtag } : undefined),
+            },
+            options?.headers,
+          ]),
+        },
+        this._client,
+      ),
+    );
+  }
+
+  /**
    * Create a simple container sandbox with a custom image and command
    *
    * @example
@@ -292,6 +327,46 @@ export interface StackRetrieveResponse {
   readyAt?: string;
 }
 
+/**
+ * Response after patching a stack
+ */
+export interface StackUpdateResponse {
+  /**
+   * Stack identifier
+   */
+  id: string;
+
+  /**
+   * Number of operations applied
+   */
+  applied: number;
+
+  /**
+   * New ETag after changes
+   */
+  etag: string;
+
+  /**
+   * Stack lifecycle phases
+   */
+  phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
+
+  /**
+   * Whether stack was restarted
+   */
+  restarted: boolean;
+
+  /**
+   * Services affected by patch (for multi-service stacks)
+   */
+  affectedServices?: Array<string>;
+
+  /**
+   * Optional warnings if patch partially failed
+   */
+  warnings?: Array<string>;
+}
+
 export interface StackCreateAndRunResponse {
   id: string;
 
@@ -406,6 +481,33 @@ export interface StackCreateParams {
    * Header param: SHA-256 hash of the bundle for deduplication
    */
   'content-hash'?: string;
+}
+
+export interface StackUpdateParams {
+  /**
+   * Header param: Unique key for idempotent requests
+   */
+  'idempotency-key': string;
+
+  /**
+   * Header param: Current stack etag for conflict detection
+   */
+  'base-etag': string;
+
+  /**
+   * Body param: Optional tar.zst bundle containing changed/added files
+   */
+  bundle?: Uploadable;
+
+  /**
+   * Body param: Optional JSON manifest file with file metadata
+   */
+  manifest?: Uploadable;
+
+  /**
+   * Body param: Optional JSON string containing array of patch operations
+   */
+  ops?: string;
 }
 
 export interface StackCreateAndRunParams {
