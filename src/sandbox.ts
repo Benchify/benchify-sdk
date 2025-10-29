@@ -416,13 +416,10 @@ export class Sandbox {
         response.etag,
         response.kind === 'stack' ? response.id : undefined,
         response.kind === 'stack' && response.services ?
-          response.services.reduce(
-            (acc, service) => {
-              acc[service.workspacePath] = service.id;
-              return acc;
-            },
-            {} as Record<string, string>,
-          )
+          response.services.reduce<Record<string, string>>((acc, service) => {
+            acc[service.workspacePath] = service.id;
+            return acc;
+          }, {})
         : undefined,
         filteredFiles,
       );

@@ -1,8 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as FixerAPI from './fixer';
-import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -13,115 +11,29 @@ export class Fixer extends APIResource {
    *
    * @example
    * ```ts
-   * const response = await client.fixer.run();
+   * const response = await client.fixer.run({
+   *   files: [
+   *     {
+   *       path: 'src/index.ts',
+   *       contents: "export const hello = 'world';",
+   *     },
+   *     {
+   *       path: 'src/utils.ts',
+   *       contents: 'export function helper() {}',
+   *     },
+   *   ],
+   *   fixes: [],
+   *   mode: 'project',
+   *   response_encoding: 'json',
+   *   response_format: 'ALL_FILES',
+   * });
    * ```
    */
-  run(body: FixerRunParams, options?: RequestOptions): APIPromise<FixerRunResponse> {
+  run(body: FixerRunParams | null | undefined = {}, options?: RequestOptions): APIPromise<FixerRunResponse> {
     return this._client.post('/v1/fixer', { body, ...options });
   }
 }
 
-/**
- * Result of running diagnostics
- */
-export interface DiagnosticResponse {
-  /**
-   * Diagnostics grouped by file
-   */
-  file_to_diagnostics?: { [key: string]: Array<DiagnosticResponse.FileToDiagnostic> };
-}
-
-export namespace DiagnosticResponse {
-  /**
-   * Enhanced diagnostic model for external API
-   */
-  export interface FileToDiagnostic {
-    /**
-     * File where diagnostic occurs
-     */
-    file_path: string;
-
-    /**
-     * Location of the diagnostic
-     */
-    location: FileToDiagnostic.Location;
-
-    /**
-     * Diagnostic message
-     */
-    message: string;
-
-    /**
-     * Type of the diagnostic
-     */
-    type:
-      | 'type_error'
-      | 'parsing'
-      | 'dependency'
-      | 'implicit_any'
-      | 'implicit_any_array'
-      | 'invalid_jsx'
-      | 'css'
-      | 'ui'
-      | 'unclassified';
-
-    /**
-     * Code given by the diagnostic generator
-     */
-    code?: number | null;
-
-    /**
-     * Surrounding code context
-     */
-    context?: string | null;
-  }
-
-  export namespace FileToDiagnostic {
-    /**
-     * Location of the diagnostic
-     */
-    export interface Location {
-      /**
-       * Column number (1-based)
-       */
-      column: number | null;
-
-      /**
-       * Line number (1-based)
-       */
-      line: number | null;
-
-      /**
-       * Span of the error
-       */
-      span: number;
-
-      /**
-       * Position of the first character of the error location in the source code
-       */
-      starting_character_position: number | null;
-    }
-  }
-}
-
-/**
- * Model for a single file change
- */
-export interface FixerFile {
-  /**
-   * Contents of the file
-   */
-  contents: string;
-
-  /**
-   * Path of the file
-   */
-  path: string;
-}
-
-/**
- * Wrapped response model for benchify-api compatibility
- */
 export interface FixerRunResponse {
   /**
    * The actual response data
@@ -136,7 +48,7 @@ export interface FixerRunResponse {
   /**
    * Meta information
    */
-  meta?: Shared.ResponseMeta;
+  meta?: FixerRunResponse.Meta;
 }
 
 export namespace FixerRunResponse {
@@ -145,24 +57,44 @@ export namespace FixerRunResponse {
    */
   export interface Data {
     /**
+     * Version of the fixer
+     */
+    fixer_version: string;
+
+    /**
      * Final per-file status after fixing
      */
     status: Data.Status;
 
     /**
-     * Information about the bundling process and results
+     * Suggested changes to fix the issues
+     */
+    suggested_changes: Data.SuggestedChanges;
+
+    /**
+     * Bundle information if bundling was requested
      */
     bundle?: Data.Bundle | null;
 
     /**
-     * List of fix types that were actually applied during the fixer run
+     * Per-file strategy statistics
+     */
+    file_to_strategy_statistics?: { [key: string]: Array<Data.FileToStrategyStatistic> };
+
+    /**
+     * Diagnostics after fixing
+     */
+    final_diagnostics?: unknown;
+
+    /**
+     * Fix types that were used
      */
     fix_types_used?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
     /**
-     * Changes made by the fixer in the requested format
+     * Diagnostics before fixing
      */
-    suggested_changes?: Data.DiffFormat | Data.ChangedFilesFormat | Data.AllFilesFormat | null;
+    initial_diagnostics?: unknown;
   }
 
   export namespace Data {
@@ -170,6 +102,9 @@ export namespace FixerRunResponse {
      * Final per-file status after fixing
      */
     export interface Status {
+      /**
+       * Overall composite status
+       */
       composite_status:
         | 'FIXED_EVERYTHING'
         | 'FIXED_REQUESTED'
@@ -179,7 +114,7 @@ export namespace FixerRunResponse {
         | 'FAILED';
 
       /**
-       * Status of each file.
+       * Status of each file
        */
       file_to_composite_status?: {
         [key: string]:
@@ -193,69 +128,151 @@ export namespace FixerRunResponse {
     }
 
     /**
-     * Information about the bundling process and results
+     * Response format when requesting DIFF format
      */
-    export interface Bundle {
-      /**
-       * Overall status of the bundling operation
-       */
-      status: 'SUCCESS' | 'FAILED' | 'NOT_ATTEMPTED' | 'PARTIAL_SUCCESS';
-
-      /**
-       * Successfully bundled files
-       */
-      files?: Array<FixerAPI.FixerFile>;
-
-      /**
-       * Base64-encoded compressed file contents (blob format)
-       */
-      files_data?: string | null;
-
-      /**
-       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
-       */
-      files_manifest?: Array<{ [key: string]: unknown }> | null;
-    }
-
     export interface DiffFormat {
-      /**
-       * Git diff of changes made
-       */
       diff?: string | null;
+      diff_data?: string | null;
+      diff_manifest?: Array<{ [key: string]: unknown }> | null;
     }
 
+    /**
+     * Response format when requesting CHANGED_FILES format
+     */
     export interface ChangedFilesFormat {
-      /**
-       * List of changed files with their new contents
-       */
-      changed_files?: Array<FixerAPI.FixerFile> | null;
-
-      /**
-       * Base64-encoded compressed file contents (blob format)
-       */
+      changed_files?: Array<SuggestedChanges.ChangedFile> | null;
       changed_files_data?: string | null;
-
-      /**
-       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
-       */
       changed_files_manifest?: Array<{ [key: string]: unknown }> | null;
     }
 
+    /**
+     * Response format when requesting ALL_FILES format
+     */
     export interface AllFilesFormat {
+      all_files?: Array<SuggestedChanges.AllFile> | null;
+      all_files_data?: string | null;
+      all_files_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    /**
+     * Suggested changes to fix the issues
+     */
+    export interface SuggestedChanges {
       /**
        * List of all files with their current contents
        */
-      all_files?: Array<FixerAPI.FixerFile> | null;
+      all_files?: Array<SuggestedChanges.AllFile> | null;
 
       /**
-       * Base64-encoded compressed file contents (blob format)
+       * Base64-encoded compressed file contents
        */
       all_files_data?: string | null;
 
       /**
-       * File manifest for blob format: [{"path": "app.tsx", "size": 1024}, ...]
+       * File manifest for blob format
        */
       all_files_manifest?: Array<{ [key: string]: unknown }> | null;
+
+      /**
+       * List of changed files with their new contents
+       */
+      changed_files?: Array<SuggestedChanges.ChangedFile> | null;
+
+      /**
+       * Base64-encoded compressed file contents
+       */
+      changed_files_data?: string | null;
+
+      /**
+       * File manifest for blob format
+       */
+      changed_files_manifest?: Array<{ [key: string]: unknown }> | null;
+
+      /**
+       * Unified diff of changes
+       */
+      diff?: string | null;
+
+      /**
+       * Base64-encoded compressed diff data
+       */
+      diff_data?: string | null;
+
+      /**
+       * File manifest for blob format
+       */
+      diff_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    export namespace SuggestedChanges {
+      export interface AllFile {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
+
+      export interface ChangedFile {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
+    }
+
+    /**
+     * Bundle information if bundling was requested
+     */
+    export interface Bundle {
+      build_system: string;
+
+      status: 'SUCCESS' | 'FAILED' | 'NOT_ATTEMPTED' | 'PARTIAL_SUCCESS';
+
+      template_path: string;
+
+      bundle_url?: string | null;
+
+      debug?: { [key: string]: string };
+
+      files?: Array<Bundle.File>;
+
+      files_data?: string | null;
+
+      files_manifest?: Array<{ [key: string]: unknown }> | null;
+    }
+
+    export namespace Bundle {
+      export interface File {
+        /**
+         * Contents of the file
+         */
+        contents: string;
+
+        /**
+         * Path of the file
+         */
+        path: string;
+      }
+    }
+
+    export interface FileToStrategyStatistic {
+      strategy_name: string;
+
+      version_hash: string;
+
+      fixes_applied?: boolean;
+
+      fixes_fired?: boolean;
     }
   }
 
@@ -274,14 +291,24 @@ export namespace FixerRunResponse {
     message: string;
 
     /**
-     * Details about what caused the error, if available
+     * Details about what caused the error
      */
-    details?: string;
+    details?: { [key: string]: unknown };
+  }
+
+  /**
+   * Meta information
+   */
+  export interface Meta {
+    /**
+     * Customer tracking identifier
+     */
+    external_id?: string | null;
 
     /**
-     * Potential suggestions about how to fix the error, if applicable
+     * Unique trace identifier for the request
      */
-    suggestions?: Array<string>;
+    trace_id?: string | null;
   }
 }
 
@@ -290,6 +317,11 @@ export interface FixerRunParams {
    * Whether to bundle the project (experimental)
    */
   bundle?: boolean;
+
+  /**
+   * Unique identifier for the event
+   */
+  event_id?: string;
 
   /**
    * List of files to process (legacy format)
@@ -302,7 +334,7 @@ export interface FixerRunParams {
   files_data?: string | null;
 
   /**
-   * File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]
+   * File manifest for packed format
    */
   files_manifest?: Array<{ [key: string]: unknown }> | null;
 
@@ -312,17 +344,17 @@ export interface FixerRunParams {
   fixes?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
   /**
-   * Meta information for API requests
+   * Meta information for the request
    */
   meta?: FixerRunParams.Meta | null;
 
   /**
-   * Fixer operating mode: 'project' expects full project, 'files' expects subset
+   * Fixer operating mode
    */
   mode?: 'project' | 'files';
 
   /**
-   * Response encoding format: 'json' (default) or 'blob'
+   * Response encoding format
    */
   response_encoding?: 'json' | 'blob';
 
@@ -332,15 +364,17 @@ export interface FixerRunParams {
   response_format?: 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
 
   /**
-   * ID of the template to use for the fixer process
+   * ID of the template to use
    */
   template_id?: string | null;
+
+  /**
+   * Full path to the template
+   */
+  template_path?: string;
 }
 
 export namespace FixerRunParams {
-  /**
-   * Model for file data - clean and simple
-   */
   export interface File {
     /**
      * File contents
@@ -354,7 +388,7 @@ export namespace FixerRunParams {
   }
 
   /**
-   * Meta information for API requests
+   * Meta information for the request
    */
   export interface Meta {
     /**
@@ -365,12 +399,7 @@ export namespace FixerRunParams {
 }
 
 export declare namespace Fixer {
-  export {
-    type DiagnosticResponse as DiagnosticResponse,
-    type FixerFile as FixerFile,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
-  };
+  export { type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 }
 
 // Export File type for convenience

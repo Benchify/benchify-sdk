@@ -2,245 +2,115 @@
 
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
-import { type Uploadable } from '../core/uploads';
-import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
-import { multipartFormRequestOptions } from '../internal/uploads';
-import { path } from '../internal/utils/path';
 
 export class Sandboxes extends APIResource {
   /**
-   * Upload a binary tar.gz file to create a new stack environment. For multi-service
-   * stacks, automatically detects and orchestrates multiple services.
+   * Create a new sandbox
    */
-  create(params: SandboxCreateParams, options?: RequestOptions): APIPromise<SandboxCreateResponse> {
-    const { 'Content-Hash': contentHash, 'Idempotency-Key': idempotencyKey, ...body } = params;
-    return this._client.post(
-      '/sandboxes',
-      multipartFormRequestOptions(
-        {
-          body,
-          ...options,
-          headers: buildHeaders([
-            { 'Content-Hash': contentHash, 'Idempotency-Key': idempotencyKey },
-            options?.headers,
-          ]),
-        },
-        this._client,
-      ),
-    );
+  create(body: SandboxCreateParams, options?: RequestOptions): APIPromise<SandboxCreateResponse> {
+    return this._client.post('/v1/sandboxes', { body, ...options });
   }
 
   /**
-   * Retrieve current status and information about a stack and its services
+   * Retrieve sandbox status
    */
   retrieve(id: string, options?: RequestOptions): APIPromise<SandboxRetrieveResponse> {
-    return this._client.get(path`/sandboxes/${id}`, options);
+    return this._client.get(`/v1/sandboxes/${id}`, options);
   }
 
   /**
-   * Update stack files using tar.gz blobs and/or individual operations. For
-   * multi-service stacks, changes are routed to appropriate services.
+   * Update sandbox files
    */
-  update(
-    id: string,
-    params: SandboxUpdateParams,
-    options?: RequestOptions,
-  ): APIPromise<SandboxUpdateResponse> {
-    const {
-      'Idempotency-Key': idempotencyKey,
-      'Base-Commit': baseCommit,
-      'Base-Etag': baseEtag,
-      ...body
-    } = params;
-    return this._client.post(
-      path`/sandboxes/${id}:patch`,
-      multipartFormRequestOptions(
-        {
-          body,
-          ...options,
-          headers: buildHeaders([
-            {
-              'Idempotency-Key': idempotencyKey,
-              ...(baseCommit != null ? { 'Base-Commit': baseCommit } : undefined),
-              ...(baseEtag != null ? { 'Base-Etag': baseEtag } : undefined),
-            },
-            options?.headers,
-          ]),
-        },
-        this._client,
-      ),
-    );
+  update(id: string, body: SandboxUpdateParams, options?: RequestOptions): APIPromise<SandboxUpdateResponse> {
+    return this._client.patch(`/v1/sandboxes/${id}`, { body, ...options });
   }
 
   /**
-   * Permanently destroy a stack and all its services, cleaning up resources
+   * Delete a sandbox
    */
   delete(id: string, options?: RequestOptions): APIPromise<void> {
-    return this._client.delete(path`/sandboxes/${id}`, {
+    return this._client.delete(`/v1/sandboxes/${id}`, {
       ...options,
-      headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
+      headers: { Accept: '*/*', ...options?.headers },
     });
   }
 }
 
 export interface SandboxCreateResponse {
   id: string;
-
   contentHash: string;
-
   etag: string;
-
   kind: 'single' | 'stack';
-
   phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
-
   url: string;
-
-  buildStatus?: SandboxCreateResponse.BuildStatus;
-
-  idempotencyKey?: string;
-
-  runtime?: SandboxCreateResponse.Runtime;
-
-  services?: Array<SandboxCreateResponse.Service>;
-}
-
-export namespace SandboxCreateResponse {
-  export interface BuildStatus {
+  buildStatus?: {
     phase: 'pending' | 'running' | 'completed' | 'failed';
-
     duration?: number;
-
     error?: string;
-
     logs?: string;
-  }
-
-  export interface Runtime {
+  };
+  idempotencyKey?: string;
+  runtime?: {
     nodeVersion: string;
-
     packageManager: 'npm' | 'yarn' | 'pnpm' | 'bun';
-
     port: number;
-
     startCommand: string;
-
     type: 'node';
-
     typescript: boolean;
-
     buildCommand?: string;
-
     framework?: 'react' | 'nextjs' | 'vue' | 'nuxt' | 'express' | 'fastify' | 'nest' | 'vite' | 'vanilla';
-  }
-
-  export interface Service {
+  };
+  services?: Array<{
     id: string;
-
     name: string;
-
     phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
-
     role: 'frontend' | 'backend' | 'worker' | 'database' | 'unknown';
-
     workspacePath: string;
-
     port?: number;
-  }
+  }>;
 }
 
 export interface SandboxRetrieveResponse {
   id: string;
-
   etag: string;
-
   phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
-
   lastError?: string;
-
-  lastLogs?: Array<string>;
-
-  ports?: Array<number>;
-
+  lastLogs?: string[];
+  ports?: number[];
   readyAt?: string;
 }
 
 export interface SandboxUpdateResponse {
   id: string;
-
   applied: number;
-
   etag: string;
-
   phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
-
   restarted: boolean;
-
-  affectedServices?: Array<string>;
-
-  warnings?: Array<string>;
+  affectedServices?: string[];
+  warnings?: string[];
 }
 
 export interface SandboxCreateParams {
-  /**
-   * Body param: Binary gzipped tar archive containing project files
-   */
-  packed: Uploadable;
-
-  /**
-   * Header param: SHA-256 hash of uploaded content for deduplication
-   */
+  packed: unknown;
   'Content-Hash': string;
-
-  /**
-   * Header param: Unique key for idempotent requests
-   */
   'Idempotency-Key': string;
-
-  /**
-   * Body param: Optional JSON metadata as string
-   */
   manifest?: string;
-
-  /**
-   * Body param: Optional JSON configuration as string
-   */
   options?: string;
 }
 
 export interface SandboxUpdateParams {
-  /**
-   * Header param: Unique key for idempotent requests
-   */
   'Idempotency-Key': string;
-
-  /**
-   * Body param: JSON string containing patch metadata: { base, proposed, files:
-   * {...changed hashes...} }. Required when packed is present.
-   */
-  manifest?: string;
-
-  /**
-   * Body param: Optional JSON string containing array of patch operations
-   */
-  ops?: string;
-
-  /**
-   * Body param: Optional gzipped tar archive containing changed/added files
-   */
-  packed?: Uploadable;
-
-  /**
-   * Header param: Current stack commit hash for conflict detection
-   */
-  'Base-Commit'?: string;
-
-  /**
-   * Header param: Alternative to Base-Commit. Current stack etag for conflict
-   * detection
-   */
   'Base-Etag'?: string;
+  'Base-Commit'?: string;
+  manifest?: string;
+  ops?: string;
+  packed?: unknown;
+}
+
+export interface ResponseMeta {
+  trace_id?: string;
+  external_id?: string;
 }
 
 export declare namespace Sandboxes {
@@ -250,5 +120,6 @@ export declare namespace Sandboxes {
     type SandboxUpdateResponse as SandboxUpdateResponse,
     type SandboxCreateParams as SandboxCreateParams,
     type SandboxUpdateParams as SandboxUpdateParams,
+    type ResponseMeta as ResponseMeta,
   };
 }

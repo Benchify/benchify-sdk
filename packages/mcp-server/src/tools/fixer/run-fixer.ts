@@ -23,26 +23,24 @@ export const tool: Tool = {
     properties: {
       bundle: {
         type: 'boolean',
-        title: 'Bundle',
         description: 'Whether to bundle the project (experimental)',
+      },
+      event_id: {
+        type: 'string',
+        description: 'Unique identifier for the event',
       },
       files: {
         type: 'array',
-        title: 'Files',
         description: 'List of files to process (legacy format)',
         items: {
           type: 'object',
-          title: 'RequestTestFile',
-          description: 'Model for file data - clean and simple',
           properties: {
             contents: {
               type: 'string',
-              title: 'Contents',
               description: 'File contents',
             },
             path: {
               type: 'string',
-              title: 'Path',
               description: 'Path to the file',
             },
           },
@@ -51,13 +49,11 @@ export const tool: Tool = {
       },
       files_data: {
         type: 'string',
-        title: 'Files Data',
         description: 'Base64-encoded compressed file contents (packed format)',
       },
       files_manifest: {
         type: 'array',
-        title: 'Files Manifest',
-        description: 'File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]',
+        description: 'File manifest for packed format',
         items: {
           type: 'object',
           additionalProperties: true,
@@ -65,49 +61,44 @@ export const tool: Tool = {
       },
       fixes: {
         type: 'array',
-        title: 'Fixes',
         description: 'Configuration for which fix types to apply',
         items: {
           type: 'string',
-          title: 'FixTypeName',
-          description: 'Enumeration of available fix types',
           enum: ['dependency', 'parsing', 'css', 'ai_fallback', 'types', 'ui', 'sql'],
         },
       },
       meta: {
         type: 'object',
-        title: 'RequestMeta',
-        description: 'Meta information for API requests',
+        description: 'Meta information for the request',
         properties: {
           external_id: {
             type: 'string',
-            title: 'External Id',
             description: 'Customer tracking identifier',
           },
         },
       },
       mode: {
         type: 'string',
-        title: 'FixerMode',
-        description: "Fixer operating mode: 'project' expects full project, 'files' expects subset",
+        description: 'Fixer operating mode',
         enum: ['project', 'files'],
       },
       response_encoding: {
         type: 'string',
-        title: 'ResponseEncoding',
-        description: "Response encoding format: 'json' (default) or 'blob'",
+        description: 'Response encoding format',
         enum: ['json', 'blob'],
       },
       response_format: {
         type: 'string',
-        title: 'ResponseFormat',
         description: 'Format for the response (diff, changed_files, or all_files)',
         enum: ['DIFF', 'CHANGED_FILES', 'ALL_FILES'],
       },
       template_id: {
         type: 'string',
-        title: 'Template Id',
-        description: 'ID of the template to use for the fixer process',
+        description: 'ID of the template to use',
+      },
+      template_path: {
+        type: 'string',
+        description: 'Full path to the template',
       },
     },
     required: [],

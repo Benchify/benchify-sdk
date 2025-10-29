@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   operation: 'write',
   tags: [],
   httpMethod: 'delete',
-  httpPath: '/sandboxes/{id}',
-  operationId: 'destroyStack',
+  httpPath: '/v1/sandboxes/{id}',
+  operationId: 'sandboxes_delete',
 };
 
 export const tool: Tool = {
@@ -26,15 +26,13 @@ export const tool: Tool = {
     },
     required: ['id'],
   },
-  annotations: {
-    idempotentHint: true,
-  },
+  annotations: {},
 };
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
-  const { id, ...body } = args as any;
-  const response = await client.sandboxes.delete(id).asResponse();
-  return asTextContentResult(await response.text());
+  const { id } = args as any;
+  await client.sandboxes.delete(id);
+  return asTextContentResult({ success: true });
 };
 
 export default { metadata, tool, handler };

@@ -1,13 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export * from './shared';
-export {
-  Fixer,
-  type DiagnosticResponse,
-  type FixerFile,
-  type FixerRunResponse,
-  type FixerRunParams,
-} from './fixer';
+export { Fixer, type FixerRunResponse, type FixerRunParams } from './fixer';
 export {
   Sandboxes,
   type SandboxCreateResponse,
@@ -15,4 +8,5 @@ export {
   type SandboxUpdateResponse,
   type SandboxCreateParams,
   type SandboxUpdateParams,
+  type ResponseMeta,
 } from './sandboxes';
