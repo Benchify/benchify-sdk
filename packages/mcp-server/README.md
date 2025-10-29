@@ -130,23 +130,13 @@ over time, you can manually enable or disable certain capabilities:
 
 Launching the client with `--transport=http` launches the server as a remote server using Streamable HTTP transport. The `--port` setting can choose the port it will run on, and the `--socket` setting allows it to run on a Unix socket.
 
-Authorization can be provided via the `Authorization` header using the Bearer scheme.
-
-Additionally, authorization can be provided via the following headers:
-| Header | Equivalent client option | Security scheme |
-| -------------------- | ------------------------ | --------------- |
-| `x-benchify-api-key` | `apiKey` | bearerAuth |
-
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
 ```json
 {
   "mcpServers": {
     "benchify_api": {
-      "url": "http://localhost:3000",
-      "headers": {
-        "Authorization": "Bearer <auth value>"
-      }
+      "url": "http://localhost:3000"
     }
   }
 }
@@ -207,10 +197,3 @@ The following tools are available in this MCP server.
 ### Resource `fixer`:
 
 - `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.
-
-### Resource `sandboxes`:
-
-- `create_sandboxes` (`write`): Upload a binary tar.gz file to create a new stack environment. For multi-service stacks, automatically detects and orchestrates multiple services.
-- `retrieve_sandboxes` (`read`): Retrieve current status and information about a stack and its services
-- `update_sandboxes` (`write`): Update stack files using tar.gz blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
-- `delete_sandboxes` (`write`): Permanently destroy a stack and all its services, cleaning up resources
