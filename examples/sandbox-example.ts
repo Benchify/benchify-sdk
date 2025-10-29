@@ -78,7 +78,7 @@ app.listen(port, () => {
     console.log('Creating sandbox...');
 
     // Create a sandbox with ergonomic options
-    const handle = await client.sandbox.create(files, {
+    const handle = await client.stack.create(files, {
       name: 'my-express-app',
       port: 3000,
       buildCommand: 'npm run build',
@@ -217,7 +217,7 @@ async function conflictHandlingExample() {
   ];
 
   try {
-    const handle = await client.sandbox.create(files, {
+    const handle = await client.stack.create(files, {
       name: 'conflict-example',
     });
 
@@ -334,7 +334,7 @@ app.listen(port, () => {
   try {
     console.log('Creating stack sandbox...');
 
-    const handle = await client.sandbox.create(files, {
+    const handle = await client.stack.create(files, {
       name: 'my-fullstack-app',
       runtime: {
         nodeVersion: '18.x',

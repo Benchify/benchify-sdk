@@ -22,6 +22,7 @@ import {
   FixStringLiterals,
 } from './resources/fix-string-literals';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import * as FixerAPI from './resources/fixer';
 import {
   StackCreateAndRunParams,
   StackCreateAndRunResponse,
@@ -42,6 +43,7 @@ import {
   ValidateTemplateValidateParams,
   ValidateTemplateValidateResponse,
 } from './resources/validate-template';
+import { Stack } from './sandbox';
 
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -910,8 +912,13 @@ export class Benchify {
         return files as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
       });
   }
-  sandboxes: API.Sandboxes = new API.Sandboxes(this);
-  sandbox: Sandbox = new Sandbox(this);
+  // Stainless-generated resources (for direct API access)
+  stacks: API.Stacks = new API.Stacks(this);
+  fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
+  validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
+
+  // User-friendly wrapper for stacks
+  stack: Stack = new Stack(this);
 }
 
 Benchify.Fixer = Fixer;
@@ -951,4 +958,12 @@ export declare namespace Benchify {
     type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
     type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
   };
+}
+
+export interface Benchify {
+  stacks: API.Stacks;
+  fixer: API.Fixer;
+  fixStringLiterals: API.FixStringLiterals;
+  validateTemplate: API.ValidateTemplate;
+  stack: Stack;
 }

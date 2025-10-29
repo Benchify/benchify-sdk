@@ -59,7 +59,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const { id, ...body } = args as any;
-  return asTextContentResult(await client.sandboxes.update(id, body));
+  return asTextContentResult(await client.stacks.update(id, body));
 };
 
 export default { metadata, tool, handler };

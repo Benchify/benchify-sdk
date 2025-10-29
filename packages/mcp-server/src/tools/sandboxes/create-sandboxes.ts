@@ -52,7 +52,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const body = args as any;
-  return asTextContentResult(await client.sandboxes.create(body));
+  return asTextContentResult(await client.stacks.create(body));
 };
 
 export default { metadata, tool, handler };

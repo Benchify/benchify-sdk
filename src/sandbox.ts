@@ -4,14 +4,14 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
 import { type FileData, type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
-import { type SandboxRetrieveResponse } from './resources/sandboxes';
+import { type StackRetrieveResponse } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
 
 /**
  * File input with path and contents
  */
-export interface SandboxFile {
+export interface StackFile {
   path: string;
   contents: string | Uint8Array;
 }
@@ -25,9 +25,9 @@ export interface FileChange {
 }
 
 /**
- * Options for creating a sandbox
+ * Options for creating a stack
  */
-export interface SandboxCreateOptions {
+export interface StackCreateOptions {
   name?: string;
   buildCommand?: string;
   startCommand?: string;
@@ -44,7 +44,7 @@ export interface SandboxCreateOptions {
 /**
  * Normalized error response
  */
-export interface SandboxError {
+export interface StackError {
   code: string;
   message: string;
   requestId?: string;
@@ -69,7 +69,7 @@ const DEFAULT_IGNORE_PATTERNS = [
 /**
  * Sandbox handle returned from create() with methods to interact with the sandbox
  */
-export class SandboxHandle {
+export class StackHandle {
   private _client: Benchify;
   private _id: string;
   private _url: string;
@@ -87,7 +87,7 @@ export class SandboxHandle {
     etag: string,
     stackId?: string,
     workspaceMap?: Record<string, string>,
-    initialFiles?: SandboxFile[],
+    initialFiles?: StackFile[],
   ) {
     this._client = client;
     this._id = id;
@@ -147,11 +147,11 @@ export class SandboxHandle {
   }
 
   /**
-   * Get current sandbox status
+   * Get current stack status
    */
-  async status(): Promise<SandboxRetrieveResponse> {
+  async status(): Promise<StackRetrieveResponse> {
     try {
-      const response = await this._client.sandboxes.retrieve(this._id);
+      const response = await this._client.stacks.retrieve(this._id);
       this._etag = response.etag;
       return response;
     } catch (error) {
@@ -160,11 +160,11 @@ export class SandboxHandle {
   }
 
   /**
-   * Destroy the sandbox
+   * Destroy the stack
    */
   async destroy(): Promise<void> {
     try {
-      await this._client.sandboxes.delete(this._id);
+      await this._client.stacks.destroy(this._id);
     } catch (error) {
       throw this._normalizeError(error);
     }
@@ -226,17 +226,23 @@ export class SandboxHandle {
         }))
         .sort((a, b) => a.path.localeCompare(b.path));
 
-      // Build parameters - Stainless will detect Blob and create multipart FormData
+      // Build parameters - Stainless will detect File and create multipart FormData
       requestParams = {
-        'Base-Etag': this._etag,
-        'Idempotency-Key': idempotencyKey,
+        'base-etag': this._etag,
+        'idempotency-key': idempotencyKey,
       };
 
       // Add binary tar.zst file if there are file changes
       if (changedFiles.length > 0) {
         const { buffer, manifest } = await packWithManifest(binaryFiles, proposedTreeHash);
-        requestParams.packed = await toFile(buffer, 'changes.tar.zst', { type: 'application/octet-stream' });
-        requestParams.manifest = JSON.stringify(manifest);
+        requestParams.bundle = await toFile(buffer, 'changes.tar.zst', { type: 'application/octet-stream' });
+        requestParams.manifest = await toFile(
+          Buffer.from(JSON.stringify(manifest), 'utf-8'),
+          'manifest.json',
+          {
+            type: 'application/json',
+          },
+        );
       }
 
       // Add operations as JSON string if present
@@ -246,13 +252,13 @@ export class SandboxHandle {
     } else {
       // No changes, send minimal update with headers only
       requestParams = {
-        'Base-Etag': this._etag,
-        'Idempotency-Key': idempotencyKey,
+        'base-etag': this._etag,
+        'idempotency-key': idempotencyKey,
       };
     }
 
     // The generated client already handles multipart conversion properly
-    const response = await this._client.sandboxes.update(this._id, requestParams);
+    const response = await this._client.stacks.update(this._id, requestParams);
 
     // Update our state
     this._etag = response.etag;
@@ -298,7 +304,7 @@ export class SandboxHandle {
     );
   }
 
-  private _normalizeError(error: any): SandboxError {
+  private _normalizeError(error: any): StackError {
     if (error instanceof APIError) {
       return {
         code: error.constructor.name.replace('Error', '').toUpperCase(),
@@ -325,7 +331,7 @@ export class SandboxHandle {
 /**
  * High-level sandbox API with ergonomic interface
  */
-export class Sandbox {
+export class Stack {
   private _client: Benchify;
 
   constructor(client: Benchify) {
@@ -336,7 +342,7 @@ export class Sandbox {
    * Create a new sandbox with files and options
    * Returns a handle to interact with the sandbox
    */
-  async create(files: SandboxFile[], opts: SandboxCreateOptions = {}): Promise<SandboxHandle> {
+  async create(files: StackFile[], opts: StackCreateOptions = {}): Promise<StackHandle> {
     // Filter files based on ignore patterns
     const filteredFiles = this._filterFiles(files);
 
@@ -370,16 +376,18 @@ export class Sandbox {
 
       // Build parameters for API - Stainless will detect File and create multipart FormData
       const params: {
-        packed: Uploadable;
-        manifest: string;
+        bundle: Uploadable;
+        manifest: Uploadable;
         options?: string;
-        'Content-Hash': string;
-        'Idempotency-Key': string;
+        'content-hash': string;
+        'idempotency-key': string;
       } = {
-        packed, // Binary tar.zst file - Stainless will detect this and use multipart
-        manifest: JSON.stringify(manifest), // JSON string field
-        'Content-Hash': treeHash,
-        'Idempotency-Key': idempotencyKey,
+        bundle: packed, // Binary tar.zst file - Stainless will detect this and use multipart
+        manifest: await toFile(Buffer.from(JSON.stringify(manifest), 'utf-8'), 'manifest.json', {
+          type: 'application/json',
+        }),
+        'content-hash': treeHash,
+        'idempotency-key': idempotencyKey,
       };
 
       // Add options as JSON string if present
@@ -388,9 +396,9 @@ export class Sandbox {
       }
 
       // The generated client already handles multipart conversion properly
-      const response = await this._client.sandboxes.create(params);
+      const response = await this._client.stacks.create(params);
 
-      return new SandboxHandle(
+      return new StackHandle(
         this._client,
         response.id,
         response.url,
@@ -398,10 +406,13 @@ export class Sandbox {
         response.etag,
         response.kind === 'stack' ? response.id : undefined,
         response.kind === 'stack' && response.services ?
-          response.services.reduce<Record<string, string>>((acc, service) => {
-            acc[service.workspacePath] = service.id;
-            return acc;
-          }, {})
+          response.services.reduce<Record<string, string>>(
+            (acc: Record<string, string>, service: { workspacePath: string; id: string }) => {
+              acc[service.workspacePath] = service.id;
+              return acc;
+            },
+            {},
+          )
         : undefined,
         filteredFiles,
       );
@@ -410,7 +421,7 @@ export class Sandbox {
     }
   }
 
-  private _filterFiles(files: SandboxFile[]): SandboxFile[] {
+  private _filterFiles(files: StackFile[]): StackFile[] {
     return files.filter((file) => {
       return !DEFAULT_IGNORE_PATTERNS.some((pattern) => minimatch(file.path, pattern));
     });
@@ -441,7 +452,7 @@ export class Sandbox {
     return createHash('sha256').update(`${baseCommit}:${proposedTree}`).digest('hex');
   }
 
-  private _normalizeError(error: any): SandboxError {
+  private _normalizeError(error: any): StackError {
     if (error instanceof APIError) {
       return {
         code: error.constructor.name.replace('Error', '').toUpperCase(),
