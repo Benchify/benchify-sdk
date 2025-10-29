@@ -171,7 +171,7 @@ export namespace FixerRunResponse {
       /**
        * File manifest for blob format
        */
-      all_files_manifest?: Array<{ [key: string]: unknown }> | null;
+      all_files_manifest?: Array<SuggestedChanges.AllFilesManifest> | null;
 
       /**
        * List of changed files with their new contents
@@ -186,7 +186,7 @@ export namespace FixerRunResponse {
       /**
        * File manifest for blob format
        */
-      changed_files_manifest?: Array<{ [key: string]: unknown }> | null;
+      changed_files_manifest?: Array<SuggestedChanges.ChangedFilesManifest> | null;
 
       /**
        * Unified diff of changes
@@ -201,7 +201,7 @@ export namespace FixerRunResponse {
       /**
        * File manifest for blob format
        */
-      diff_manifest?: Array<{ [key: string]: unknown }> | null;
+      diff_manifest?: Array<SuggestedChanges.DiffManifest> | null;
     }
 
     export namespace SuggestedChanges {
@@ -217,6 +217,26 @@ export namespace FixerRunResponse {
         path: string;
       }
 
+      /**
+       * File manifest entry for packed format
+       */
+      export interface AllFilesManifest {
+        /**
+         * File path relative to project root
+         */
+        path: string;
+
+        /**
+         * File size in bytes
+         */
+        size: number;
+
+        /**
+         * File content hash (optional)
+         */
+        digest?: string;
+      }
+
       export interface ChangedFile {
         /**
          * Contents of the file
@@ -227,6 +247,46 @@ export namespace FixerRunResponse {
          * Path of the file
          */
         path: string;
+      }
+
+      /**
+       * File manifest entry for packed format
+       */
+      export interface ChangedFilesManifest {
+        /**
+         * File path relative to project root
+         */
+        path: string;
+
+        /**
+         * File size in bytes
+         */
+        size: number;
+
+        /**
+         * File content hash (optional)
+         */
+        digest?: string;
+      }
+
+      /**
+       * File manifest entry for packed format
+       */
+      export interface DiffManifest {
+        /**
+         * File path relative to project root
+         */
+        path: string;
+
+        /**
+         * File size in bytes
+         */
+        size: number;
+
+        /**
+         * File content hash (optional)
+         */
+        digest?: string;
       }
     }
 
@@ -248,7 +308,7 @@ export namespace FixerRunResponse {
 
       files_data?: string | null;
 
-      files_manifest?: Array<{ [key: string]: unknown }> | null;
+      files_manifest?: Array<Bundle.FilesManifest> | null;
     }
 
     export namespace Bundle {
@@ -262,6 +322,26 @@ export namespace FixerRunResponse {
          * Path of the file
          */
         path: string;
+      }
+
+      /**
+       * File manifest entry for packed format
+       */
+      export interface FilesManifest {
+        /**
+         * File path relative to project root
+         */
+        path: string;
+
+        /**
+         * File size in bytes
+         */
+        size: number;
+
+        /**
+         * File content hash (optional)
+         */
+        digest?: string;
       }
     }
 
@@ -334,9 +414,9 @@ export interface FixerRunParams {
   files_data?: string | null;
 
   /**
-   * File manifest for packed format
+   * File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]
    */
-  files_manifest?: Array<{ [key: string]: unknown }> | null;
+  files_manifest?: Array<FixerRunParams.FilesManifest> | null;
 
   /**
    * Configuration for which fix types to apply
@@ -385,6 +465,26 @@ export namespace FixerRunParams {
      * Path to the file
      */
     path: string;
+  }
+
+  /**
+   * File manifest entry for packed format
+   */
+  export interface FilesManifest {
+    /**
+     * File path relative to project root
+     */
+    path: string;
+
+    /**
+     * File size in bytes
+     */
+    size: number;
+
+    /**
+     * File content hash (optional)
+     */
+    digest?: string;
   }
 
   /**

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'post',
   httpPath: '/v1/validate-template',
+  operationId: 'validate_template',
 };
 
 export const tool: Tool = {

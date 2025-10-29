@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'post',
   httpPath: '/v1/fix-string-literals',
+  operationId: 'fix_string_literals',
 };
 
 export const tool: Tool = {

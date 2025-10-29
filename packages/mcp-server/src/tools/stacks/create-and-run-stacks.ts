@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'post',
   httpPath: '/v1/stacks/create-and-run',
+  operationId: 'create_and_run',
 };
 
 export const tool: Tool = {

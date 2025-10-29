@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'delete',
   httpPath: '/v1/stacks/{id}',
+  operationId: 'delete_stack',
 };
 
 export const tool: Tool = {

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'get',
   httpPath: '/v1/stacks/{id}/network-info',
+  operationId: 'get_stack_network_info',
 };
 
 export const tool: Tool = {

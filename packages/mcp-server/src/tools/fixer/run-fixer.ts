@@ -53,10 +53,25 @@ export const tool: Tool = {
       },
       files_manifest: {
         type: 'array',
-        description: 'File manifest for packed format',
+        description: 'File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]',
         items: {
           type: 'object',
-          additionalProperties: true,
+          description: 'File manifest entry for packed format',
+          properties: {
+            path: {
+              type: 'string',
+              description: 'File path relative to project root',
+            },
+            size: {
+              type: 'number',
+              description: 'File size in bytes',
+            },
+            digest: {
+              type: 'string',
+              description: 'File content hash (optional)',
+            },
+          },
+          required: ['path', 'size'],
         },
       },
       fixes: {
