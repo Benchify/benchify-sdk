@@ -59,11 +59,16 @@ describe('Sandbox', () => {
       // Verify manifest structure
       const callArgs = mockSandboxAPI.create.mock.calls[0][0];
       const manifest = JSON.parse(callArgs.manifest);
+      expect(manifest).toHaveProperty('manifest_version');
+      expect(manifest).toHaveProperty('bundle');
       expect(manifest).toHaveProperty('files');
-      expect(manifest).toHaveProperty('treeHash');
+      expect(manifest).toHaveProperty('tree_hash');
+      expect(manifest.manifest_version).toBe('1');
+      expect(manifest.bundle.format).toBe('tar.zst');
+      expect(manifest.bundle.compression).toBe('zstd');
       expect(manifest.files).toBeInstanceOf(Array);
       expect(manifest.files[0]).toHaveProperty('path');
-      expect(manifest.files[0]).toHaveProperty('hash');
+      expect(manifest.files[0]).toHaveProperty('digest');
     });
 
     it('should create a stack sandbox with services', async () => {
@@ -158,7 +163,7 @@ describe('Sandbox', () => {
 
       const callArgs = mockSandboxAPI.create.mock.calls[0][0];
       expect(callArgs.packed).toBeInstanceOf(Blob);
-      expect(callArgs.packed.type).toBe('application/gzip');
+      expect(callArgs.packed.type).toBe('application/octet-stream');
     });
 
     it('should handle Uint8Array file contents', async () => {
@@ -344,8 +349,12 @@ describe('SandboxHandle', () => {
       // Verify manifest structure for updates
       const callArgs = mockSandboxAPI.update.mock.calls[0][1];
       const manifest = JSON.parse(callArgs.manifest);
+      expect(manifest).toHaveProperty('manifest_version');
+      expect(manifest).toHaveProperty('bundle');
       expect(manifest).toHaveProperty('files');
-      expect(manifest).toHaveProperty('treeHash');
+      expect(manifest).toHaveProperty('tree_hash');
+      expect(manifest.manifest_version).toBe('1');
+      expect(manifest.bundle.format).toBe('tar.zst');
     });
 
     it('should handle file deletions only (no packed data)', async () => {
@@ -395,7 +404,7 @@ describe('SandboxHandle', () => {
       expect(callArgs.manifest).toBeDefined();
 
       // Verify packed blob is correct type
-      expect(callArgs.packed.type).toBe('application/gzip');
+      expect(callArgs.packed.type).toBe('application/octet-stream');
     });
 
     it('should handle 409 conflict with retry', async () => {

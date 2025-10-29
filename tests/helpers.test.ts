@@ -1,6 +1,6 @@
 // Tests for the helpers utility functions
 
-import { normalizePath, filesToTarGzBlob, type BinaryFileData } from '../src/lib/helpers';
+import { normalizePath, packTarZst, type BinaryFileData } from '../src/lib/helpers';
 
 describe('normalizePath', () => {
   it('should normalize Windows paths to POSIX', () => {
@@ -40,18 +40,17 @@ describe('normalizePath', () => {
   });
 });
 
-describe('filesToTarGzBlob', () => {
-  it('should create tar.gz blob from files', async () => {
+describe('packTarZst', () => {
+  it('should create tar.zst buffer from files', async () => {
     const files: BinaryFileData[] = [
       { path: 'src/index.ts', contents: 'console.log("Hello, world!");' },
       { path: 'package.json', contents: JSON.stringify({ name: 'test' }) },
     ];
 
-    const blob = await filesToTarGzBlob(files);
+    const buffer = await packTarZst(files);
 
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.type).toBe('application/octet-stream');
-    expect(blob.size).toBeGreaterThan(0);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 
   it('should handle binary file contents', async () => {
@@ -61,11 +60,10 @@ describe('filesToTarGzBlob', () => {
       { path: 'text.txt', contents: 'Hello, world!' },
     ];
 
-    const blob = await filesToTarGzBlob(files);
+    const buffer = await packTarZst(files);
 
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.type).toBe('application/octet-stream');
-    expect(blob.size).toBeGreaterThan(0);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 
   it('should sort files by path for deterministic output', async () => {
@@ -75,7 +73,7 @@ describe('filesToTarGzBlob', () => {
       { path: 'm-middle.ts', contents: 'middle' },
     ];
 
-    const blob1 = await filesToTarGzBlob(files);
+    const buffer1 = await packTarZst(files);
 
     // Same files in different order
     const shuffledFiles: BinaryFileData[] = [
@@ -84,10 +82,10 @@ describe('filesToTarGzBlob', () => {
       { path: 'a-first.ts', contents: 'first' },
     ];
 
-    const blob2 = await filesToTarGzBlob(shuffledFiles);
+    const buffer2 = await packTarZst(shuffledFiles);
 
-    // Both blobs should be identical since files are sorted internally
-    expect(blob1.size).toBe(blob2.size);
+    // Both buffers should be identical since files are sorted internally
+    expect(buffer1.length).toBe(buffer2.length);
   });
 
   it('should normalize paths in tar creation', async () => {
@@ -96,10 +94,10 @@ describe('filesToTarGzBlob', () => {
       { path: './relative/path.ts', contents: 'relative' },
     ];
 
-    const blob = await filesToTarGzBlob(files);
+    const buffer = await packTarZst(files);
 
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.size).toBeGreaterThan(0);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 
   it('should handle custom file modes', async () => {
@@ -108,20 +106,20 @@ describe('filesToTarGzBlob', () => {
       { path: 'config.json', contents: '{}', mode: '0644' },
     ];
 
-    const blob = await filesToTarGzBlob(files);
+    const buffer = await packTarZst(files);
 
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.size).toBeGreaterThan(0);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 
   it('should use deterministic timestamps', async () => {
     const files: BinaryFileData[] = [{ path: 'test.txt', contents: 'content' }];
 
-    const blob1 = await filesToTarGzBlob(files);
-    const blob2 = await filesToTarGzBlob(files);
+    const buffer1 = await packTarZst(files);
+    const buffer2 = await packTarZst(files);
 
     // Should produce identical output with deterministic timestamps
-    expect(blob1.size).toBe(blob2.size);
+    expect(buffer1.length).toBe(buffer2.length);
   });
 
   it('should handle empty files', async () => {
@@ -130,9 +128,9 @@ describe('filesToTarGzBlob', () => {
       { path: 'empty-binary', contents: new Uint8Array(0) },
     ];
 
-    const blob = await filesToTarGzBlob(files);
+    const buffer = await packTarZst(files);
 
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.size).toBeGreaterThan(0);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 });

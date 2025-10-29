@@ -17,13 +17,13 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'create_sandboxes',
   description:
-    'Upload a binary tar.gz file to create a new stack environment. For multi-service stacks, automatically detects and orchestrates multiple services.',
+    'Upload a binary tar.zst file to create a new stack environment. For multi-service stacks, automatically detects and orchestrates multiple services.',
   inputSchema: {
     type: 'object',
     properties: {
       packed: {
         type: 'string',
-        description: 'Binary gzipped tar archive containing project files',
+        description: 'Binary tar archive compressed with Zstandard containing project files',
       },
       'Content-Hash': {
         type: 'string',

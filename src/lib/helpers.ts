@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
-import { gzipSync, gunzipSync } from 'zlib';
 import * as tar from 'tar-stream';
+import * as zstd from '@mongodb-js/zstd';
 
 export interface FileData {
   path: string;
@@ -115,77 +116,6 @@ export function applyChanges({
 }
 
 /**
- * Package blob data structure for sending files in compressed format
- */
-export interface PackageBlob {
-  files_data: string;
-  files_manifest: Array<{ path: string; size: number }>;
-}
-
-/**
- * Convert files to package blob format using BYTE-based processing
- * This eliminates JavaScript vs Python character counting discrepancies
- */
-export function filesToPackageBlob(files: FileData[]): PackageBlob {
-  // Work with BYTES throughout, not strings
-  const manifest: Array<{ path: string; size: number }> = [];
-  const fileBuffers: Buffer[] = [];
-
-  for (const file of files) {
-    // CRITICAL: Use BYTE length, not character length
-    const contentBuffer =
-      typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf8') : Buffer.from(file.contents);
-    const byteSize = contentBuffer.length; // This is UTF-8 byte count
-
-    fileBuffers.push(contentBuffer);
-    manifest.push({
-      path: file.path,
-      size: byteSize, // Store byte count, not character count
-    });
-  }
-
-  // Concatenate ALL file buffers into single byte array
-  const combinedBuffer = Buffer.concat(fileBuffers);
-  const compressedBuffer = gzipSync(combinedBuffer);
-  const base64Data = compressedBuffer.toString('base64');
-
-  return {
-    files_data: base64Data,
-    files_manifest: manifest,
-  };
-}
-
-/**
- * Convert package blob back to files using BYTE-based slicing
- */
-export function packageBlobToFiles(blob: PackageBlob): FileData[] {
-  const compressedBuffer = Buffer.from(blob.files_data, 'base64');
-  const rawBytes = gunzipSync(compressedBuffer); // Keep as bytes!
-
-  const files: FileData[] = [];
-  let byteOffset = 0;
-
-  for (const manifestEntry of blob.files_manifest) {
-    const byteSize = manifestEntry.size; // This is UTF-8 byte count
-
-    // Slice RAW BYTES first
-    const fileBytes = rawBytes.subarray(byteOffset, byteOffset + byteSize);
-
-    // THEN decode to string
-    const contents = fileBytes.toString('utf8');
-
-    files.push({
-      path: manifestEntry.path,
-      contents: contents,
-    });
-
-    byteOffset += byteSize;
-  }
-
-  return files;
-}
-
-/**
  * Normalize path to POSIX format and remove ./ and // patterns
  * Throws on absolute paths or path traversal attempts
  */
@@ -216,15 +146,15 @@ export function normalizePath(path: string): string {
 }
 
 /**
- * Create a tar.gz blob from files using tar-stream (battle-tested and reliable)
- * Handles binary safety, deterministic output, and proper USTAR format
+ * Pack files into tar.zst format
+ * Used by both Sandbox and Fixer APIs
  */
-export async function filesToTarGzBlob(
+export async function packTarZst(
   files: BinaryFileData[],
   options?: {
     buildTime?: number;
   },
-): Promise<Blob> {
+): Promise<Buffer> {
   // Normalize all paths once and sort for deterministic output
   const normalizedFiles = files
     .map((file) => ({
@@ -272,8 +202,126 @@ export async function filesToTarGzBlob(
   // Combine tar data
   const tarData = Buffer.concat(chunks);
 
-  // Compress with gzip
-  const gzippedData = gzipSync(tarData);
+  // Compress with zstd (level 10 for better compression)
+  const zstdData = await zstd.compress(tarData, 10);
 
-  return new Blob([new Uint8Array(gzippedData)], { type: 'application/octet-stream' });
+  return zstdData;
+}
+
+/**
+ * Manifest format matching API specification
+ */
+export interface Manifest {
+  manifest_version: '1';
+  bundle: {
+    digest: string;
+    size: number;
+    format: 'tar.zst';
+    compression: 'zstd';
+  };
+  files: Array<{
+    path: string;
+    digest: string;
+    size: number;
+    type: 'file';
+    mode: string;
+  }>;
+  tree_hash: string;
+}
+
+/**
+ * Pack files and create manifest in one operation
+ * Returns both the packed buffer and the manifest
+ */
+export async function packWithManifest(
+  files: BinaryFileData[],
+  treeHash: string,
+  options?: {
+    buildTime?: number;
+  },
+): Promise<{ buffer: Buffer; manifest: Manifest }> {
+  // Pack the files
+  const buffer = await packTarZst(files, options);
+
+  // Calculate bundle hash
+  const bundleDigest = createHash('sha256').update(buffer).digest('hex');
+
+  // Build manifest
+  const manifest: Manifest = {
+    manifest_version: '1',
+    bundle: {
+      digest: `sha256:${bundleDigest}`,
+      size: buffer.length,
+      format: 'tar.zst',
+      compression: 'zstd',
+    },
+    files: files.map((file) => {
+      const contentBuffer =
+        typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf-8') : file.contents;
+      const fileDigest = createHash('sha256').update(contentBuffer).digest('hex');
+
+      return {
+        path: file.path,
+        digest: `sha256:${fileDigest}`,
+        size: contentBuffer.length,
+        type: 'file' as const,
+        mode: file.mode || '0644',
+      };
+    }),
+    tree_hash: `sha256:${treeHash}`,
+  };
+
+  return { buffer, manifest };
+}
+
+/**
+ * Unpack tar.zst format back to files
+ * Used by both Sandbox and Fixer APIs
+ */
+export async function unpackTarZst(bundleBuffer: Buffer): Promise<BinaryFileData[]> {
+  // Decompress with zstd
+  const tarBuffer = await zstd.decompress(bundleBuffer);
+
+  // Extract files from tar
+  return new Promise((resolve, reject) => {
+    const files: BinaryFileData[] = [];
+    const extract = tar.extract();
+    const { Readable } = require('stream');
+    const stream = Readable.from(tarBuffer);
+
+    extract.on('entry', (header: any, entryStream: any, next: any) => {
+      // Only process files, skip directories
+      if (header.type !== 'file') {
+        entryStream.resume();
+        return next();
+      }
+
+      const filePath = normalizePath(header.name);
+      const chunks: Buffer[] = [];
+
+      entryStream.on('data', (chunk: Buffer) => {
+        chunks.push(chunk);
+      });
+
+      entryStream.on('end', () => {
+        const content = Buffer.concat(chunks);
+        files.push({
+          path: filePath,
+          contents: content,
+          mode: header.mode ? `0${header.mode.toString(8)}` : '0644',
+        });
+        next();
+      });
+
+      entryStream.on('error', reject);
+    });
+
+    extract.on('finish', () => {
+      resolve(files);
+    });
+
+    extract.on('error', reject);
+
+    stream.pipe(extract);
+  });
 }

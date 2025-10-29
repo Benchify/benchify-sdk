@@ -45,7 +45,7 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
-import { filesToPackageBlob, packageBlobToFiles, type FileData } from './lib/helpers';
+import { packTarZst, unpackTarZst, type BinaryFileData } from './lib/helpers';
 
 export interface ClientOptions {
   /**
@@ -776,19 +776,22 @@ export class Benchify {
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
 
-    // Convert files to package blob format for efficient transfer
-    const fileData: FileData[] = files.map((f) => ({ path: f.path, contents: f.contents }));
-    const packageBlob = filesToPackageBlob(fileData);
+    // Convert files to tar.zst format for efficient transfer
+    const binaryFiles: BinaryFileData[] = files.map((f) => ({
+      path: f.path,
+      contents: f.contents,
+    }));
+    const packedBuffer = await packTarZst(binaryFiles);
+    const base64Data = packedBuffer.toString('base64');
 
-    // Call the underlying fixer.run method with package blob format
+    // Call the underlying fixer.run method with tar.zst format
     return this.fixer
       .run({
-        files_data: packageBlob.files_data,
-        files_manifest: packageBlob.files_manifest,
+        files_data: base64Data,
         response_format: responseFormat,
         ...options,
       })
-      .then((response) => {
+      .then(async (response) => {
         const changes = response.data.suggested_changes;
         const bundle = response.data.bundle;
 
@@ -802,13 +805,15 @@ export class Benchify {
           }
           case 'CHANGED_FILES': {
             const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-            // Check for blob format first
-            if (changedFormat.changed_files_data && changedFormat.changed_files_manifest) {
-              const decodedFiles = packageBlobToFiles({
-                files_data: changedFormat.changed_files_data,
-                files_manifest: changedFormat.changed_files_manifest as Array<{ path: string; size: number }>,
-              });
-              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            // Check for tar.zst format first
+            if (changedFormat.changed_files_data) {
+              const bundleBuffer = Buffer.from(changedFormat.changed_files_data, 'base64');
+              const decodedFiles = await unpackTarZst(bundleBuffer);
+              files = decodedFiles.map((f) => ({
+                path: f.path,
+                contents:
+                  typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+              })) as FixerOutput<T>;
             } else {
               // Fall back to regular array format
               files = (changedFormat.changed_files ?? []) as FixerOutput<T>;
@@ -817,13 +822,15 @@ export class Benchify {
           }
           case 'ALL_FILES': {
             const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            // Check for blob format first
-            if (allFilesFormat.all_files_data && allFilesFormat.all_files_manifest) {
-              const decodedFiles = packageBlobToFiles({
-                files_data: allFilesFormat.all_files_data,
-                files_manifest: allFilesFormat.all_files_manifest as Array<{ path: string; size: number }>,
-              });
-              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            // Check for tar.zst format first
+            if (allFilesFormat.all_files_data) {
+              const bundleBuffer = Buffer.from(allFilesFormat.all_files_data, 'base64');
+              const decodedFiles = await unpackTarZst(bundleBuffer);
+              files = decodedFiles.map((f) => ({
+                path: f.path,
+                contents:
+                  typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+              })) as FixerOutput<T>;
             } else {
               // Fall back to regular array format
               files = (allFilesFormat.all_files ?? []) as FixerOutput<T>;
@@ -833,12 +840,14 @@ export class Benchify {
           default: {
             // Fallback to all files if format is somehow invalid
             const fallbackFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            if (fallbackFormat.all_files_data && fallbackFormat.all_files_manifest) {
-              const decodedFiles = packageBlobToFiles({
-                files_data: fallbackFormat.all_files_data,
-                files_manifest: fallbackFormat.all_files_manifest as Array<{ path: string; size: number }>,
-              });
-              files = decodedFiles.map((f) => ({ path: f.path, contents: f.contents })) as FixerOutput<T>;
+            if (fallbackFormat.all_files_data) {
+              const bundleBuffer = Buffer.from(fallbackFormat.all_files_data, 'base64');
+              const decodedFiles = await unpackTarZst(bundleBuffer);
+              files = decodedFiles.map((f) => ({
+                path: f.path,
+                contents:
+                  typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+              })) as FixerOutput<T>;
             } else {
               files = (fallbackFormat.all_files ?? []) as FixerOutput<T>;
             }
@@ -846,15 +855,17 @@ export class Benchify {
           }
         }
 
-        // Handle bundled files - check for blob format first
+        // Handle bundled files - check for tar.zst format first
         let bundledFiles: Array<FixerAPI.File> | undefined;
         if (bundle) {
-          if (bundle.files_data && bundle.files_manifest) {
-            const decodedBundleFiles = packageBlobToFiles({
-              files_data: bundle.files_data,
-              files_manifest: bundle.files_manifest as Array<{ path: string; size: number }>,
-            });
-            bundledFiles = decodedBundleFiles.map((f) => ({ path: f.path, contents: f.contents }));
+          if (bundle.files_data) {
+            const bundleBuffer = Buffer.from(bundle.files_data, 'base64');
+            const decodedBundleFiles = await unpackTarZst(bundleBuffer);
+            bundledFiles = decodedBundleFiles.map((f) => ({
+              path: f.path,
+              contents:
+                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+            }));
           } else {
             bundledFiles = bundle.files;
           }
