@@ -5,6 +5,16 @@ import { Metadata, Endpoint, HandlerFunction } from './types';
 export { Metadata, Endpoint, HandlerFunction };
 
 import run_fixer from './fixer/run-fixer';
+import create_stacks from './stacks/create-stacks';
+import retrieve_stacks from './stacks/retrieve-stacks';
+import update_stacks from './stacks/update-stacks';
+import create_and_run_stacks from './stacks/create-and-run-stacks';
+import destroy_stacks from './stacks/destroy-stacks';
+import execute_command_stacks from './stacks/execute-command-stacks';
+import get_logs_stacks from './stacks/get-logs-stacks';
+import get_network_info_stacks from './stacks/get-network-info-stacks';
+import create_fix_string_literals from './fix-string-literals/create-fix-string-literals';
+import validate_validate_template from './validate-template/validate-validate-template';
 
 export const endpoints: Endpoint[] = [];
 
@@ -13,6 +23,16 @@ function addEndpoint(endpoint: Endpoint) {
 }
 
 addEndpoint(run_fixer);
+addEndpoint(create_stacks);
+addEndpoint(retrieve_stacks);
+addEndpoint(update_stacks);
+addEndpoint(create_and_run_stacks);
+addEndpoint(destroy_stacks);
+addEndpoint(execute_command_stacks);
+addEndpoint(get_logs_stacks);
+addEndpoint(get_network_info_stacks);
+addEndpoint(create_fix_string_literals);
+addEndpoint(validate_validate_template);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';

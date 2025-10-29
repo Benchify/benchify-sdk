@@ -130,13 +130,23 @@ over time, you can manually enable or disable certain capabilities:
 
 Launching the client with `--transport=http` launches the server as a remote server using Streamable HTTP transport. The `--port` setting can choose the port it will run on, and the `--socket` setting allows it to run on a Unix socket.
 
+Authorization can be provided via the `Authorization` header using the Bearer scheme.
+
+Additionally, authorization can be provided via the following headers:
+| Header | Equivalent client option | Security scheme |
+| -------------------- | ------------------------ | --------------- |
+| `x-benchify-api-key` | `apiKey` | bearerAuth |
+
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
 ```json
 {
   "mcpServers": {
     "benchify_api": {
-      "url": "http://localhost:3000"
+      "url": "http://localhost:3000",
+      "headers": {
+        "Authorization": "Bearer <auth value>"
+      }
     }
   }
 }
@@ -197,3 +207,22 @@ The following tools are available in this MCP server.
 ### Resource `fixer`:
 
 - `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.
+
+### Resource `stacks`:
+
+- `create_stacks` (`write`): Create a new stack environment using manifest + bundle format. Upload a JSON manifest with file metadata and a tar.zst bundle containing your project files. For multi-service stacks, automatically detects and orchestrates multiple services.
+- `retrieve_stacks` (`read`): Retrieve current status and information about a stack and its services
+- `update_stacks` (`write`): Update stack files using manifest + bundle format and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
+- `create_and_run_stacks` (`write`): Create a simple container sandbox with a custom image and command
+- `destroy_stacks` (`write`): Permanently destroy a stack and all its services, cleaning up resources
+- `execute_command_stacks` (`write`): Run a command in the sandbox container and get the output
+- `get_logs_stacks` (`read`): Retrieve logs from all services in the stack
+- `get_network_info_stacks` (`read`): Retrieve network details for a stack including URLs and connection info
+
+### Resource `fix_string_literals`:
+
+- `create_fix_string_literals` (`write`): Fix string literal issues in TypeScript files.
+
+### Resource `validate_template`:
+
+- `validate_validate_template` (`write`): Validate a template configuration

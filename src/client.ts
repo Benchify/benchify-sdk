@@ -16,8 +16,32 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
+import {
+  FixStringLiteralCreateParams,
+  FixStringLiteralCreateResponse,
+  FixStringLiterals,
+} from './resources/fix-string-literals';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import { Sandboxes } from './resources/sandboxes';
+import {
+  StackCreateAndRunParams,
+  StackCreateAndRunResponse,
+  StackCreateParams,
+  StackCreateResponse,
+  StackExecuteCommandParams,
+  StackExecuteCommandResponse,
+  StackGetLogsParams,
+  StackGetLogsResponse,
+  StackGetNetworkInfoResponse,
+  StackRetrieveResponse,
+  StackUpdateParams,
+  StackUpdateResponse,
+  Stacks,
+} from './resources/stacks';
+import {
+  ValidateTemplate,
+  ValidateTemplateValidateParams,
+  ValidateTemplateValidateResponse,
+} from './resources/validate-template';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -33,7 +57,7 @@ import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Benchify API Key. Obtain a key from the Benchify web portal under Settings > Credentials. Provide the key in the Authorization header as `Bearer $BENCHIFY_KEY`.
+   * Defaults to process.env['BENCHIFY_API_KEY'].
    */
   apiKey?: string | null | undefined;
 
@@ -198,7 +222,23 @@ export class Benchify {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    return;
+    if (this.apiKey && values.get('authorization')) {
+      return;
+    }
+    if (nulls.has('authorization')) {
+      return;
+    }
+
+    throw new Error(
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
+    );
+  }
+
+  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    if (this.apiKey == null) {
+      return undefined;
+    }
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
@@ -638,6 +678,7 @@ export class Benchify {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
+      await this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -705,16 +746,46 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
-  sandboxes: API.Sandboxes = new API.Sandboxes(this);
+  stacks: API.Stacks = new API.Stacks(this);
+  fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
+  validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
 }
 
 Benchify.Fixer = Fixer;
-Benchify.Sandboxes = Sandboxes;
+Benchify.Stacks = Stacks;
+Benchify.FixStringLiterals = FixStringLiterals;
+Benchify.ValidateTemplate = ValidateTemplate;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
   export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 
-  export { Sandboxes as Sandboxes };
+  export {
+    Stacks as Stacks,
+    type StackCreateResponse as StackCreateResponse,
+    type StackRetrieveResponse as StackRetrieveResponse,
+    type StackUpdateResponse as StackUpdateResponse,
+    type StackCreateAndRunResponse as StackCreateAndRunResponse,
+    type StackExecuteCommandResponse as StackExecuteCommandResponse,
+    type StackGetLogsResponse as StackGetLogsResponse,
+    type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
+    type StackCreateParams as StackCreateParams,
+    type StackUpdateParams as StackUpdateParams,
+    type StackCreateAndRunParams as StackCreateAndRunParams,
+    type StackExecuteCommandParams as StackExecuteCommandParams,
+    type StackGetLogsParams as StackGetLogsParams,
+  };
+
+  export {
+    FixStringLiterals as FixStringLiterals,
+    type FixStringLiteralCreateResponse as FixStringLiteralCreateResponse,
+    type FixStringLiteralCreateParams as FixStringLiteralCreateParams,
+  };
+
+  export {
+    ValidateTemplate as ValidateTemplate,
+    type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
+    type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
+  };
 }

@@ -22,7 +22,9 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 const response = await client.fixer.run();
 
@@ -37,12 +39,63 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Benchify from 'benchify';
 
-const client = new Benchify();
+const client = new Benchify({
+  apiKey: process.env['BENCHIFY_API_KEY'], // This is the default and can be omitted
+});
 
 const response: Benchify.FixerRunResponse = await client.fixer.run();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+
+## File uploads
+
+Request parameters that correspond to file uploads can be passed in many different forms:
+
+- `File` (or an object with the same structure)
+- a `fetch` `Response` (or an object with the same structure)
+- an `fs.ReadStream`
+- the return value of our `toFile` helper
+
+```ts
+import fs from 'fs';
+import Benchify, { toFile } from 'benchify';
+
+const client = new Benchify();
+
+// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
+await client.stacks.create({
+  bundle: fs.createReadStream('/path/to/file'),
+  manifest: fs.createReadStream('path/to/file'),
+  'idempotency-key': 'key-12345678',
+});
+
+// Or if you have the web `File` API you can pass a `File` instance:
+await client.stacks.create({
+  bundle: new File(['my bytes'], 'file'),
+  manifest: fs.createReadStream('path/to/file'),
+  'idempotency-key': 'key-12345678',
+});
+
+// You can also pass a `fetch` `Response`:
+await client.stacks.create({
+  bundle: await fetch('https://somesite/file'),
+  manifest: fs.createReadStream('path/to/file'),
+  'idempotency-key': 'key-12345678',
+});
+
+// Finally, if none of the above are convenient, you can use our `toFile` helper:
+await client.stacks.create({
+  bundle: await toFile(Buffer.from('my bytes'), 'file'),
+  manifest: fs.createReadStream('path/to/file'),
+  'idempotency-key': 'key-12345678',
+});
+await client.stacks.create({
+  bundle: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+  manifest: fs.createReadStream('path/to/file'),
+  'idempotency-key': 'key-12345678',
+});
+```
 
 ## Handling errors
 
