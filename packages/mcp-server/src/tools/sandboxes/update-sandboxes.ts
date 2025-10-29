@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'update_sandboxes',
   description:
-    'Update stack files using tar.gz blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.',
+    'Update stack files using tar.zst blobs and/or individual operations. For multi-service stacks, changes are routed to appropriate services.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -49,7 +49,7 @@ export const tool: Tool = {
       },
       packed: {
         type: 'string',
-        description: 'Optional gzipped tar archive containing changed/added files',
+        description: 'Optional tar archive compressed with Zstandard containing changed/added files',
       },
     },
     required: ['id', 'Idempotency-Key'],

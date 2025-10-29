@@ -2,8 +2,11 @@
 export {
   collectFiles,
   applyChanges,
-  filesToPackageBlob,
-  packageBlobToFiles,
+  packTarZst,
+  unpackTarZst,
+  packWithManifest,
+  normalizePath,
   type FileData,
-  type PackageBlob,
+  type BinaryFileData,
+  type Manifest,
 } from './lib/helpers';

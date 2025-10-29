@@ -3,7 +3,7 @@
 import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
-import { type FileData, type BinaryFileData, filesToTarGzBlob, normalizePath } from './lib/helpers';
+import { type FileData, type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
 import { type SandboxRetrieveResponse } from './resources/sandboxes';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
@@ -232,19 +232,10 @@ export class SandboxHandle {
         'Idempotency-Key': idempotencyKey,
       };
 
-      // Add binary tar.gz file if there are file changes
+      // Add binary tar.zst file if there are file changes
       if (changedFiles.length > 0) {
-        const packedBlob = await filesToTarGzBlob(binaryFiles); // Binary tar.gz
-        requestParams.packed = await toFile(packedBlob, 'changes.tar.gz', { type: 'application/gzip' }); // Convert to File for Uploadable interface
-
-        // Build manifest: path → sha256(fileBytes) (same order as tarball)
-        const manifest = {
-          files: binaryFiles.map((file) => ({
-            path: file.path,
-            hash: this._computeFileHash(file.contents),
-          })),
-          treeHash: proposedTreeHash,
-        };
+        const { buffer, manifest } = await packWithManifest(binaryFiles, proposedTreeHash);
+        requestParams.packed = await toFile(buffer, 'changes.tar.zst', { type: 'application/octet-stream' });
         requestParams.manifest = JSON.stringify(manifest);
       }
 
@@ -373,18 +364,9 @@ export class Sandbox {
       // Sort files for consistent ordering between manifest and tarball
       const sortedFiles = normalizedFiles.sort((a, b) => a.path.localeCompare(b.path));
 
-      // Create binary tar.gz blob and convert to File for Uploadable interface
-      const packedBlob = await filesToTarGzBlob(sortedFiles);
-      const packed = await toFile(packedBlob, 'sandbox.tar.gz', { type: 'application/gzip' });
-
-      // Build manifest: path → sha256(fileBytes) (same order as tarball)
-      const manifest = {
-        files: sortedFiles.map((file) => ({
-          path: file.path,
-          hash: this._computeFileHash(file.contents),
-        })),
-        treeHash: treeHash,
-      };
+      // Pack files and create manifest
+      const { buffer, manifest } = await packWithManifest(sortedFiles, treeHash);
+      const packed = await toFile(buffer, 'sandbox.tar.zst', { type: 'application/octet-stream' });
 
       // Build parameters for API - Stainless will detect File and create multipart FormData
       const params: {
@@ -394,7 +376,7 @@ export class Sandbox {
         'Content-Hash': string;
         'Idempotency-Key': string;
       } = {
-        packed, // Binary tar.gz file - Stainless will detect this and use multipart
+        packed, // Binary tar.zst file - Stainless will detect this and use multipart
         manifest: JSON.stringify(manifest), // JSON string field
         'Content-Hash': treeHash,
         'Idempotency-Key': idempotencyKey,
