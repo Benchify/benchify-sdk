@@ -16,12 +16,6 @@ import get_network_info_stacks from './stacks/get-network-info-stacks';
 import create_fix_string_literals from './fix-string-literals/create-fix-string-literals';
 import validate_validate_template from './validate-template/validate-validate-template';
 
-import create_sandboxes from './sandboxes/create-sandboxes';
-import retrieve_sandboxes from './sandboxes/retrieve-sandboxes';
-import update_sandboxes from './sandboxes/update-sandboxes';
-import delete_sandboxes from './sandboxes/delete-sandboxes';
-import run_fix_local from './fixer/run-fix-local';
-
 export const endpoints: Endpoint[] = [];
 
 function addEndpoint(endpoint: Endpoint) {

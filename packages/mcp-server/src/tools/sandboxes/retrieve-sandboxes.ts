@@ -36,7 +36,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const { id } = args as any;
-  return asTextContentResult(await client.sandboxes.retrieve(id));
+  return asTextContentResult(await client.stacks.retrieve(id));
 };
 
 export default { metadata, tool, handler };

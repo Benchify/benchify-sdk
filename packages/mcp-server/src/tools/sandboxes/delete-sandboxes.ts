@@ -31,7 +31,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const { id } = args as any;
-  await client.sandboxes.delete(id);
+  await client.stacks.destroy(id);
   return asTextContentResult({ success: true });
 };
 

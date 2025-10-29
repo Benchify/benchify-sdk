@@ -1,31 +1,31 @@
-// Tests for the Sandbox wrapper functionality
+// Tests for the Stack wrapper functionality
 
 import { Benchify } from '../src/client';
-import { Sandbox, SandboxHandle, type SandboxFile, type FileChange } from '../src/sandbox';
+import { Stack, StackHandle, type StackFile, type FileChange } from '../src/sandbox';
 import { ConflictError, APIError } from '../src/core/error';
 
-// Mock the client's sandbox API
-const mockSandboxAPI = {
+// Mock the client's stack API
+const mockStackAPI = {
   create: jest.fn(),
   retrieve: jest.fn(),
   update: jest.fn(),
-  delete: jest.fn(),
+  destroy: jest.fn(),
 };
 
 const mockClient = {
-  sandboxes: mockSandboxAPI,
+  stacks: mockStackAPI,
 } as any as Benchify;
 
-describe('Sandbox', () => {
-  let sandbox: Sandbox;
+describe('Stack', () => {
+  let stack: Stack;
 
   beforeEach(() => {
-    sandbox = new Sandbox(mockClient);
+    stack = new Stack(mockClient);
     jest.clearAllMocks();
   });
 
   describe('create()', () => {
-    const testFiles: SandboxFile[] = [
+    const testFiles: StackFile[] = [
       { path: 'src/index.ts', contents: 'console.log("Hello, world!");' },
       { path: 'package.json', contents: JSON.stringify({ name: 'test-app' }) },
     ];
@@ -33,32 +33,34 @@ describe('Sandbox', () => {
     it('should create a sandbox and return a handle', async () => {
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      const handle = await sandbox.create(testFiles);
+      const handle = await stack.create(testFiles);
 
-      expect(handle).toBeInstanceOf(SandboxHandle);
+      expect(handle).toBeInstanceOf(StackHandle);
       expect(handle.id).toBe('sandbox-123');
-      expect(handle.url).toBe('https://sandbox.example.com');
+      expect(handle.url).toBe('https://stack.example.com');
       expect(handle.kind).toBe('single');
 
-      expect(mockSandboxAPI.create).toHaveBeenCalledWith({
-        packed: expect.any(Blob),
-        manifest: expect.any(String),
-        'Content-Hash': expect.any(String),
-        'Idempotency-Key': expect.any(String),
+      expect(mockStackAPI.create).toHaveBeenCalledWith({
+        bundle: expect.any(File),
+        manifest: expect.any(File),
+        'content-hash': expect.any(String),
+        'idempotency-key': expect.any(String),
       });
 
       // Verify manifest structure
-      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
-      const manifest = JSON.parse(callArgs.manifest);
+      const callArgs = mockStackAPI.create.mock.calls[0][0];
+      // manifest is now a File object, we need to read its contents
+      const manifestText = await callArgs.manifest.text();
+      const manifest = JSON.parse(manifestText);
       expect(manifest).toHaveProperty('manifest_version');
       expect(manifest).toHaveProperty('bundle');
       expect(manifest).toHaveProperty('files');
@@ -97,9 +99,9 @@ describe('Sandbox', () => {
         ],
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      const handle = await sandbox.create(testFiles);
+      const handle = await stack.create(testFiles);
 
       expect(handle.kind).toBe('stack');
       expect(handle.stackId).toBe('stack-123');
@@ -108,14 +110,14 @@ describe('Sandbox', () => {
     it('should include options when provided', async () => {
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
       const options = {
         name: 'test-sandbox',
@@ -129,19 +131,19 @@ describe('Sandbox', () => {
         },
       };
 
-      await sandbox.create(testFiles, options);
+      await stack.create(testFiles, options);
 
-      expect(mockSandboxAPI.create).toHaveBeenCalledWith({
-        packed: expect.any(Blob),
-        manifest: expect.any(String),
+      expect(mockStackAPI.create).toHaveBeenCalledWith({
+        bundle: expect.any(File),
+        manifest: expect.any(File),
         options: expect.any(String),
-        'Content-Hash': expect.any(String),
-        'Idempotency-Key': expect.any(String),
+        'content-hash': expect.any(String),
+        'idempotency-key': expect.any(String),
       });
     });
 
     it('should filter out ignored files', async () => {
-      const filesWithIgnored: SandboxFile[] = [
+      const filesWithIgnored: StackFile[] = [
         { path: 'src/index.ts', contents: 'console.log("Hello, world!");' },
         { path: 'node_modules/package/index.js', contents: 'module.exports = {}' },
         { path: '.git/config', contents: '[core]' },
@@ -150,89 +152,91 @@ describe('Sandbox', () => {
 
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      await sandbox.create(filesWithIgnored);
+      await stack.create(filesWithIgnored);
 
-      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
-      expect(callArgs.packed).toBeInstanceOf(Blob);
-      expect(callArgs.packed.type).toBe('application/octet-stream');
+      const callArgs = mockStackAPI.create.mock.calls[0][0];
+      expect(callArgs.bundle).toBeInstanceOf(File);
+      expect(callArgs.bundle.type).toBe('application/octet-stream');
     });
 
     it('should handle Uint8Array file contents', async () => {
-      const filesWithBytes: SandboxFile[] = [
+      const filesWithBytes: StackFile[] = [
         { path: 'src/index.ts', contents: new TextEncoder().encode('console.log("Hello!");') },
       ];
 
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      const handle = await sandbox.create(filesWithBytes);
+      const handle = await stack.create(filesWithBytes);
 
       expect(handle.id).toBe('sandbox-123');
-      expect(mockSandboxAPI.create).toHaveBeenCalled();
+      expect(mockStackAPI.create).toHaveBeenCalled();
     });
 
     it('should normalize API errors', async () => {
       const apiError = new APIError(400, { message: 'Bad request' }, 'Bad request', new Headers());
-      mockSandboxAPI.create.mockRejectedValueOnce(apiError);
+      mockStackAPI.create.mockRejectedValueOnce(apiError);
 
-      await expect(sandbox.create(testFiles)).rejects.toMatchObject({
+      await expect(stack.create(testFiles)).rejects.toMatchObject({
         code: 'API',
         message: '400 Bad request',
       });
     });
 
     it('should normalize file paths and reject dangerous paths', async () => {
-      const dangerousFiles: SandboxFile[] = [{ path: '/absolute/path.ts', contents: 'console.log("Bad");' }];
+      const dangerousFiles: StackFile[] = [{ path: '/absolute/path.ts', contents: 'console.log("Bad");' }];
 
-      await expect(sandbox.create(dangerousFiles)).rejects.toThrow('Absolute paths not allowed');
+      await expect(stack.create(dangerousFiles)).rejects.toThrow('Absolute paths not allowed');
     });
 
     it('should reject path traversal attempts', async () => {
-      const traversalFiles: SandboxFile[] = [
+      const traversalFiles: StackFile[] = [
         { path: 'src/../../../evil.ts', contents: 'console.log("Evil");' },
       ];
 
-      await expect(sandbox.create(traversalFiles)).rejects.toThrow('Path traversal not allowed');
+      await expect(stack.create(traversalFiles)).rejects.toThrow('Path traversal not allowed');
     });
 
     it('should normalize Windows-style paths', async () => {
-      const windowsFiles: SandboxFile[] = [
+      const windowsFiles: StackFile[] = [
         { path: 'src\\index.ts', contents: 'console.log("Windows");' },
         { path: '.\\package.json', contents: '{}' },
       ];
 
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      await sandbox.create(windowsFiles);
+      await stack.create(windowsFiles);
 
-      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
-      const manifest = JSON.parse(callArgs.manifest);
+      const callArgs = mockStackAPI.create.mock.calls[0][0];
+      // manifest is now a File object, we need to read its contents
+      const manifestText = await callArgs.manifest.text();
+      const manifest = JSON.parse(manifestText);
 
       // Paths should be normalized to POSIX format and sorted
       expect(manifest.files[0].path).toBe('package.json'); // Comes first alphabetically
@@ -240,7 +244,7 @@ describe('Sandbox', () => {
     });
 
     it('should generate deterministic output with sorted files', async () => {
-      const unsortedFiles: SandboxFile[] = [
+      const unsortedFiles: StackFile[] = [
         { path: 'z-last.ts', contents: 'console.log("Last");' },
         { path: 'a-first.ts', contents: 'console.log("First");' },
         { path: 'm-middle.ts', contents: 'console.log("Middle");' },
@@ -248,19 +252,21 @@ describe('Sandbox', () => {
 
       const mockResponse = {
         id: 'sandbox-123',
-        url: 'https://sandbox.example.com',
+        url: 'https://stack.example.com',
         kind: 'single' as const,
         etag: 'etag-456',
         contentHash: 'hash-789',
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.create.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.create.mockResolvedValueOnce(mockResponse);
 
-      await sandbox.create(unsortedFiles);
+      await stack.create(unsortedFiles);
 
-      const callArgs = mockSandboxAPI.create.mock.calls[0][0];
-      const manifest = JSON.parse(callArgs.manifest);
+      const callArgs = mockStackAPI.create.mock.calls[0][0];
+      // manifest is now a File object, we need to read its contents
+      const manifestText = await callArgs.manifest.text();
+      const manifest = JSON.parse(manifestText);
 
       // Files should be sorted by path in manifest
       expect(manifest.files[0].path).toBe('a-first.ts');
@@ -270,15 +276,15 @@ describe('Sandbox', () => {
   });
 });
 
-describe('SandboxHandle', () => {
-  let handle: SandboxHandle;
-  const testFiles: SandboxFile[] = [{ path: 'src/index.ts', contents: 'console.log("Hello, world!");' }];
+describe('StackHandle', () => {
+  let handle: StackHandle;
+  const testFiles: StackFile[] = [{ path: 'src/index.ts', contents: 'console.log("Hello, world!");' }];
 
   beforeEach(() => {
-    handle = new SandboxHandle(
+    handle = new StackHandle(
       mockClient,
       'sandbox-123',
-      'https://sandbox.example.com',
+      'https://stack.example.com',
       'single',
       'etag-456',
       undefined,
@@ -296,12 +302,12 @@ describe('SandboxHandle', () => {
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.retrieve.mockResolvedValueOnce(mockStatus);
+      mockStackAPI.retrieve.mockResolvedValueOnce(mockStatus);
 
       const status = await handle.status();
 
       expect(status).toEqual(mockStatus);
-      expect(mockSandboxAPI.retrieve).toHaveBeenCalledWith('sandbox-123');
+      expect(mockStackAPI.retrieve).toHaveBeenCalledWith('sandbox-123');
     });
 
     it('should update internal etag after status call', async () => {
@@ -311,12 +317,12 @@ describe('SandboxHandle', () => {
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.retrieve.mockResolvedValueOnce(mockStatus);
+      mockStackAPI.retrieve.mockResolvedValueOnce(mockStatus);
 
       await handle.status();
 
       // The etag should be updated internally (we can verify this through subsequent calls)
-      expect(mockSandboxAPI.retrieve).toHaveBeenCalledWith('sandbox-123');
+      expect(mockStackAPI.retrieve).toHaveBeenCalledWith('sandbox-123');
     });
   });
 
@@ -332,23 +338,25 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      expect(mockSandboxAPI.update).toHaveBeenCalledWith(
+      expect(mockStackAPI.update).toHaveBeenCalledWith(
         'sandbox-123',
         expect.objectContaining({
-          packed: expect.any(Blob),
-          manifest: expect.any(String),
-          'Base-Etag': 'etag-456',
-          'Idempotency-Key': expect.any(String),
+          bundle: expect.any(File),
+          manifest: expect.any(File),
+          'base-etag': 'etag-456',
+          'idempotency-key': expect.any(String),
         }),
       );
 
       // Verify manifest structure for updates
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
-      const manifest = JSON.parse(callArgs.manifest);
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
+      // manifest is now a File object, we need to read its contents
+      const manifestText = await callArgs.manifest.text();
+      const manifest = JSON.parse(manifestText);
       expect(manifest).toHaveProperty('manifest_version');
       expect(manifest).toHaveProperty('bundle');
       expect(manifest).toHaveProperty('files');
@@ -370,11 +378,11 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/unused.ts"}]');
       expect(callArgs.packed).toBeUndefined();
       expect(callArgs.manifest).toBeUndefined();
@@ -395,16 +403,16 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
-      expect(callArgs.packed).toBeDefined();
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
+      expect(callArgs.bundle).toBeDefined();
       expect(callArgs.manifest).toBeDefined();
 
-      // Verify packed blob is correct type
-      expect(callArgs.packed.type).toBe('application/octet-stream');
+      // Verify bundle file is correct type
+      expect(callArgs.bundle.type).toBe('application/octet-stream');
     });
 
     it('should handle 409 conflict with retry', async () => {
@@ -424,13 +432,13 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockRejectedValueOnce(conflictError).mockResolvedValueOnce(successResponse);
-      mockSandboxAPI.retrieve.mockResolvedValueOnce(statusResponse);
+      mockStackAPI.update.mockRejectedValueOnce(conflictError).mockResolvedValueOnce(successResponse);
+      mockStackAPI.retrieve.mockResolvedValueOnce(statusResponse);
 
       await handle.apply(changes);
 
-      expect(mockSandboxAPI.update).toHaveBeenCalledTimes(2);
-      expect(mockSandboxAPI.retrieve).toHaveBeenCalledTimes(1);
+      expect(mockStackAPI.update).toHaveBeenCalledTimes(2);
+      expect(mockStackAPI.retrieve).toHaveBeenCalledTimes(1);
     });
 
     it('should fail after one retry attempt', async () => {
@@ -443,16 +451,16 @@ describe('SandboxHandle', () => {
         phase: 'running' as const,
       };
 
-      mockSandboxAPI.update.mockRejectedValueOnce(conflictError).mockRejectedValueOnce(conflictError);
-      mockSandboxAPI.retrieve.mockResolvedValueOnce(statusResponse);
+      mockStackAPI.update.mockRejectedValueOnce(conflictError).mockRejectedValueOnce(conflictError);
+      mockStackAPI.retrieve.mockResolvedValueOnce(statusResponse);
 
       await expect(handle.apply(changes)).rejects.toMatchObject({
         code: 'CONFLICT',
         message: '409 Conflict',
       });
 
-      expect(mockSandboxAPI.update).toHaveBeenCalledTimes(2);
-      expect(mockSandboxAPI.retrieve).toHaveBeenCalledTimes(1);
+      expect(mockStackAPI.update).toHaveBeenCalledTimes(2);
+      expect(mockStackAPI.retrieve).toHaveBeenCalledTimes(1);
     });
 
     it('should skip unchanged files', async () => {
@@ -469,12 +477,12 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
       // Should still make the API call, but with no packed data since no actual changes
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
       expect(callArgs.packed).toBeUndefined();
       expect(callArgs.manifest).toBeUndefined();
       expect(callArgs.ops).toBeUndefined();
@@ -483,16 +491,16 @@ describe('SandboxHandle', () => {
 
   describe('destroy()', () => {
     it('should delete the sandbox', async () => {
-      mockSandboxAPI.delete.mockResolvedValueOnce(undefined);
+      mockStackAPI.destroy.mockResolvedValueOnce(undefined);
 
       await handle.destroy();
 
-      expect(mockSandboxAPI.delete).toHaveBeenCalledWith('sandbox-123');
+      expect(mockStackAPI.destroy).toHaveBeenCalledWith('sandbox-123');
     });
 
     it('should normalize API errors', async () => {
       const apiError = new APIError(404, { message: 'Not found' }, 'Not found', new Headers());
-      mockSandboxAPI.delete.mockRejectedValueOnce(apiError);
+      mockStackAPI.destroy.mockRejectedValueOnce(apiError);
 
       await expect(handle.destroy()).rejects.toMatchObject({
         code: 'API',
@@ -517,20 +525,20 @@ describe('SandboxHandle', () => {
         restarted: true,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/old-file.ts"}]');
-      expect(callArgs.packed).toBeDefined(); // Always pack when there are file changes for consistency
+      expect(callArgs.bundle).toBeDefined(); // Always pack when there are file changes for consistency
       expect(callArgs.manifest).toBeDefined(); // Should include manifest with file changes
     });
   });
 
   describe('stack operations', () => {
     it('should handle stack edits without changing public DX', async () => {
-      const stackHandle = new SandboxHandle(
+      const stackHandle = new StackHandle(
         mockClient,
         'stack-123',
         'https://stack.example.com',
@@ -555,11 +563,11 @@ describe('SandboxHandle', () => {
         affectedServices: ['service-1', 'service-2'],
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await stackHandle.apply(changes);
 
-      expect(mockSandboxAPI.update).toHaveBeenCalledWith('stack-123', expect.any(Object));
+      expect(mockStackAPI.update).toHaveBeenCalledWith('stack-123', expect.any(Object));
     });
   });
 
@@ -578,12 +586,14 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
-      const manifest = JSON.parse(callArgs.manifest);
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
+      // manifest is now a File object, we need to read its contents
+      const manifestText = await callArgs.manifest.text();
+      const manifest = JSON.parse(manifestText);
 
       // Paths should be normalized to POSIX format
       expect(manifest.files[0].path).toBe('relative/path.ts');
@@ -600,7 +610,7 @@ describe('SandboxHandle', () => {
       });
 
       // Verify no API call was made due to early validation failure
-      expect(mockSandboxAPI.update).not.toHaveBeenCalled();
+      expect(mockStackAPI.update).not.toHaveBeenCalled();
     });
 
     it('should normalize deletion paths', async () => {
@@ -616,11 +626,11 @@ describe('SandboxHandle', () => {
         restarted: false,
       };
 
-      mockSandboxAPI.update.mockResolvedValueOnce(mockResponse);
+      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
 
       await handle.apply(changes);
 
-      const callArgs = mockSandboxAPI.update.mock.calls[0][1];
+      const callArgs = mockStackAPI.update.mock.calls[0][1];
       expect(callArgs.ops).toBe('[{"op":"remove","path":"src/to/delete.ts"}]');
     });
   });
