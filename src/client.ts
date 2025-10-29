@@ -16,15 +16,8 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import { DiagnosticResponse, Fixer, FixerFile, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import {
-  SandboxCreateParams,
-  SandboxCreateResponse,
-  SandboxRetrieveResponse,
-  SandboxUpdateParams,
-  SandboxUpdateResponse,
-  Sandboxes,
-} from './resources/sandboxes';
+import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { Sandboxes } from './resources/sandboxes';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -205,23 +198,7 @@ export class Benchify {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    if (this.apiKey && values.get('authorization')) {
-      return;
-    }
-    if (nulls.has('authorization')) {
-      return;
-    }
-
-    throw new Error(
-      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
-    );
-  }
-
-  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
-    if (this.apiKey == null) {
-      return undefined;
-    }
-    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
+    return;
   }
 
   /**
@@ -661,7 +638,6 @@ export class Benchify {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
-      await this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -738,22 +714,7 @@ Benchify.Sandboxes = Sandboxes;
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
 
-  export {
-    Fixer as Fixer,
-    type DiagnosticResponse as DiagnosticResponse,
-    type FixerFile as FixerFile,
-    type FixerRunResponse as FixerRunResponse,
-    type FixerRunParams as FixerRunParams,
-  };
+  export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 
-  export {
-    Sandboxes as Sandboxes,
-    type SandboxCreateResponse as SandboxCreateResponse,
-    type SandboxRetrieveResponse as SandboxRetrieveResponse,
-    type SandboxUpdateResponse as SandboxUpdateResponse,
-    type SandboxCreateParams as SandboxCreateParams,
-    type SandboxUpdateParams as SandboxUpdateParams,
-  };
-
-  export type ResponseMeta = API.ResponseMeta;
+  export { Sandboxes as Sandboxes };
 }
