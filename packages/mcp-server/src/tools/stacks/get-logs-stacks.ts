@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'get',
   httpPath: '/v1/stacks/{id}/logs',
+  operationId: 'get_stack_logs',
 };
 
 export const tool: Tool = {

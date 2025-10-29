@@ -34,8 +34,6 @@ import {
   StackGetLogsResponse,
   StackGetNetworkInfoResponse,
   StackRetrieveResponse,
-  StackUpdateParams,
-  StackUpdateResponse,
   Stacks,
 } from './resources/stacks';
 import {
@@ -935,13 +933,11 @@ export declare namespace Benchify {
     Stacks as Stacks,
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
-    type StackUpdateResponse as StackUpdateResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
     type StackCreateParams as StackCreateParams,
-    type StackUpdateParams as StackUpdateParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,

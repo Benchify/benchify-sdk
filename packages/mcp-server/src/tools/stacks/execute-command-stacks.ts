@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   tags: [],
   httpMethod: 'post',
   httpPath: '/v1/stacks/{id}/exec',
+  operationId: 'exec_command',
 };
 
 export const tool: Tool = {
