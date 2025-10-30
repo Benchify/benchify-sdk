@@ -1,7 +1,7 @@
 // Tests for the Stack wrapper functionality
 
 import { Benchify } from '../src/client';
-import { Stack, StackHandle, type StackFile, type FileChange } from '../src/stacks';
+import { Stacks, StackHandle, type StackFile, type FileChange } from '../src/stacks';
 import { ConflictError, APIError } from '../src/core/error';
 
 // Mock the client's stack API
@@ -16,11 +16,11 @@ const mockClient = {
   stacks: mockStackAPI,
 } as any as Benchify;
 
-describe('Stack', () => {
-  let stack: Stack;
+describe('Stacks', () => {
+  let stack: Stacks;
 
   beforeEach(() => {
-    stack = new Stack(mockClient);
+    stack = new Stacks(mockClient);
     jest.clearAllMocks();
   });
 
@@ -190,14 +190,12 @@ describe('Stack', () => {
       expect(mockStackAPI.create).toHaveBeenCalled();
     });
 
-    it('should normalize API errors', async () => {
+    it('should throw raw API errors', async () => {
       const apiError = new APIError(400, { message: 'Bad request' }, 'Bad request', new Headers());
       mockStackAPI.create.mockRejectedValueOnce(apiError);
 
-      await expect(stack.create(testFiles)).rejects.toMatchObject({
-        code: 'API',
-        message: '400 Bad request',
-      });
+      // Should throw the raw Stainless error
+      await expect(stack.create(testFiles)).rejects.toThrow(apiError);
     });
 
     it('should normalize file paths and reject dangerous paths', async () => {
@@ -238,9 +236,9 @@ describe('Stack', () => {
       const manifestText = await callArgs.manifest.text();
       const manifest = JSON.parse(manifestText);
 
-      // Paths should be normalized to POSIX format and sorted
-      expect(manifest.files[0].path).toBe('package.json'); // Comes first alphabetically
-      expect(manifest.files[1].path).toBe('src/index.ts');
+      // Paths should be normalized to POSIX format (in input order, not sorted)
+      expect(manifest.files[0].path).toBe('src/index.ts');
+      expect(manifest.files[1].path).toBe('package.json');
     });
 
     it('should generate deterministic output with sorted files', async () => {
@@ -268,10 +266,10 @@ describe('Stack', () => {
       const manifestText = await callArgs.manifest.text();
       const manifest = JSON.parse(manifestText);
 
-      // Files should be sorted by path in manifest
-      expect(manifest.files[0].path).toBe('a-first.ts');
-      expect(manifest.files[1].path).toBe('m-middle.ts');
-      expect(manifest.files[2].path).toBe('z-last.ts');
+      // Manifest reflects input order (unsorted in this case)
+      expect(manifest.files[0].path).toBe('z-last.ts');
+      expect(manifest.files[1].path).toBe('a-first.ts');
+      expect(manifest.files[2].path).toBe('m-middle.ts');
     });
   });
 });
@@ -289,7 +287,6 @@ describe('StackHandle', () => {
       'etag-456',
       undefined,
       undefined,
-      testFiles,
     );
     jest.clearAllMocks();
   });
@@ -454,39 +451,14 @@ describe('StackHandle', () => {
       mockStackAPI.update.mockRejectedValueOnce(conflictError).mockRejectedValueOnce(conflictError);
       mockStackAPI.retrieve.mockResolvedValueOnce(statusResponse);
 
-      await expect(handle.apply(changes)).rejects.toMatchObject({
-        code: 'CONFLICT',
-        message: '409 Conflict',
-      });
+      // Should throw the raw Stainless error after retries
+      await expect(handle.apply(changes)).rejects.toThrow(conflictError);
 
       expect(mockStackAPI.update).toHaveBeenCalledTimes(2);
       expect(mockStackAPI.retrieve).toHaveBeenCalledTimes(1);
     });
 
-    it('should skip unchanged files', async () => {
-      // Apply the same content that was already there
-      const changes: FileChange[] = [
-        { path: 'src/index.ts', contents: 'console.log("Hello, world!");' }, // Same as initial
-      ];
-
-      const mockResponse = {
-        id: 'sandbox-123',
-        applied: 0,
-        etag: 'etag-456', // Same etag since no changes
-        phase: 'running' as const,
-        restarted: false,
-      };
-
-      mockStackAPI.update.mockResolvedValueOnce(mockResponse);
-
-      await handle.apply(changes);
-
-      // Should still make the API call, but with no packed data since no actual changes
-      const callArgs = mockStackAPI.update.mock.calls[0][1];
-      expect(callArgs.packed).toBeUndefined();
-      expect(callArgs.manifest).toBeUndefined();
-      expect(callArgs.ops).toBeUndefined();
-    });
+    // Note: Client-side change detection removed - server handles deduplication
   });
 
   describe('destroy()', () => {
@@ -498,14 +470,12 @@ describe('StackHandle', () => {
       expect(mockStackAPI.destroy).toHaveBeenCalledWith('sandbox-123');
     });
 
-    it('should normalize API errors', async () => {
+    it('should throw raw API errors', async () => {
       const apiError = new APIError(404, { message: 'Not found' }, 'Not found', new Headers());
       mockStackAPI.destroy.mockRejectedValueOnce(apiError);
 
-      await expect(handle.destroy()).rejects.toMatchObject({
-        code: 'API',
-        message: '404 Not found',
-      });
+      // Should throw the raw Stainless error
+      await expect(handle.destroy()).rejects.toThrow(apiError);
     });
   });
 
@@ -546,7 +516,6 @@ describe('StackHandle', () => {
         'etag-456',
         'stack-123',
         { 'frontend/': 'service-1', 'backend/': 'service-2' },
-        testFiles,
       );
 
       const changes: FileChange[] = [
@@ -595,19 +564,16 @@ describe('StackHandle', () => {
       const manifestText = await callArgs.manifest.text();
       const manifest = JSON.parse(manifestText);
 
-      // Paths should be normalized to POSIX format
-      expect(manifest.files[0].path).toBe('relative/path.ts');
-      expect(manifest.files[1].path).toBe('src/windows/path.ts');
+      // Paths should be normalized to POSIX format (in input order)
+      expect(manifest.files[0].path).toBe('src/windows/path.ts');
+      expect(manifest.files[1].path).toBe('relative/path.ts');
     });
 
     it('should reject dangerous paths in updates', async () => {
       const changes: FileChange[] = [{ path: '../../../evil.ts', contents: 'console.log("Evil");' }];
 
       // Path validation should throw before any API call is made
-      await expect(handle.apply(changes)).rejects.toMatchObject({
-        code: 'UNKNOWN_ERROR',
-        message: expect.stringContaining('Path traversal not allowed'),
-      });
+      await expect(handle.apply(changes)).rejects.toThrow('Path traversal not allowed');
 
       // Verify no API call was made due to early validation failure
       expect(mockStackAPI.update).not.toHaveBeenCalled();

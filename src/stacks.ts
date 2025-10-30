@@ -3,7 +3,7 @@
 import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
-import { type FileData, type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
+import { type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
 import { type StackRetrieveResponse } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
@@ -162,16 +162,14 @@ export class StackHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-        : undefined;
+      : undefined;
 
     // Idempotency key ensures retries are safe
     const changeSignature = changes
       .map((c) => `${c.path}:${c.contents ? 'update' : 'delete'}`)
       .sort()
       .join('|');
-    const idempotencyKey = createHash('sha256')
-      .update(`${this._etag}:${changeSignature}`)
-      .digest('hex');
+    const idempotencyKey = createHash('sha256').update(`${this._etag}:${changeSignature}`).digest('hex');
 
     const requestParams: any = {
       'base-etag': this._etag,
@@ -186,13 +184,9 @@ export class StackHandle {
 
       const { buffer, manifest } = await packWithManifest(binaryFiles);
       requestParams.bundle = await toFile(buffer, 'changes.tar.zst', { type: 'application/octet-stream' });
-      requestParams.manifest = await toFile(
-        Buffer.from(JSON.stringify(manifest), 'utf-8'),
-        'manifest.json',
-        {
-          type: 'application/json',
-        },
-      );
+      requestParams.manifest = await toFile(Buffer.from(JSON.stringify(manifest), 'utf-8'), 'manifest.json', {
+        type: 'application/json',
+      });
     }
 
     if (ops) {
@@ -315,7 +309,7 @@ export class Stacks {
           },
           {},
         )
-        : undefined,
+      : undefined,
     );
   }
 

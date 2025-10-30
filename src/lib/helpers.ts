@@ -272,7 +272,7 @@ export async function packWithManifest(
   // 2. Calculate tree hash on normalized files
   const treeHash = calculateTreeHash(normalizedFiles);
 
-  // 3. Pack files (use normalized files!)
+  // 3. Pack files (packTarZst will sort internally)
   const buffer = await packTarZst(normalizedFiles, options);
 
   // 4. Calculate bundle hash

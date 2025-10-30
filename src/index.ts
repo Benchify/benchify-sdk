@@ -5,13 +5,7 @@ export { Benchify as default } from './client';
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
 export { Benchify, type ClientOptions } from './client';
-export {
-  Stacks,
-  StackHandle,
-  type StackFile,
-  type FileChange,
-  type StackCreateOptions,
-} from './stacks';
+export { Stacks, StackHandle, type StackFile, type FileChange, type StackCreateOptions } from './stacks';
 export {
   BenchifyError,
   APIError,
