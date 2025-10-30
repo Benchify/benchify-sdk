@@ -207,7 +207,7 @@ export class StackHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-      : undefined;
+        : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
@@ -234,7 +234,7 @@ export class StackHandle {
 
       // Add binary tar.zst file if there are file changes
       if (changedFiles.length > 0) {
-        const { buffer, manifest } = await packWithManifest(binaryFiles, proposedTreeHash);
+        const { buffer, manifest } = await packWithManifest(binaryFiles);
         requestParams.bundle = await toFile(buffer, 'changes.tar.zst', { type: 'application/octet-stream' });
         requestParams.manifest = await toFile(
           Buffer.from(JSON.stringify(manifest), 'utf-8'),
@@ -371,7 +371,7 @@ export class Stack {
       const sortedFiles = normalizedFiles.sort((a, b) => a.path.localeCompare(b.path));
 
       // Pack files and create manifest
-      const { buffer, manifest } = await packWithManifest(sortedFiles, treeHash);
+      const { buffer, manifest } = await packWithManifest(sortedFiles);
       const packed = await toFile(buffer, 'sandbox.tar.zst', { type: 'application/octet-stream' });
 
       // Build parameters for API - Stainless will detect File and create multipart FormData
@@ -413,7 +413,7 @@ export class Stack {
             },
             {},
           )
-        : undefined,
+          : undefined,
         filteredFiles,
       );
     } catch (error) {
