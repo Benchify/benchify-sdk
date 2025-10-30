@@ -34,14 +34,14 @@ import {
   StackGetLogsResponse,
   StackGetNetworkInfoResponse,
   StackRetrieveResponse,
-  Stacks,
+  Stacks as StacksAPI,
 } from './resources/stacks';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
   ValidateTemplateValidateResponse,
 } from './resources/validate-template';
-import { Stack } from './sandbox';
+import { Stacks } from './stacks';
 
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -915,12 +915,12 @@ export class Benchify {
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
   validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
 
-  // User-friendly wrapper for stacks
-  stack: Stack = new Stack(this);
+  // User-friendly wrapper for stacks (singular to avoid collision with low-level API)
+  stack: Stacks = new Stacks(this);
 }
 
 Benchify.Fixer = Fixer;
-Benchify.Stacks = Stacks;
+Benchify.Stacks = StacksAPI;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
 
@@ -930,7 +930,7 @@ export declare namespace Benchify {
   export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 
   export {
-    Stacks as Stacks,
+    StacksAPI as Stacks,
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
@@ -961,5 +961,5 @@ export interface Benchify {
   fixer: API.Fixer;
   fixStringLiterals: API.FixStringLiterals;
   validateTemplate: API.ValidateTemplate;
-  stack: Stack;
+  stack: Stacks;
 }

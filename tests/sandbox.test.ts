@@ -1,7 +1,7 @@
 // Tests for the Stack wrapper functionality
 
 import { Benchify } from '../src/client';
-import { Stack, StackHandle, type StackFile, type FileChange } from '../src/sandbox';
+import { Stack, StackHandle, type StackFile, type FileChange } from '../src/stacks';
 import { ConflictError, APIError } from '../src/core/error';
 
 // Mock the client's stack API
