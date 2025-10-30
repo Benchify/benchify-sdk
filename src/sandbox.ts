@@ -207,7 +207,7 @@ export class StackHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-        : undefined;
+      : undefined;
 
     // Generate idempotency key
     const currentTreeHash = this._computeTreeHash(this._fileManifest);
@@ -413,7 +413,7 @@ export class Stack {
             },
             {},
           )
-          : undefined,
+        : undefined,
         filteredFiles,
       );
     } catch (error) {
