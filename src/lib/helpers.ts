@@ -148,6 +148,7 @@ export function normalizePath(path: string): string {
 /**
  * Pack files into tar.zst format
  * Used by both Sandbox and Fixer APIs
+ * Note: Assumes paths are already normalized
  */
 export async function packTarZst(
   files: BinaryFileData[],
@@ -155,13 +156,8 @@ export async function packTarZst(
     buildTime?: number;
   },
 ): Promise<Buffer> {
-  // Normalize all paths once and sort for deterministic output
-  const normalizedFiles = files
-    .map((file) => ({
-      ...file,
-      path: normalizePath(file.path),
-    }))
-    .sort((a, b) => a.path.localeCompare(b.path));
+  // Sort for deterministic output
+  const sortedFiles = [...files].sort((a, b) => a.path.localeCompare(b.path, 'en-US', { numeric: true }));
 
   // Create tar pack stream
   const pack = tar.pack();
@@ -173,7 +169,7 @@ export async function packTarZst(
   });
 
   // Add files to tar stream
-  for (const file of normalizedFiles) {
+  for (const file of sortedFiles) {
     // Handle binary-safe content
     const contentBuffer =
       typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf8') : Buffer.from(file.contents);
@@ -209,6 +205,34 @@ export async function packTarZst(
 }
 
 /**
+ * Calculate tree hash for content-addressable verification
+ * Algorithm matches API specification exactly
+ *
+ * @internal Assumes paths are already normalized - only called by packWithManifest
+ */
+export function calculateTreeHash(files: BinaryFileData[]): string {
+  if (files.length === 0) {
+    return createHash('sha256').update('').digest('hex');
+  }
+
+  // 1. Sort by path using localeCompare with en-US locale
+  const sorted = [...files].sort((a, b) => a.path.localeCompare(b.path, 'en-US', { numeric: true }));
+
+  // 2. Build entries: calculate hash for each file
+  const entries = sorted.map((file) => {
+    const content =
+      typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf-8') : Buffer.from(file.contents);
+
+    const hash = createHash('sha256').update(content).digest('hex');
+    return `${file.path}:${hash}`;
+  });
+
+  // 3. Hash the concatenated entries
+  const treeInput = entries.join('\n');
+  return createHash('sha256').update(treeInput).digest('hex');
+}
+
+/**
  * Manifest format matching API specification
  */
 export interface Manifest {
@@ -235,18 +259,26 @@ export interface Manifest {
  */
 export async function packWithManifest(
   files: BinaryFileData[],
-  treeHash: string,
   options?: {
     buildTime?: number;
   },
 ): Promise<{ buffer: Buffer; manifest: Manifest }> {
-  // Pack the files
-  const buffer = await packTarZst(files, options);
+  // 1. Normalize ALL paths first
+  const normalizedFiles = files.map((file) => ({
+    ...file,
+    path: normalizePath(file.path),
+  }));
 
-  // Calculate bundle hash
+  // 2. Calculate tree hash on normalized files
+  const treeHash = calculateTreeHash(normalizedFiles);
+
+  // 3. Pack files (use normalized files!)
+  const buffer = await packTarZst(normalizedFiles, options);
+
+  // 4. Calculate bundle hash
   const bundleDigest = createHash('sha256').update(buffer).digest('hex');
 
-  // Build manifest
+  // 5. Build manifest
   const manifest: Manifest = {
     manifest_version: '1',
     bundle: {
@@ -255,13 +287,13 @@ export async function packWithManifest(
       format: 'tar.zst',
       compression: 'zstd',
     },
-    files: files.map((file) => {
+    files: normalizedFiles.map((file) => {
       const contentBuffer =
-        typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf-8') : file.contents;
+        typeof file.contents === 'string' ? Buffer.from(file.contents, 'utf-8') : Buffer.from(file.contents);
       const fileDigest = createHash('sha256').update(contentBuffer).digest('hex');
 
       return {
-        path: file.path,
+        path: file.path, // Already normalized
         digest: `sha256:${fileDigest}`,
         size: contentBuffer.length,
         type: 'file' as const,

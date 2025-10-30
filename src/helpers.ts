@@ -5,6 +5,7 @@ export {
   packTarZst,
   unpackTarZst,
   packWithManifest,
+  calculateTreeHash,
   normalizePath,
   type FileData,
   type BinaryFileData,
