@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.65 (2025-10-31)
+
+Full Changelog: [v0.1.0-alpha.64...v0.1.0-alpha.65](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.64...v0.1.0-alpha.65)
+
+### Features
+
+* **api:** api update ([15f13c2](https://github.com/Benchify/benchify-sdk/commit/15f13c2d40f4991a787a50fb4c024be7424a6567))
+
+
+### Bug Fixes
+
+* **mcpb:** pin @anthropic-ai/mcpb version ([25f58ec](https://github.com/Benchify/benchify-sdk/commit/25f58ecf152608894f1daea89c965d2140180c34))
+
 ## 0.1.0-alpha.64 (2025-10-30)
 
 Full Changelog: [v0.1.0-alpha.63...v0.1.0-alpha.64](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.63...v0.1.0-alpha.64)
