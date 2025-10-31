@@ -206,7 +206,7 @@ The following tools are available in this MCP server.
 
 ### Resource `fixer`:
 
-- `run_fixer` (`write`): Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.
+- `run_fixer` (`write`): Handle fixer requests - supports two formats: 1) JSON with inline file contents in files array, 2) multipart/form-data with tar.zst bundle and manifest (same as Sandbox API). Use multipart for better performance with large projects.
 
 ### Resource `stacks`:
 

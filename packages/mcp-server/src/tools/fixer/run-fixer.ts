@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'run_fixer',
   description:
-    'Handle fixer requests - supports both legacy (embedded files) and new (manifest+blobs) formats.',
+    'Handle fixer requests - supports two formats: 1) JSON with inline file contents in files array, 2) multipart/form-data with tar.zst bundle and manifest (same as Sandbox API). Use multipart for better performance with large projects.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -31,7 +31,8 @@ export const tool: Tool = {
       },
       files: {
         type: 'array',
-        description: 'List of files to process (legacy format)',
+        description:
+          'List of files to process (JSON format with inline contents). For large projects, use multipart/form-data with manifest + bundle instead.',
         items: {
           type: 'object',
           properties: {
@@ -45,33 +46,6 @@ export const tool: Tool = {
             },
           },
           required: ['contents', 'path'],
-        },
-      },
-      files_data: {
-        type: 'string',
-        description: 'Base64-encoded compressed file contents (packed format)',
-      },
-      files_manifest: {
-        type: 'array',
-        description: 'File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]',
-        items: {
-          type: 'object',
-          description: 'File manifest entry for packed format',
-          properties: {
-            path: {
-              type: 'string',
-              description: 'File path relative to project root',
-            },
-            size: {
-              type: 'number',
-              description: 'File size in bytes',
-            },
-            digest: {
-              type: 'string',
-              description: 'File content hash (optional)',
-            },
-          },
-          required: ['path', 'size'],
         },
       },
       fixes: {
