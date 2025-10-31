@@ -145,6 +145,15 @@ type FixerOutput<T extends ResponseFormat> =
 type FixerBundleOutput<T extends ResponseFormat> = {
   files: FixerOutput<T>;
   bundled_files: Array<FixerAPI.File>;
+  initial_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+  final_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+};
+
+// Type for standard responses with diagnostics
+type FixerOutputWithDiagnostics<T extends ResponseFormat> = {
+  files: FixerOutput<T>;
+  initial_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+  final_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
 };
 
 /**
@@ -798,7 +807,7 @@ export class Benchify {
   async runFixer<T extends ResponseFormat = 'ALL_FILES', B extends boolean = false>(
     files: API.FixerRunParams.File[],
     options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: B },
-  ): Promise<B extends true ? FixerBundleOutput<T> : FixerOutput<T>> {
+  ): Promise<B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>> {
     // Default to ALL_FILES if no format specified
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
@@ -821,6 +830,8 @@ export class Benchify {
       .then(async (response) => {
         const changes = response.data.suggested_changes;
         const bundle = response.data.bundle;
+        const initialDiagnostics = response.data.initial_diagnostics;
+        const finalDiagnostics = response.data.final_diagnostics;
 
         let files: FixerOutput<T>;
 
@@ -898,16 +909,22 @@ export class Benchify {
           }
         }
 
-        // If bundle is enabled, return both files and bundled_files
+        // If bundle is enabled, return files, bundled_files, and diagnostics
         if (bundleEnabled && bundledFiles) {
           return {
             files,
             bundled_files: bundledFiles,
-          } as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
+            initial_diagnostics: initialDiagnostics,
+            final_diagnostics: finalDiagnostics,
+          } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
         }
 
-        // Otherwise, return just the files (maintains backward compatibility)
-        return files as B extends true ? FixerBundleOutput<T> : FixerOutput<T>;
+        // Otherwise, return files and diagnostics
+        return {
+          files,
+          initial_diagnostics: initialDiagnostics,
+          final_diagnostics: finalDiagnostics,
+        } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
       });
   }
   // Stainless-generated resources (for direct API access)

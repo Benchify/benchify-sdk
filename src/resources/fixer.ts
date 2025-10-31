@@ -82,10 +82,9 @@ export namespace FixerRunResponse {
     file_to_strategy_statistics?: { [key: string]: Array<Data.FileToStrategyStatistic> };
 
     /**
-     * Diagnostics after fixing, split into relevant vs other based on requested fix
-     * types
+     * Diagnostics after fixing, split into relevant vs other based on requested fix types
      */
-    final_diagnostics?: Data.FinalDiagnostics | null;
+    final_diagnostics?: Data.PartitionedDiagnosticResponse | null;
 
     /**
      * Fix types that were used
@@ -93,10 +92,9 @@ export namespace FixerRunResponse {
     fix_types_used?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
     /**
-     * Diagnostics before fixing, split into relevant vs other based on requested fix
-     * types
+     * Diagnostics before fixing, split into relevant vs other based on requested fix types
      */
-    initial_diagnostics?: Data.InitialDiagnostics | null;
+    initial_diagnostics?: Data.PartitionedDiagnosticResponse | null;
   }
 
   export namespace Data {
@@ -358,323 +356,88 @@ export namespace FixerRunResponse {
     }
 
     /**
-     * Diagnostics after fixing, split into relevant vs other based on requested fix
-     * types
+     * Location information for a diagnostic
      */
-    export interface FinalDiagnostics {
+    export interface DiagnosticLocation {
       /**
-       * Diagnostics that do not match the requested fix types
+       * Line number (1-based)
        */
-      not_requested?: FinalDiagnostics.NotRequested | null;
-
-      /**
-       * Diagnostics that match the requested fix types
-       */
-      requested?: FinalDiagnostics.Requested | null;
-    }
-
-    export namespace FinalDiagnostics {
-      /**
-       * Diagnostics that do not match the requested fix types
-       */
-      export interface NotRequested {
-        /**
-         * Diagnostics grouped by file
-         */
-        file_to_diagnostics?: { [key: string]: Array<NotRequested.FileToDiagnostic> };
-      }
-
-      export namespace NotRequested {
-        export interface FileToDiagnostic {
-          /**
-           * File where diagnostic occurs
-           */
-          file_path: string;
-
-          /**
-           * Location of the diagnostic
-           */
-          location: FileToDiagnostic.Location;
-
-          /**
-           * Diagnostic message
-           */
-          message: string;
-
-          /**
-           * Type of the diagnostic
-           */
-          type: string;
-
-          /**
-           * Code given by the diagnostic generator
-           */
-          code?: number | null;
-
-          /**
-           * Surrounding code context
-           */
-          context?: string | null;
-        }
-
-        export namespace FileToDiagnostic {
-          /**
-           * Location of the diagnostic
-           */
-          export interface Location {
-            /**
-             * Column number (1-based)
-             */
-            column: number | null;
-
-            /**
-             * Line number (1-based)
-             */
-            line: number | null;
-
-            /**
-             * Span of the error
-             */
-            span: number;
-
-            /**
-             * Position of the first character of the error location in the source code
-             */
-            starting_character_position: number | null;
-          }
-        }
-      }
+      line: number | null;
 
       /**
-       * Diagnostics that match the requested fix types
+       * Column number (1-based)
        */
-      export interface Requested {
-        /**
-         * Diagnostics grouped by file
-         */
-        file_to_diagnostics?: { [key: string]: Array<Requested.FileToDiagnostic> };
-      }
+      column: number | null;
 
-      export namespace Requested {
-        export interface FileToDiagnostic {
-          /**
-           * File where diagnostic occurs
-           */
-          file_path: string;
+      /**
+       * Position of the first character of the error location in the source code
+       */
+      starting_character_position: number | null;
 
-          /**
-           * Location of the diagnostic
-           */
-          location: FileToDiagnostic.Location;
-
-          /**
-           * Diagnostic message
-           */
-          message: string;
-
-          /**
-           * Type of the diagnostic
-           */
-          type: string;
-
-          /**
-           * Code given by the diagnostic generator
-           */
-          code?: number | null;
-
-          /**
-           * Surrounding code context
-           */
-          context?: string | null;
-        }
-
-        export namespace FileToDiagnostic {
-          /**
-           * Location of the diagnostic
-           */
-          export interface Location {
-            /**
-             * Column number (1-based)
-             */
-            column: number | null;
-
-            /**
-             * Line number (1-based)
-             */
-            line: number | null;
-
-            /**
-             * Span of the error
-             */
-            span: number;
-
-            /**
-             * Position of the first character of the error location in the source code
-             */
-            starting_character_position: number | null;
-          }
-        }
-      }
+      /**
+       * Span of the error
+       */
+      span: number;
     }
 
     /**
-     * Diagnostics before fixing, split into relevant vs other based on requested fix
-     * types
+     * A single diagnostic entry
      */
-    export interface InitialDiagnostics {
+    export interface Diagnostic {
       /**
-       * Diagnostics that do not match the requested fix types
+       * Diagnostic message
        */
-      not_requested?: InitialDiagnostics.NotRequested | null;
+      message: string;
 
       /**
-       * Diagnostics that match the requested fix types
+       * Type of the diagnostic
        */
-      requested?: InitialDiagnostics.Requested | null;
+      type: string;
+
+      /**
+       * Code given by the diagnostic generator
+       */
+      code?: number | null;
+
+      /**
+       * File where diagnostic occurs
+       */
+      file_path: string;
+
+      /**
+       * Location of the diagnostic
+       */
+      location: DiagnosticLocation;
+
+      /**
+       * Surrounding code context
+       */
+      context?: string | null;
     }
 
-    export namespace InitialDiagnostics {
+    /**
+     * Diagnostics grouped by file
+     */
+    export interface DiagnosticResponse {
       /**
-       * Diagnostics that do not match the requested fix types
+       * Diagnostics grouped by file path
        */
-      export interface NotRequested {
-        /**
-         * Diagnostics grouped by file
-         */
-        file_to_diagnostics?: { [key: string]: Array<NotRequested.FileToDiagnostic> };
-      }
+      file_to_diagnostics: { [key: string]: Array<Diagnostic> };
+    }
 
-      export namespace NotRequested {
-        export interface FileToDiagnostic {
-          /**
-           * File where diagnostic occurs
-           */
-          file_path: string;
-
-          /**
-           * Location of the diagnostic
-           */
-          location: FileToDiagnostic.Location;
-
-          /**
-           * Diagnostic message
-           */
-          message: string;
-
-          /**
-           * Type of the diagnostic
-           */
-          type: string;
-
-          /**
-           * Code given by the diagnostic generator
-           */
-          code?: number | null;
-
-          /**
-           * Surrounding code context
-           */
-          context?: string | null;
-        }
-
-        export namespace FileToDiagnostic {
-          /**
-           * Location of the diagnostic
-           */
-          export interface Location {
-            /**
-             * Column number (1-based)
-             */
-            column: number | null;
-
-            /**
-             * Line number (1-based)
-             */
-            line: number | null;
-
-            /**
-             * Span of the error
-             */
-            span: number;
-
-            /**
-             * Position of the first character of the error location in the source code
-             */
-            starting_character_position: number | null;
-          }
-        }
-      }
-
+    /**
+     * Diagnostics split into requested and other groups
+     */
+    export interface PartitionedDiagnosticResponse {
       /**
        * Diagnostics that match the requested fix types
        */
-      export interface Requested {
-        /**
-         * Diagnostics grouped by file
-         */
-        file_to_diagnostics?: { [key: string]: Array<Requested.FileToDiagnostic> };
-      }
+      requested?: DiagnosticResponse | null;
 
-      export namespace Requested {
-        export interface FileToDiagnostic {
-          /**
-           * File where diagnostic occurs
-           */
-          file_path: string;
-
-          /**
-           * Location of the diagnostic
-           */
-          location: FileToDiagnostic.Location;
-
-          /**
-           * Diagnostic message
-           */
-          message: string;
-
-          /**
-           * Type of the diagnostic
-           */
-          type: string;
-
-          /**
-           * Code given by the diagnostic generator
-           */
-          code?: number | null;
-
-          /**
-           * Surrounding code context
-           */
-          context?: string | null;
-        }
-
-        export namespace FileToDiagnostic {
-          /**
-           * Location of the diagnostic
-           */
-          export interface Location {
-            /**
-             * Column number (1-based)
-             */
-            column: number | null;
-
-            /**
-             * Line number (1-based)
-             */
-            line: number | null;
-
-            /**
-             * Span of the error
-             */
-            span: number;
-
-            /**
-             * Position of the first character of the error location in the source code
-             */
-            starting_character_position: number | null;
-          }
-        }
-      }
+      /**
+       * Diagnostics that do not match the requested fix types
+       */
+      not_requested?: DiagnosticResponse | null;
     }
   }
 
