@@ -82,9 +82,10 @@ export namespace FixerRunResponse {
     file_to_strategy_statistics?: { [key: string]: Array<Data.FileToStrategyStatistic> };
 
     /**
-     * Diagnostics after fixing
+     * Diagnostics after fixing, split into relevant vs other based on requested fix
+     * types
      */
-    final_diagnostics?: unknown;
+    final_diagnostics?: Data.FinalDiagnostics | null;
 
     /**
      * Fix types that were used
@@ -92,9 +93,10 @@ export namespace FixerRunResponse {
     fix_types_used?: Array<'dependency' | 'parsing' | 'css' | 'ai_fallback' | 'types' | 'ui' | 'sql'>;
 
     /**
-     * Diagnostics before fixing
+     * Diagnostics before fixing, split into relevant vs other based on requested fix
+     * types
      */
-    initial_diagnostics?: unknown;
+    initial_diagnostics?: Data.InitialDiagnostics | null;
   }
 
   export namespace Data {
@@ -326,6 +328,326 @@ export namespace FixerRunResponse {
       fixes_applied?: boolean;
 
       fixes_fired?: boolean;
+    }
+
+    /**
+     * Diagnostics after fixing, split into relevant vs other based on requested fix
+     * types
+     */
+    export interface FinalDiagnostics {
+      /**
+       * Diagnostics that do not match the requested fix types
+       */
+      not_requested?: FinalDiagnostics.NotRequested | null;
+
+      /**
+       * Diagnostics that match the requested fix types
+       */
+      requested?: FinalDiagnostics.Requested | null;
+    }
+
+    export namespace FinalDiagnostics {
+      /**
+       * Diagnostics that do not match the requested fix types
+       */
+      export interface NotRequested {
+        /**
+         * Diagnostics grouped by file
+         */
+        file_to_diagnostics?: { [key: string]: Array<NotRequested.FileToDiagnostic> };
+      }
+
+      export namespace NotRequested {
+        export interface FileToDiagnostic {
+          /**
+           * File where diagnostic occurs
+           */
+          file_path: string;
+
+          /**
+           * Location of the diagnostic
+           */
+          location: FileToDiagnostic.Location;
+
+          /**
+           * Diagnostic message
+           */
+          message: string;
+
+          /**
+           * Type of the diagnostic
+           */
+          type: string;
+
+          /**
+           * Code given by the diagnostic generator
+           */
+          code?: number | null;
+
+          /**
+           * Surrounding code context
+           */
+          context?: string | null;
+        }
+
+        export namespace FileToDiagnostic {
+          /**
+           * Location of the diagnostic
+           */
+          export interface Location {
+            /**
+             * Column number (1-based)
+             */
+            column: number | null;
+
+            /**
+             * Line number (1-based)
+             */
+            line: number | null;
+
+            /**
+             * Span of the error
+             */
+            span: number;
+
+            /**
+             * Position of the first character of the error location in the source code
+             */
+            starting_character_position: number | null;
+          }
+        }
+      }
+
+      /**
+       * Diagnostics that match the requested fix types
+       */
+      export interface Requested {
+        /**
+         * Diagnostics grouped by file
+         */
+        file_to_diagnostics?: { [key: string]: Array<Requested.FileToDiagnostic> };
+      }
+
+      export namespace Requested {
+        export interface FileToDiagnostic {
+          /**
+           * File where diagnostic occurs
+           */
+          file_path: string;
+
+          /**
+           * Location of the diagnostic
+           */
+          location: FileToDiagnostic.Location;
+
+          /**
+           * Diagnostic message
+           */
+          message: string;
+
+          /**
+           * Type of the diagnostic
+           */
+          type: string;
+
+          /**
+           * Code given by the diagnostic generator
+           */
+          code?: number | null;
+
+          /**
+           * Surrounding code context
+           */
+          context?: string | null;
+        }
+
+        export namespace FileToDiagnostic {
+          /**
+           * Location of the diagnostic
+           */
+          export interface Location {
+            /**
+             * Column number (1-based)
+             */
+            column: number | null;
+
+            /**
+             * Line number (1-based)
+             */
+            line: number | null;
+
+            /**
+             * Span of the error
+             */
+            span: number;
+
+            /**
+             * Position of the first character of the error location in the source code
+             */
+            starting_character_position: number | null;
+          }
+        }
+      }
+    }
+
+    /**
+     * Diagnostics before fixing, split into relevant vs other based on requested fix
+     * types
+     */
+    export interface InitialDiagnostics {
+      /**
+       * Diagnostics that do not match the requested fix types
+       */
+      not_requested?: InitialDiagnostics.NotRequested | null;
+
+      /**
+       * Diagnostics that match the requested fix types
+       */
+      requested?: InitialDiagnostics.Requested | null;
+    }
+
+    export namespace InitialDiagnostics {
+      /**
+       * Diagnostics that do not match the requested fix types
+       */
+      export interface NotRequested {
+        /**
+         * Diagnostics grouped by file
+         */
+        file_to_diagnostics?: { [key: string]: Array<NotRequested.FileToDiagnostic> };
+      }
+
+      export namespace NotRequested {
+        export interface FileToDiagnostic {
+          /**
+           * File where diagnostic occurs
+           */
+          file_path: string;
+
+          /**
+           * Location of the diagnostic
+           */
+          location: FileToDiagnostic.Location;
+
+          /**
+           * Diagnostic message
+           */
+          message: string;
+
+          /**
+           * Type of the diagnostic
+           */
+          type: string;
+
+          /**
+           * Code given by the diagnostic generator
+           */
+          code?: number | null;
+
+          /**
+           * Surrounding code context
+           */
+          context?: string | null;
+        }
+
+        export namespace FileToDiagnostic {
+          /**
+           * Location of the diagnostic
+           */
+          export interface Location {
+            /**
+             * Column number (1-based)
+             */
+            column: number | null;
+
+            /**
+             * Line number (1-based)
+             */
+            line: number | null;
+
+            /**
+             * Span of the error
+             */
+            span: number;
+
+            /**
+             * Position of the first character of the error location in the source code
+             */
+            starting_character_position: number | null;
+          }
+        }
+      }
+
+      /**
+       * Diagnostics that match the requested fix types
+       */
+      export interface Requested {
+        /**
+         * Diagnostics grouped by file
+         */
+        file_to_diagnostics?: { [key: string]: Array<Requested.FileToDiagnostic> };
+      }
+
+      export namespace Requested {
+        export interface FileToDiagnostic {
+          /**
+           * File where diagnostic occurs
+           */
+          file_path: string;
+
+          /**
+           * Location of the diagnostic
+           */
+          location: FileToDiagnostic.Location;
+
+          /**
+           * Diagnostic message
+           */
+          message: string;
+
+          /**
+           * Type of the diagnostic
+           */
+          type: string;
+
+          /**
+           * Code given by the diagnostic generator
+           */
+          code?: number | null;
+
+          /**
+           * Surrounding code context
+           */
+          context?: string | null;
+        }
+
+        export namespace FileToDiagnostic {
+          /**
+           * Location of the diagnostic
+           */
+          export interface Location {
+            /**
+             * Column number (1-based)
+             */
+            column: number | null;
+
+            /**
+             * Line number (1-based)
+             */
+            line: number | null;
+
+            /**
+             * Span of the error
+             */
+            span: number;
+
+            /**
+             * Position of the first character of the error location in the source code
+             */
+            starting_character_position: number | null;
+          }
+        }
+      }
     }
   }
 
