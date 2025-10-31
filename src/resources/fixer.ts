@@ -3,11 +3,13 @@
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
+import { maybeMultipartFormRequestOptions } from '../internal/uploads';
 
 export class Fixer extends APIResource {
   /**
-   * Handle fixer requests - supports both legacy (embedded files) and new
-   * (manifest+blobs) formats.
+   * Handle fixer requests - supports two formats: 1) JSON with inline file contents
+   * in files array, 2) multipart/form-data with tar.zst bundle and manifest (same as
+   * Sandbox API). Use multipart for better performance with large projects.
    *
    * @example
    * ```ts
@@ -30,7 +32,10 @@ export class Fixer extends APIResource {
    * ```
    */
   run(body: FixerRunParams | null | undefined = {}, options?: RequestOptions): APIPromise<FixerRunResponse> {
-    return this._client.post('/v1/fixer', { body, ...options });
+    return this._client.post(
+      '/v1/fixer',
+      maybeMultipartFormRequestOptions({ body, ...options }, this._client),
+    );
   }
 }
 
@@ -134,47 +139,53 @@ export namespace FixerRunResponse {
      */
     export interface SuggestedChanges {
       /**
-       * List of all files with their current contents
+       * List of all files with their current contents (JSON format)
        */
       all_files?: Array<SuggestedChanges.AllFile> | null;
 
       /**
-       * Base64-encoded compressed file contents
+       * Base64-encoded tar.zst bundle of all files. Only present when response_encoding
+       * is "blob".
        */
       all_files_data?: string | null;
 
       /**
-       * File manifest for blob format
+       * File manifest when response_encoding is "blob". Contains metadata for the
+       * tar.zst bundle in all_files_data.
        */
       all_files_manifest?: Array<SuggestedChanges.AllFilesManifest> | null;
 
       /**
-       * List of changed files with their new contents
+       * List of changed files with their new contents (JSON format)
        */
       changed_files?: Array<SuggestedChanges.ChangedFile> | null;
 
       /**
-       * Base64-encoded compressed file contents
+       * Base64-encoded tar.zst bundle of changed files. Only present when
+       * response_encoding is "blob".
        */
       changed_files_data?: string | null;
 
       /**
-       * File manifest for blob format
+       * File manifest when response_encoding is "blob". Contains metadata for the
+       * tar.zst bundle in changed_files_data.
        */
       changed_files_manifest?: Array<SuggestedChanges.ChangedFilesManifest> | null;
 
       /**
-       * Unified diff of changes
+       * Unified diff of changes (text format)
        */
       diff?: string | null;
 
       /**
-       * Base64-encoded compressed diff data
+       * Base64-encoded tar.zst compressed diff. Only present when response_encoding is
+       * "blob".
        */
       diff_data?: string | null;
 
       /**
-       * File manifest for blob format
+       * File manifest when response_encoding is "blob". Contains metadata for diff in
+       * diff_data.
        */
       diff_manifest?: Array<SuggestedChanges.DiffManifest> | null;
     }
@@ -193,23 +204,19 @@ export namespace FixerRunResponse {
       }
 
       /**
-       * File manifest entry for packed format
+       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
+       * digest (SHA-256 hash), type (file/dir), and optional mode.
        */
       export interface AllFilesManifest {
-        /**
-         * File path relative to project root
-         */
+        digest: string;
+
         path: string;
 
-        /**
-         * File size in bytes
-         */
         size: number;
 
-        /**
-         * File content hash (optional)
-         */
-        digest?: string;
+        type: 'file' | 'dir';
+
+        mode?: string;
       }
 
       export interface ChangedFile {
@@ -225,43 +232,35 @@ export namespace FixerRunResponse {
       }
 
       /**
-       * File manifest entry for packed format
+       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
+       * digest (SHA-256 hash), type (file/dir), and optional mode.
        */
       export interface ChangedFilesManifest {
-        /**
-         * File path relative to project root
-         */
+        digest: string;
+
         path: string;
 
-        /**
-         * File size in bytes
-         */
         size: number;
 
-        /**
-         * File content hash (optional)
-         */
-        digest?: string;
+        type: 'file' | 'dir';
+
+        mode?: string;
       }
 
       /**
-       * File manifest entry for packed format
+       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
+       * digest (SHA-256 hash), type (file/dir), and optional mode.
        */
       export interface DiffManifest {
-        /**
-         * File path relative to project root
-         */
+        digest: string;
+
         path: string;
 
-        /**
-         * File size in bytes
-         */
         size: number;
 
-        /**
-         * File content hash (optional)
-         */
-        digest?: string;
+        type: 'file' | 'dir';
+
+        mode?: string;
       }
     }
 
@@ -300,23 +299,19 @@ export namespace FixerRunResponse {
       }
 
       /**
-       * File manifest entry for packed format
+       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
+       * digest (SHA-256 hash), type (file/dir), and optional mode.
        */
       export interface FilesManifest {
-        /**
-         * File path relative to project root
-         */
+        digest: string;
+
         path: string;
 
-        /**
-         * File size in bytes
-         */
         size: number;
 
-        /**
-         * File content hash (optional)
-         */
-        digest?: string;
+        type: 'file' | 'dir';
+
+        mode?: string;
       }
     }
 
@@ -699,19 +694,10 @@ export interface FixerRunParams {
   event_id?: string;
 
   /**
-   * List of files to process (legacy format)
+   * List of files to process (JSON format with inline contents). For large projects,
+   * use multipart/form-data with manifest + bundle instead.
    */
   files?: Array<FixerRunParams.File> | null;
-
-  /**
-   * Base64-encoded compressed file contents (packed format)
-   */
-  files_data?: string | null;
-
-  /**
-   * File manifest for packed format: [{"path": "app.tsx", "size": 1024}, ...]
-   */
-  files_manifest?: Array<FixerRunParams.FilesManifest> | null;
 
   /**
    * Configuration for which fix types to apply
@@ -760,26 +746,6 @@ export namespace FixerRunParams {
      * Path to the file
      */
     path: string;
-  }
-
-  /**
-   * File manifest entry for packed format
-   */
-  export interface FilesManifest {
-    /**
-     * File path relative to project root
-     */
-    path: string;
-
-    /**
-     * File size in bytes
-     */
-    size: number;
-
-    /**
-     * File content hash (optional)
-     */
-    digest?: string;
   }
 
   /**
