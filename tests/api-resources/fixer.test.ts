@@ -8,6 +8,67 @@ const client = new Benchify({
 });
 
 describe('resource fixer', () => {
+  test('runFixer returns diagnostics with correct structure', async () => {
+    const result = await client.runFixer(
+      [
+        {
+          path: 'src/test.ts',
+          contents: `import { nonExistentFunction } from './missing-module';
+
+function demo() {
+  console.log('Max's demo');
+  return nonExistentFunction();
+}`,
+        },
+      ],
+      {
+        response_format: 'ALL_FILES',
+        fixes: ['parsing'],
+      },
+    );
+
+    // Print diagnostics for inspection
+    console.log('=== INITIAL DIAGNOSTICS ===');
+    console.log(JSON.stringify(result.initial_diagnostics, null, 2));
+    console.log('\n=== FINAL DIAGNOSTICS ===');
+    console.log(JSON.stringify(result.final_diagnostics, null, 2));
+
+    // Verify diagnostics structure exists
+    expect(result).toHaveProperty('initial_diagnostics');
+    expect(result).toHaveProperty('final_diagnostics');
+
+    // Verify initial diagnostics structure
+    if (result.initial_diagnostics) {
+      expect(result.initial_diagnostics).toHaveProperty('requested');
+      expect(result.initial_diagnostics).toHaveProperty('not_requested');
+
+      // Check nested structure
+      if (result.initial_diagnostics.requested) {
+        expect(result.initial_diagnostics.requested).toHaveProperty('file_to_diagnostics');
+      }
+      if (result.initial_diagnostics.not_requested) {
+        expect(result.initial_diagnostics.not_requested).toHaveProperty('file_to_diagnostics');
+      }
+    }
+
+    // Verify final diagnostics structure
+    if (result.final_diagnostics) {
+      expect(result.final_diagnostics).toHaveProperty('requested');
+      expect(result.final_diagnostics).toHaveProperty('not_requested');
+
+      // Check nested structure
+      if (result.final_diagnostics.requested) {
+        expect(result.final_diagnostics.requested).toHaveProperty('file_to_diagnostics');
+      }
+      if (result.final_diagnostics.not_requested) {
+        expect(result.final_diagnostics.not_requested).toHaveProperty('file_to_diagnostics');
+      }
+    }
+
+    // Verify files are returned
+    expect(result).toHaveProperty('files');
+  });
+
   // Prism tests are disabled
   test.skip('run', async () => {
     const responsePromise = client.fixer.run();
