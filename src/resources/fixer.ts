@@ -164,55 +164,21 @@ export namespace FixerRunResponse {
      */
     export interface SuggestedChanges {
       /**
-       * List of all files with their current contents (JSON format)
+       * List of all files with their current contents. Only present when
+       * response_encoding is "json".
        */
       all_files?: Array<SuggestedChanges.AllFile> | null;
 
       /**
-       * Base64-encoded tar.zst bundle of all files. Only present when response_encoding
-       * is "blob".
-       */
-      all_files_data?: string | null;
-
-      /**
-       * File manifest when response_encoding is "blob". Contains metadata for the
-       * tar.zst bundle in all_files_data.
-       */
-      all_files_manifest?: Array<SuggestedChanges.AllFilesManifest> | null;
-
-      /**
-       * List of changed files with their new contents (JSON format)
+       * List of changed files with their new contents. Only present when
+       * response_encoding is "json".
        */
       changed_files?: Array<SuggestedChanges.ChangedFile> | null;
 
       /**
-       * Base64-encoded tar.zst bundle of changed files. Only present when
-       * response_encoding is "blob".
-       */
-      changed_files_data?: string | null;
-
-      /**
-       * File manifest when response_encoding is "blob". Contains metadata for the
-       * tar.zst bundle in changed_files_data.
-       */
-      changed_files_manifest?: Array<SuggestedChanges.ChangedFilesManifest> | null;
-
-      /**
-       * Unified diff of changes (text format)
+       * Unified diff of changes. Only present when response_encoding is "json".
        */
       diff?: string | null;
-
-      /**
-       * Base64-encoded tar.zst compressed diff. Only present when response_encoding is
-       * "blob".
-       */
-      diff_data?: string | null;
-
-      /**
-       * File manifest when response_encoding is "blob". Contains metadata for diff in
-       * diff_data.
-       */
-      diff_manifest?: Array<SuggestedChanges.DiffManifest> | null;
     }
 
     export namespace SuggestedChanges {
@@ -228,22 +194,6 @@ export namespace FixerRunResponse {
         path: string;
       }
 
-      /**
-       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
-       * digest (SHA-256 hash), type (file/dir), and optional mode.
-       */
-      export interface AllFilesManifest {
-        digest: string;
-
-        path: string;
-
-        size: number;
-
-        type: 'file' | 'dir';
-
-        mode?: string;
-      }
-
       export interface ChangedFile {
         /**
          * Contents of the file
@@ -254,38 +204,6 @@ export namespace FixerRunResponse {
          * Path of the file
          */
         path: string;
-      }
-
-      /**
-       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
-       * digest (SHA-256 hash), type (file/dir), and optional mode.
-       */
-      export interface ChangedFilesManifest {
-        digest: string;
-
-        path: string;
-
-        size: number;
-
-        type: 'file' | 'dir';
-
-        mode?: string;
-      }
-
-      /**
-       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
-       * digest (SHA-256 hash), type (file/dir), and optional mode.
-       */
-      export interface DiffManifest {
-        digest: string;
-
-        path: string;
-
-        size: number;
-
-        type: 'file' | 'dir';
-
-        mode?: string;
       }
     }
 
@@ -304,10 +222,6 @@ export namespace FixerRunResponse {
       debug?: { [key: string]: string };
 
       files?: Array<Bundle.File>;
-
-      files_data?: string | null;
-
-      files_manifest?: Array<Bundle.FilesManifest> | null;
     }
 
     export namespace Bundle {
@@ -321,22 +235,6 @@ export namespace FixerRunResponse {
          * Path of the file
          */
         path: string;
-      }
-
-      /**
-       * File manifest entry describing a file in a tar.zst bundle. Contains path, size,
-       * digest (SHA-256 hash), type (file/dir), and optional mode.
-       */
-      export interface FilesManifest {
-        digest: string;
-
-        path: string;
-
-        size: number;
-
-        type: 'file' | 'dir';
-
-        mode?: string;
       }
     }
 
@@ -505,9 +403,10 @@ export interface FixerRunParams {
   mode?: 'project' | 'files';
 
   /**
-   * Response encoding format
+   * Response encoding: "json" for inline file contents in JSON, "multipart" for
+   * multipart/form-data with tar.zst bundle + manifest
    */
-  response_encoding?: 'json' | 'blob';
+  response_encoding?: 'json' | 'multipart';
 
   /**
    * Format for the response (diff, changed_files, or all_files)

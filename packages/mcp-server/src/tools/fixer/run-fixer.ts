@@ -73,8 +73,9 @@ export const tool: Tool = {
       },
       response_encoding: {
         type: 'string',
-        description: 'Response encoding format',
-        enum: ['json', 'blob'],
+        description:
+          'Response encoding: "json" for inline file contents in JSON, "multipart" for multipart/form-data with tar.zst bundle + manifest',
+        enum: ['json', 'multipart'],
       },
       response_format: {
         type: 'string',
