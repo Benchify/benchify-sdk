@@ -1,6 +1,6 @@
 {
   "name": "benchify",
-  "version": "0.1.0-alpha.66",
+  "version": "0.1.0-alpha.67",
   "description": "The official TypeScript library for the Benchify API",
   "author": "Benchify <support@benchify.com>",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "TEST_API_BASE_URL=http://localhost:3000 ./scripts/test",
+    "test": "./scripts/test",
     "build": "./scripts/build",
     "prepublishOnly": "echo 'to publish, run yarn build && (cd dist; yarn publish)' && exit 1",
     "format": "./scripts/format",
