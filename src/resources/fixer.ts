@@ -222,6 +222,11 @@ export namespace FixerRunResponse {
       debug?: { [key: string]: string };
 
       files?: Array<Bundle.File>;
+
+      /**
+       * Base64-encoded tar.zst archive containing bundled files (multipart format)
+       */
+      files_data?: string | null;
     }
 
     export namespace Bundle {
@@ -386,6 +391,12 @@ export interface FixerRunParams {
    * use multipart/form-data with manifest + bundle instead.
    */
   files?: Array<FixerRunParams.File> | null;
+
+  /**
+   * Base64-encoded tar.zst archive containing all files (multipart format). Preferred
+   * over the files array for better performance with large projects.
+   */
+  files_data?: string;
 
   /**
    * Configuration for which fix types to apply

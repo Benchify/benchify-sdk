@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import Benchify from 'benchify';
+import { packTarZst } from '../../src/lib/helpers';
 
 const client = new Benchify({
   apiKey: 'My API Key',
@@ -8,7 +9,8 @@ const client = new Benchify({
 });
 
 describe('resource fixer', () => {
-  test('runFixer returns diagnostics with correct structure', async () => {
+  // Integration test - requires running API server
+  test.skip('runFixer returns diagnostics with correct structure', async () => {
     const result = await client.runFixer(
       [
         {
@@ -67,6 +69,83 @@ function demo() {
 
     // Verify files are returned
     expect(result).toHaveProperty('files');
+  });
+
+  // Unit test - mocks fetch response to test tar.zst handling
+  test('runFixer handles multipart tar.zst responses correctly', async () => {
+    // Create mock files
+    const mockFiles = [
+      { path: 'src/index.ts', contents: 'export const fixed = true;' },
+      { path: 'src/utils.ts', contents: 'export function helper() { return "fixed"; }' },
+    ];
+
+    // Pack them into tar.zst format
+    const packedBuffer = await packTarZst(mockFiles);
+    const base64Data = packedBuffer.toString('base64');
+
+    // Create a mock response
+    const mockResponse = {
+      data: {
+        fixer_version: '1.0.0',
+        status: {
+          composite_status: 'FIXED_EVERYTHING' as const,
+        },
+        suggested_changes: {
+          all_files_data: base64Data,
+        },
+        initial_diagnostics: {
+          requested: { file_to_diagnostics: {} },
+          not_requested: { file_to_diagnostics: {} },
+        },
+        final_diagnostics: {
+          requested: { file_to_diagnostics: {} },
+          not_requested: { file_to_diagnostics: {} },
+        },
+      },
+    };
+
+    // Mock the fetch call
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => mockResponse,
+      text: async () => JSON.stringify(mockResponse),
+      url: 'http://test.com/v1/fixer',
+    });
+
+    const testClient = new Benchify({
+      apiKey: 'test-key',
+      baseURL: 'http://test.com',
+      fetch: mockFetch as any,
+    });
+
+    // Call runFixer
+    const result = await testClient.runFixer([{ path: 'input.ts', contents: 'const test = 1;' }], {
+      response_format: 'ALL_FILES',
+    });
+
+    // Verify the request was made with multipart encoding
+    expect(mockFetch).toHaveBeenCalled();
+    const callArgs = mockFetch.mock.calls[0];
+    const requestBody = JSON.parse(callArgs[1].body);
+    expect(requestBody).toHaveProperty('files_data');
+    expect(requestBody).toHaveProperty('response_encoding', 'multipart');
+    expect(requestBody).toHaveProperty('response_format', 'ALL_FILES');
+
+    // Verify the response was unpacked correctly
+    expect(result).toHaveProperty('files');
+    expect(Array.isArray(result.files)).toBe(true);
+    expect(result.files).toHaveLength(2);
+    expect(result.files[0]).toEqual({ path: 'src/index.ts', contents: 'export const fixed = true;' });
+    expect(result.files[1]).toEqual({
+      path: 'src/utils.ts',
+      contents: 'export function helper() { return "fixed"; }',
+    });
+
+    // Verify diagnostics are returned
+    expect(result).toHaveProperty('initial_diagnostics');
+    expect(result).toHaveProperty('final_diagnostics');
   });
 
   // Prism tests are disabled
