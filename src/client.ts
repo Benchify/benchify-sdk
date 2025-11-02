@@ -55,7 +55,8 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
-import { packTarZst, unpackTarZst, type BinaryFileData } from './lib/helpers';
+import { packWithManifest, unpackTarZst } from './lib/helpers';
+import { toFile } from './core/uploads';
 
 export interface ClientOptions {
   /**
@@ -813,18 +814,20 @@ export class Benchify {
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
 
-    // Convert files to tar.zst format for efficient transfer
-    const binaryFiles: BinaryFileData[] = files.map((f) => ({
-      path: f.path,
-      contents: f.contents,
-    }));
-    const packedBuffer = await packTarZst(binaryFiles);
-    const base64Data = packedBuffer.toString('base64');
+    // Pack files with manifest using tar.zst compression
+    const { buffer: packedBuffer, manifest } = await packWithManifest(files);
+
+    // Convert buffer and manifest to File objects for multipart/form-data upload
+    const filesDataFile = await toFile(packedBuffer, 'files.tar.zst', { type: 'application/octet-stream' });
+    const manifestFile = await toFile(Buffer.from(JSON.stringify(manifest), 'utf-8'), 'manifest.json', {
+      type: 'application/json',
+    });
 
     // Call the underlying fixer.run method with tar.zst format via multipart form
     return this.fixer
       .run({
-        files_data: base64Data,
+        files_data: filesDataFile,
+        manifest: manifestFile,
         response_format: responseFormat,
         response_encoding: 'multipart',
         ...options,

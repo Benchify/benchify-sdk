@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import Benchify from 'benchify';
-import { packTarZst } from '../../src/lib/helpers';
+import { packWithManifest } from '../../src/lib/helpers';
 
 const client = new Benchify({
   apiKey: 'My API Key',
@@ -79,8 +79,8 @@ function demo() {
       { path: 'src/utils.ts', contents: 'export function helper() { return "fixed"; }' },
     ];
 
-    // Pack them into tar.zst format
-    const packedBuffer = await packTarZst(mockFiles);
+    // Pack them into tar.zst format with manifest
+    const { buffer: packedBuffer, manifest } = await packWithManifest(mockFiles);
     const base64Data = packedBuffer.toString('base64');
 
     // Create a mock response
@@ -125,13 +125,34 @@ function demo() {
       response_format: 'ALL_FILES',
     });
 
-    // Verify the request was made with multipart encoding
+    // Verify the request was made with multipart encoding and manifest
     expect(mockFetch).toHaveBeenCalled();
-    const callArgs = mockFetch.mock.calls[0];
-    const requestBody = JSON.parse(callArgs[1].body);
-    expect(requestBody).toHaveProperty('files_data');
-    expect(requestBody).toHaveProperty('response_encoding', 'multipart');
-    expect(requestBody).toHaveProperty('response_format', 'ALL_FILES');
+
+    // The first call might be internal (like FormData support check), so use the last call
+    const callArgs = mockFetch.mock.calls[mockFetch.mock.calls.length - 1];
+    const requestInit = callArgs[1];
+    const requestBody = requestInit?.body;
+
+    // Verify it's actually FormData (multipart)
+    expect(requestBody).toBeInstanceOf(FormData);
+
+    // Check that the FormData contains the expected fields
+    expect(requestBody.has('files_data')).toBe(true);
+    expect(requestBody.has('manifest')).toBe(true);
+    expect(requestBody.has('response_encoding')).toBe(true);
+    expect(requestBody.has('response_format')).toBe(true);
+
+    // Verify response_encoding and response_format values
+    expect(requestBody.get('response_encoding')).toBe('multipart');
+    expect(requestBody.get('response_format')).toBe('ALL_FILES');
+
+    // Verify files_data is a File/Blob
+    const filesData = requestBody.get('files_data');
+    expect(filesData).toBeInstanceOf(File);
+
+    // Verify manifest is a File/Blob
+    const manifestData = requestBody.get('manifest');
+    expect(manifestData).toBeInstanceOf(File);
 
     // Verify the response was unpacked correctly
     expect(result).toHaveProperty('files');
