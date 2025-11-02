@@ -395,8 +395,16 @@ export interface FixerRunParams {
   /**
    * Base64-encoded tar.zst archive containing all files (multipart format). Preferred
    * over the files array for better performance with large projects.
+   * Can be a string (base64) or File/Blob object for multipart uploads.
    */
-  files_data?: string;
+  files_data?: string | File | Blob;
+
+  /**
+   * Manifest describing the contents of files_data (required when using multipart format).
+   * Contains metadata about files including paths, digests, and bundle information.
+   * Can be a Manifest object (converted to JSON) or File/Blob object for multipart uploads.
+   */
+  manifest?: FixerRunParams.Manifest | File | Blob;
 
   /**
    * Configuration for which fix types to apply
@@ -456,6 +464,25 @@ export namespace FixerRunParams {
      * Customer tracking identifier
      */
     external_id?: string | null;
+  }
+
+  /**
+   * Manifest describing the contents of files_data for multipart format
+   */
+  export interface Manifest {
+    manifest_version: '1';
+    bundle: {
+      digest: string;
+      size: number;
+      format: 'tar.zst';
+      compression: 'zstd';
+    };
+    files: Array<{
+      path: string;
+      digest: string;
+      size: number;
+      mode?: string;
+    }>;
   }
 }
 
