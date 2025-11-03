@@ -15,11 +15,13 @@ export {
   type StackExecuteCommandResponse,
   type StackGetLogsResponse,
   type StackGetNetworkInfoResponse,
+  type StackWaitForDevServerURLResponse,
   type StackCreateParams,
   type StackUpdateParams,
   type StackCreateAndRunParams,
   type StackExecuteCommandParams,
   type StackGetLogsParams,
+  type StackWaitForDevServerURLParams,
 } from './stacks';
 export {
   ValidateTemplate,
