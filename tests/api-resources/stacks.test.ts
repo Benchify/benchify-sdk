@@ -49,7 +49,10 @@ describe('resource stacks', () => {
 
   // Prism tests are disabled
   test.skip('update: only required params', async () => {
-    const responsePromise = client.stacks.update('stk_abc123', { 'idempotency-key': 'key-12345678' });
+    const responsePromise = client.stacks.update('stk_abc123', {
+      'idempotency-key': 'key-12345678',
+      'base-etag': 'etag-123',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
