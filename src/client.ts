@@ -22,6 +22,7 @@ import {
   FixStringLiterals,
 } from './resources/fix-string-literals';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import * as FixerAPI from './resources/fixer';
 import {
   StackCreateAndRunParams,
   StackCreateAndRunResponse,
@@ -33,13 +34,17 @@ import {
   StackGetLogsResponse,
   StackGetNetworkInfoResponse,
   StackRetrieveResponse,
-  Stacks,
+  StackUpdateParams,
+  StackUpdateResponse,
+  Stacks as StacksAPI,
 } from './resources/stacks';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
   ValidateTemplateValidateResponse,
 } from './resources/validate-template';
+import { Stacks } from './stacks';
+
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -52,6 +57,8 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
+import { packWithManifest, unpackTarZst } from './lib/helpers';
+import { toFile } from './core/uploads';
 
 export interface ClientOptions {
   /**
@@ -127,6 +134,30 @@ export interface ClientOptions {
    */
   logger?: Logger | undefined;
 }
+
+// Add the conditional return type before the Benchify class
+type ResponseFormat = 'DIFF' | 'CHANGED_FILES' | 'ALL_FILES';
+
+type FixerOutput<T extends ResponseFormat> =
+  T extends 'ALL_FILES' ? Array<FixerAPI.File>
+  : T extends 'CHANGED_FILES' ? Array<FixerAPI.File>
+  : T extends 'DIFF' ? string
+  : never;
+
+// Type for bundle-enabled responses
+type FixerBundleOutput<T extends ResponseFormat> = {
+  files: FixerOutput<T>;
+  bundled_files: Array<FixerAPI.File>;
+  initial_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+  final_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+};
+
+// Type for standard responses with diagnostics
+type FixerOutputWithDiagnostics<T extends ResponseFormat> = {
+  files: FixerOutput<T>;
+  initial_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+  final_diagnostics?: FixerAPI.FixerRunResponse.Data.PartitionedDiagnosticResponse | null;
+};
 
 /**
  * API Client for interfacing with the Benchify API.
@@ -744,13 +775,153 @@ export class Benchify {
   static toFile = Uploads.toFile;
 
   fixer: API.Fixer = new API.Fixer(this);
+  /**
+   * Process all files using the fixer with a simplified interface.
+   * Uses multipart form with tar.zst compression for efficient transfer.
+   *
+   * @param files - Array of files to process
+   * @param options - Optional parameters for the fixer run
+   * @returns Promise resolving to the appropriate format based on response_format and bundle flag
+   *
+   * @example
+   * ```ts
+   * // Get all files
+   * const allFiles = await client.runFixer([
+   *   { path: "src/index.ts", contents: "export const hello = 'world';" },
+   *   { path: "src/utils.ts", contents: "export function helper() {}" }
+   * ], { response_format: 'ALL_FILES' });
+   *
+   * // Get only changed files
+   * const changedFiles = await client.runFixer([
+   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
+   * ], { response_format: 'CHANGED_FILES' });
+   *
+   * // Get diff format
+   * const diff = await client.runFixer([
+   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
+   * ], { response_format: 'DIFF' });
+   *
+   * // Get bundled files alongside regular files
+   * const bundleResult = await client.runFixer([
+   *   { path: "src/index.ts", contents: "export const hello = 'world';" }
+   * ], { response_format: 'ALL_FILES', bundle: true });
+   * // Returns: { files: FileChange[], bundled_files: FileChange[] }
+   * ```
+   */
+  async runFixer<T extends ResponseFormat = 'ALL_FILES', B extends boolean = false>(
+    files: API.FixerRunParams.File[],
+    options?: Partial<API.FixerRunParams> & { response_format?: T; bundle?: B },
+  ): Promise<B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>> {
+    // Default to ALL_FILES if no format specified
+    const responseFormat = options?.response_format || ('ALL_FILES' as T);
+    const bundleEnabled = options?.bundle || false;
+
+    // Pack files with manifest using tar.zst compression
+    const { buffer: packedBuffer, manifest } = await packWithManifest(files);
+
+    // Convert buffer and manifest to File objects for multipart/form-data upload
+    const filesDataFile = await toFile(packedBuffer, 'files.tar.zst', { type: 'application/octet-stream' });
+    const manifestFile = await toFile(Buffer.from(JSON.stringify(manifest), 'utf-8'), 'manifest.json', {
+      type: 'application/json',
+    });
+
+    // Call the underlying fixer.run method with tar.zst format via multipart form
+    return this.fixer
+      .run({
+        files_data: filesDataFile,
+        manifest: manifestFile,
+        response_format: responseFormat,
+        response_encoding: 'multipart',
+        ...options,
+      })
+      .then(async (response) => {
+        const changes = response.data.suggested_changes;
+        const bundle = response.data.bundle;
+        const initialDiagnostics = response.data.initial_diagnostics;
+        const finalDiagnostics = response.data.final_diagnostics;
+
+        let files: FixerOutput<T>;
+
+        // Unpack response based on format - all responses use tar.zst
+        switch (responseFormat) {
+          case 'DIFF': {
+            const diffFormat = changes as FixerAPI.FixerRunResponse.Data.DiffFormat;
+            if (diffFormat.diff_data) {
+              const diffBuffer = Buffer.from(diffFormat.diff_data, 'base64');
+              const decodedFiles = await unpackTarZst(diffBuffer);
+              // For DIFF format, the tar.zst contains a single file with the diff
+              files = (decodedFiles[0]?.contents || '') as FixerOutput<T>;
+            } else {
+              // Fallback to diff field if diff_data not present
+              files = (diffFormat.diff ?? '') as FixerOutput<T>;
+            }
+            break;
+          }
+          case 'CHANGED_FILES': {
+            const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
+            const bundleBuffer = Buffer.from(changedFormat.changed_files_data!, 'base64');
+            const decodedFiles = await unpackTarZst(bundleBuffer);
+            files = decodedFiles.map((f) => ({
+              path: f.path,
+              contents:
+                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+            })) as FixerOutput<T>;
+            break;
+          }
+          case 'ALL_FILES':
+          default: {
+            const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
+            const bundleBuffer = Buffer.from(allFilesFormat.all_files_data!, 'base64');
+            const decodedFiles = await unpackTarZst(bundleBuffer);
+            files = decodedFiles.map((f) => ({
+              path: f.path,
+              contents:
+                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+            })) as FixerOutput<T>;
+            break;
+          }
+        }
+
+        // Handle bundled files (also in tar.zst format)
+        let bundledFiles: Array<FixerAPI.File> | undefined;
+        if (bundle?.files_data) {
+          const bundleBuffer = Buffer.from(bundle.files_data, 'base64');
+          const decodedBundleFiles = await unpackTarZst(bundleBuffer);
+          bundledFiles = decodedBundleFiles.map((f) => ({
+            path: f.path,
+            contents: typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+          }));
+        }
+
+        // If bundle is enabled, return files, bundled_files, and diagnostics
+        if (bundleEnabled && bundledFiles) {
+          return {
+            files,
+            bundled_files: bundledFiles,
+            initial_diagnostics: initialDiagnostics,
+            final_diagnostics: finalDiagnostics,
+          } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
+        }
+
+        // Otherwise, return files and diagnostics
+        return {
+          files,
+          initial_diagnostics: initialDiagnostics,
+          final_diagnostics: finalDiagnostics,
+        } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
+      });
+  }
+  // Stainless-generated resources (for direct API access)
   stacks: API.Stacks = new API.Stacks(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
   validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
+
+  // User-friendly wrapper for stacks (singular to avoid collision with low-level API)
+  stack: Stacks = new Stacks(this);
 }
 
 Benchify.Fixer = Fixer;
-Benchify.Stacks = Stacks;
+Benchify.Stacks = StacksAPI;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
 
@@ -760,14 +931,16 @@ export declare namespace Benchify {
   export { Fixer as Fixer, type FixerRunResponse as FixerRunResponse, type FixerRunParams as FixerRunParams };
 
   export {
-    Stacks as Stacks,
+    StacksAPI as Stacks,
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
+    type StackUpdateResponse as StackUpdateResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
     type StackCreateParams as StackCreateParams,
+    type StackUpdateParams as StackUpdateParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
@@ -784,4 +957,12 @@ export declare namespace Benchify {
     type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
     type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
   };
+}
+
+export interface Benchify {
+  stacks: API.Stacks;
+  fixer: API.Fixer;
+  fixStringLiterals: API.FixStringLiterals;
+  validateTemplate: API.ValidateTemplate;
+  stack: Stacks;
 }

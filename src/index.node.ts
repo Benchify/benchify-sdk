@@ -1,11 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
-
-export { Benchify as default } from './client';
+// This is the Node.js-specific entry point that includes helper functions
 
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
 export { Benchify, type ClientOptions } from './client';
-export { Stacks, StackHandle, type StackFile, type FileChange, type StackCreateOptions } from './stacks';
 export {
   BenchifyError,
   APIError,
@@ -21,3 +19,19 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './core/error';
+
+export { BundleRenderer, type BundleFile } from './lib/bundle-renderer';
+
+// Node.js-only helper utilities (uses fs module)
+export {
+  collectFiles,
+  applyChanges,
+  packTarZst,
+  unpackTarZst,
+  packWithManifest,
+  calculateTreeHash,
+  normalizePath,
+  type FileData,
+  type BinaryFileData,
+  type Manifest,
+} from './lib/helpers';

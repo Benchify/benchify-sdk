@@ -16,6 +16,13 @@ async function* walk(dir) {
 }
 
 async function postprocess() {
+  // Remove source TypeScript files to avoid module resolution conflicts
+  const srcDir = path.join(distDir, 'src');
+  if (fs.existsSync(srcDir)) {
+    console.error('Removing source files from dist/src to prevent module resolution conflicts...');
+    await fs.promises.rm(srcDir, { recursive: true, force: true });
+  }
+
   for await (const file of walk(distDir)) {
     if (!/(\.d)?[cm]?ts$/.test(file)) continue;
 
@@ -35,8 +42,12 @@ async function postprocess() {
     }
   }
 
+  // Read the existing package.json to preserve conditional exports
+  const existingPkg = JSON.parse(await fs.promises.readFile('dist/package.json', 'utf-8'));
+  const existingMainExport = existingPkg.exports?.['.'];
+
   const newExports = {
-    '.': {
+    '.': existingMainExport || {
       require: {
         types: './index.d.ts',
         default: './index.js',

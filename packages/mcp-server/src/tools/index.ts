@@ -7,6 +7,7 @@ export { Metadata, Endpoint, HandlerFunction };
 import run_fixer from './fixer/run-fixer';
 import create_stacks from './stacks/create-stacks';
 import retrieve_stacks from './stacks/retrieve-stacks';
+import update_stacks from './stacks/update-stacks';
 import create_and_run_stacks from './stacks/create-and-run-stacks';
 import destroy_stacks from './stacks/destroy-stacks';
 import execute_command_stacks from './stacks/execute-command-stacks';
@@ -24,6 +25,7 @@ function addEndpoint(endpoint: Endpoint) {
 addEndpoint(run_fixer);
 addEndpoint(create_stacks);
 addEndpoint(retrieve_stacks);
+addEndpoint(update_stacks);
 addEndpoint(create_and_run_stacks);
 addEndpoint(destroy_stacks);
 addEndpoint(execute_command_stacks);

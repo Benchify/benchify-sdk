@@ -3,8 +3,9 @@
   "exclude": [],
   "compilerOptions": {
     "target": "es2020",
-    "lib": ["es2020"],
+    "lib": ["es2020", "dom", "dom.iterable"],
     "module": "commonjs",
+    "jsx": "react-jsx",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "paths": {
@@ -12,11 +13,8 @@
       "benchify": ["./src/index.ts"]
     },
     "noEmit": true,
-
     "resolveJsonModule": true,
-
     "forceConsistentCasingInFileNames": true,
-
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -31,7 +29,6 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "isolatedModules": false,
-
     "skipLibCheck": true
   }
 }

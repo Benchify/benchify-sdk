@@ -10,3 +10,6 @@ dist-deno
 .eslintcache
 dist-bundle
 *.mcpb
+*.dxt
+bun.lockb
+package-lock.json
