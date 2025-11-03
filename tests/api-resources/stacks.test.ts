@@ -48,6 +48,29 @@ describe('resource stacks', () => {
   });
 
   // Prism tests are disabled
+  test.skip('update: only required params', async () => {
+    const responsePromise = client.stacks.update('stk_abc123', { 'idempotency-key': 'key-12345678' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('update: required and optional params', async () => {
+    const response = await client.stacks.update('stk_abc123', {
+      'idempotency-key': 'key-12345678',
+      bundle: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      manifest: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      ops: 'ops',
+      'base-etag': 'sha256:abc123...',
+    });
+  });
+
+  // Prism tests are disabled
   test.skip('createAndRun: only required params', async () => {
     const responsePromise = client.stacks.createAndRun({
       command: ['sleep', '3600'],
