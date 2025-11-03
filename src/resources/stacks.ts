@@ -173,6 +173,24 @@ export class Stacks extends APIResource {
   getNetworkInfo(id: string, options?: RequestOptions): APIPromise<StackGetNetworkInfoResponse> {
     return this._client.get(path`/v1/stacks/${id}/network-info`, options);
   }
+
+  /**
+   * Poll stack logs until a dev server URL is detected or timeout
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.waitForDevServerURL(
+   *   'stk_abc123',
+   * );
+   * ```
+   */
+  waitForDevServerURL(
+    id: string,
+    query: StackWaitForDevServerURLParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<StackWaitForDevServerURLResponse> {
+    return this._client.get(path`/v1/stacks/${id}/wait-url`, { query, ...options });
+  }
 }
 
 /**
@@ -456,6 +474,10 @@ export interface StackGetNetworkInfoResponse {
   service_url: string;
 }
 
+export interface StackWaitForDevServerURLResponse {
+  url: string;
+}
+
 export interface StackCreateParams {
   /**
    * Body param: Tar.zst bundle containing project files
@@ -546,17 +568,33 @@ export interface StackGetLogsParams {
   tail?: string;
 }
 
+export interface StackWaitForDevServerURLParams {
+  /**
+   * Polling interval in ms
+   */
+  interval?: string;
+
+  /**
+   * Timeout in seconds
+   */
+  timeout?: string;
+}
+
 export declare namespace Stacks {
   export {
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
+    type StackUpdateResponse as StackUpdateResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
+    type StackWaitForDevServerURLResponse as StackWaitForDevServerURLResponse,
     type StackCreateParams as StackCreateParams,
+    type StackUpdateParams as StackUpdateParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
+    type StackWaitForDevServerURLParams as StackWaitForDevServerURLParams,
   };
 }
