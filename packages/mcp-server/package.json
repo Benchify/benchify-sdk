@@ -1,6 +1,6 @@
 {
   "name": "benchify-mcp",
-  "version": "0.1.0-alpha.68",
+  "version": "0.1.0-alpha.69",
   "description": "The official MCP Server for the Benchify API",
   "author": "Benchify <support@benchify.com>",
   "types": "dist/index.d.ts",
