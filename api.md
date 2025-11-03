@@ -19,6 +19,7 @@ Types:
 - <code><a href="./src/resources/stacks.ts">StackExecuteCommandResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackGetLogsResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackGetNetworkInfoResponse</a></code>
+- <code><a href="./src/resources/stacks.ts">StackWaitForDevServerURLResponse</a></code>
 
 Methods:
 
@@ -30,6 +31,7 @@ Methods:
 - <code title="post /v1/stacks/{id}/exec">client.stacks.<a href="./src/resources/stacks.ts">executeCommand</a>(id, { ...params }) -> StackExecuteCommandResponse</code>
 - <code title="get /v1/stacks/{id}/logs">client.stacks.<a href="./src/resources/stacks.ts">getLogs</a>(id, { ...params }) -> StackGetLogsResponse</code>
 - <code title="get /v1/stacks/{id}/network-info">client.stacks.<a href="./src/resources/stacks.ts">getNetworkInfo</a>(id) -> StackGetNetworkInfoResponse</code>
+- <code title="get /v1/stacks/{id}/wait-url">client.stacks.<a href="./src/resources/stacks.ts">waitForDevServerURL</a>(id, { ...params }) -> StackWaitForDevServerURLResponse</code>
 
 # FixStringLiterals
 
