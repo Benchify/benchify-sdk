@@ -318,7 +318,7 @@ export class Benchify {
     const url =
       isAbsoluteURL(path) ?
         new URL(path)
-      : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
+        : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
 
     const defaultQuery = this.defaultQuery();
     if (!isEmptyObj(defaultQuery)) {
@@ -335,7 +335,7 @@ export class Benchify {
   /**
    * Used as a callback for mutating the given `FinalRequestOptions` object.
    */
-  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {}
+  protected async prepareOptions(options: FinalRequestOptions): Promise<void> { }
 
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -346,7 +346,7 @@ export class Benchify {
   protected async prepareRequest(
     request: RequestInit,
     { url, options }: { url: string; options: FinalRequestOptions },
-  ): Promise<void> {}
+  ): Promise<void> { }
 
   get<Rsp>(path: string, opts?: PromiseOrValue<RequestOptions>): APIPromise<Rsp> {
     return this.methodRequest('get', path, opts);
@@ -475,9 +475,8 @@ export class Benchify {
       throw new Errors.APIConnectionError({ cause: response });
     }
 
-    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${
-      response.ok ? 'succeeded' : 'failed'
-    } with status ${response.status} in ${headersTime - startTime}ms`;
+    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${response.ok ? 'succeeded' : 'failed'
+      } with status ${response.status} in ${headersTime - startTime}ms`;
 
     if (!response.ok) {
       const shouldRetry = await this.shouldRetry(response);
@@ -818,63 +817,85 @@ export class Benchify {
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
 
-    // Pack files with manifest using tar.zst compression
+    // Pack files into tar.zst archive
     const { buffer: packedBuffer, manifest } = await packWithManifest(files);
 
     // Convert buffer and manifest to File objects for multipart/form-data upload
-    const filesDataFile = await toFile(packedBuffer, 'files.tar.zst', { type: 'application/octet-stream' });
-    const manifestFile = await toFile(Buffer.from(JSON.stringify(manifest), 'utf-8'), 'manifest.json', {
-      type: 'application/json',
+    const filesDataFile = await toFile(packedBuffer, 'files_data.tar.zst', {
+      type: 'application/octet-stream',
     });
+    // The manifest.files array already has the correct format for the API
+    const filesManifestFile = await toFile(
+      Buffer.from(JSON.stringify(manifest.files), 'utf-8'),
+      'files_manifest.json',
+      {
+        type: 'application/json',
+      },
+    );
 
-    // Call the underlying fixer.run method with tar.zst format via multipart form
+    // Destructure options to exclude fields we're handling
+    const {
+      response_format: _,
+      response_encoding: __,
+      files: ___,
+      files_data: ____,
+      files_manifest: _____,
+      request: ______,
+      bundle: _______,
+      ...restOptions
+    } = options || {};
+
+    // Build request JSON (all non-file params go here per new spec)
+    const requestParams = {
+      ...restOptions,
+      response_format: responseFormat,
+      response_encoding: 'multipart',
+      bundle: bundleEnabled,
+    };
+
+    // Call the underlying fixer.run method with new multipart structure
     return this.fixer
       .run({
         files_data: filesDataFile,
-        manifest: manifestFile,
-        response_format: responseFormat,
-        response_encoding: 'multipart',
-        ...options,
+        files_manifest: filesManifestFile,
+        request: JSON.stringify(requestParams),
       })
       .then(async (response) => {
-        const changes = response.data.suggested_changes;
-        const bundle = response.data.bundle;
-        const initialDiagnostics = response.data.initial_diagnostics;
-        const finalDiagnostics = response.data.final_diagnostics;
+        // Parse multipart response according to new spec
+        // Response structure:
+        // - data (JSON): status, fix_types_used, diagnostics, etc.
+        // - files_data (string): base64-encoded tar.zst archive
+        // - files_manifest (array): file metadata
+        // - bundle_data (string, optional): base64-encoded tar.zst archive
+        // - bundle_manifest (array, optional): bundle file metadata
 
+        // Extract response metadata JSON
+        const responseMetadata = response.data;
+        const initialDiagnostics = responseMetadata.initial_diagnostics;
+        const finalDiagnostics = responseMetadata.final_diagnostics;
+
+        // Extract files_data (tar.zst binary, base64 encoded)
+        const filesDataBase64 = response.files_data;
+        if (!filesDataBase64) {
+          throw new Error('Response missing files_data field - ensure response_encoding is set to multipart');
+        }
+
+        // Decode and unpack tar.zst to get actual files
+        const filesDataBuffer = Buffer.from(filesDataBase64, 'base64');
+        const decodedFiles = await unpackTarZst(filesDataBuffer);
+
+        // Format files based on response_format
         let files: FixerOutput<T>;
-
-        // Unpack response based on format - all responses use tar.zst
         switch (responseFormat) {
           case 'DIFF': {
-            const diffFormat = changes as FixerAPI.FixerRunResponse.Data.DiffFormat;
-            if (diffFormat.diff_data) {
-              const diffBuffer = Buffer.from(diffFormat.diff_data, 'base64');
-              const decodedFiles = await unpackTarZst(diffBuffer);
-              // For DIFF format, the tar.zst contains a single file with the diff
-              files = (decodedFiles[0]?.contents || '') as FixerOutput<T>;
-            } else {
-              // Fallback to diff field if diff_data not present
-              files = (diffFormat.diff ?? '') as FixerOutput<T>;
-            }
+            // For DIFF format, tar.zst contains a single file with the diff
+            files = (decodedFiles[0]?.contents || '') as FixerOutput<T>;
             break;
           }
-          case 'CHANGED_FILES': {
-            const changedFormat = changes as FixerAPI.FixerRunResponse.Data.ChangedFilesFormat;
-            const bundleBuffer = Buffer.from(changedFormat.changed_files_data!, 'base64');
-            const decodedFiles = await unpackTarZst(bundleBuffer);
-            files = decodedFiles.map((f) => ({
-              path: f.path,
-              contents:
-                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
-            })) as FixerOutput<T>;
-            break;
-          }
+          case 'CHANGED_FILES':
           case 'ALL_FILES':
           default: {
-            const allFilesFormat = changes as FixerAPI.FixerRunResponse.Data.AllFilesFormat;
-            const bundleBuffer = Buffer.from(allFilesFormat.all_files_data!, 'base64');
-            const decodedFiles = await unpackTarZst(bundleBuffer);
+            // For file formats, map to array of {path, contents}
             files = decodedFiles.map((f) => ({
               path: f.path,
               contents:
@@ -884,18 +905,18 @@ export class Benchify {
           }
         }
 
-        // Handle bundled files (also in tar.zst format)
+        // Handle optional bundled files
         let bundledFiles: Array<FixerAPI.File> | undefined;
-        if (bundle?.files_data) {
-          const bundleBuffer = Buffer.from(bundle.files_data, 'base64');
-          const decodedBundleFiles = await unpackTarZst(bundleBuffer);
+        if (bundleEnabled && response.bundle_data) {
+          const bundleDataBuffer = Buffer.from(response.bundle_data, 'base64');
+          const decodedBundleFiles = await unpackTarZst(bundleDataBuffer);
           bundledFiles = decodedBundleFiles.map((f) => ({
             path: f.path,
             contents: typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
           }));
         }
 
-        // If bundle is enabled, return files, bundled_files, and diagnostics
+        // Return appropriate format based on bundle flag
         if (bundleEnabled && bundledFiles) {
           return {
             files,
@@ -905,7 +926,6 @@ export class Benchify {
           } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
         }
 
-        // Otherwise, return files and diagnostics
         return {
           files,
           initial_diagnostics: initialDiagnostics,

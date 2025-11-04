@@ -54,6 +54,26 @@ export interface FixerRunResponse {
    * Meta information
    */
   meta?: FixerRunResponse.Meta;
+
+  /**
+   * Multipart response: base64-encoded tar.zst archive of files (new format)
+   */
+  files_data?: string;
+
+  /**
+   * Multipart response: JSON array of file metadata (new format)
+   */
+  files_manifest?: Array<{ path: string; size: number; digest?: string; type?: string; mode?: string }>;
+
+  /**
+   * Multipart response: base64-encoded tar.zst archive of bundled files (new format, optional)
+   */
+  bundle_data?: string;
+
+  /**
+   * Multipart response: JSON array of bundle file metadata (new format, optional)
+   */
+  bundle_manifest?: Array<{ path: string; size: number; digest?: string; type?: string; mode?: string }>;
 }
 
 export namespace FixerRunResponse {
@@ -401,10 +421,16 @@ export interface FixerRunParams {
 
   /**
    * Manifest describing the contents of files_data (required when using multipart format).
-   * Contains metadata about files including paths, digests, and bundle information.
-   * Can be a Manifest object (converted to JSON) or File/Blob object for multipart uploads.
+   * Simple array of file metadata objects.
+   * Can be a Manifest array (converted to JSON) or File/Blob object for multipart uploads.
    */
-  manifest?: FixerRunParams.Manifest | File | Blob;
+  files_manifest?: FixerRunParams.FileManifest[] | File | Blob;
+
+  /**
+   * JSON string containing request parameters when using multipart format.
+   * Should include: response_format, response_encoding, bundle, fixes, mode, etc.
+   */
+  request?: string;
 
   /**
    * Configuration for which fix types to apply
@@ -467,22 +493,33 @@ export namespace FixerRunParams {
   }
 
   /**
-   * Manifest describing the contents of files_data for multipart format
+   * Simple file manifest entry for multipart format
    */
-  export interface Manifest {
-    manifest_version: '1';
-    bundle: {
-      digest: string;
-      size: number;
-      format: 'tar.zst';
-      compression: 'zstd';
-    };
-    files: Array<{
-      path: string;
-      digest: string;
-      size: number;
-      mode?: string;
-    }>;
+  export interface FileManifest {
+    /**
+     * Path to the file
+     */
+    path: string;
+
+    /**
+     * Size of the file in bytes
+     */
+    size: number;
+
+    /**
+     * SHA-256 digest of the file contents (optional)
+     */
+    digest?: string;
+
+    /**
+     * File type (typically "file")
+     */
+    type?: 'file' | 'dir';
+
+    /**
+     * File permissions (e.g., "0644")
+     */
+    mode?: string;
   }
 }
 
