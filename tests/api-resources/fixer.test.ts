@@ -83,15 +83,12 @@ function demo() {
     const { buffer: packedBuffer, manifest } = await packWithManifest(mockFiles);
     const base64Data = packedBuffer.toString('base64');
 
-    // Create a mock response
+    // Create a mock response (new multipart format)
     const mockResponse = {
       data: {
         fixer_version: '1.0.0',
         status: {
           composite_status: 'FIXED_EVERYTHING' as const,
-        },
-        suggested_changes: {
-          all_files_data: base64Data,
         },
         initial_diagnostics: {
           requested: { file_to_diagnostics: {} },
@@ -102,6 +99,9 @@ function demo() {
           not_requested: { file_to_diagnostics: {} },
         },
       },
+      // Multipart response fields at top level
+      files_data: base64Data,
+      files_manifest: manifest.files,
     };
 
     // Mock the fetch call
@@ -136,23 +136,25 @@ function demo() {
     // Verify it's actually FormData (multipart)
     expect(requestBody).toBeInstanceOf(FormData);
 
-    // Check that the FormData contains the expected fields
+    // Check that the FormData contains the expected fields (new spec)
     expect(requestBody.has('files_data')).toBe(true);
-    expect(requestBody.has('manifest')).toBe(true);
-    expect(requestBody.has('response_encoding')).toBe(true);
-    expect(requestBody.has('response_format')).toBe(true);
-
-    // Verify response_encoding and response_format values
-    expect(requestBody.get('response_encoding')).toBe('multipart');
-    expect(requestBody.get('response_format')).toBe('ALL_FILES');
+    expect(requestBody.has('files_manifest')).toBe(true);
+    expect(requestBody.has('request')).toBe(true);
 
     // Verify files_data is a File/Blob
     const filesData = requestBody.get('files_data');
     expect(filesData).toBeInstanceOf(File);
 
-    // Verify manifest is a File/Blob
-    const manifestData = requestBody.get('manifest');
-    expect(manifestData).toBeInstanceOf(File);
+    // Verify files_manifest is a File/Blob
+    const filesManifest = requestBody.get('files_manifest');
+    expect(filesManifest).toBeInstanceOf(File);
+
+    // Verify request is a JSON string with correct params
+    const requestStr = requestBody.get('request');
+    expect(typeof requestStr).toBe('string');
+    const requestJson = JSON.parse(requestStr as string);
+    expect(requestJson).toHaveProperty('response_encoding', 'multipart');
+    expect(requestJson).toHaveProperty('response_format', 'ALL_FILES');
 
     // Verify the response was unpacked correctly
     expect(result).toHaveProperty('files');
