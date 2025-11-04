@@ -196,11 +196,7 @@ export class Benchify {
     apiKey = readEnv('BENCHIFY_API_KEY') ?? null,
     ...opts
   }: ClientOptions = {}) {
-    const options: ClientOptions = {
-      apiKey,
-      ...opts,
-      baseURL: baseURL || `https://api.benchify.com`,
-    };
+    const options: ClientOptions = { apiKey, ...opts, baseURL: baseURL || `https://api.benchify.com` };
 
     this.baseURL = options.baseURL!;
     this.timeout = options.timeout ?? Benchify.DEFAULT_TIMEOUT /* 1 minute */;
@@ -318,7 +314,7 @@ export class Benchify {
     const url =
       isAbsoluteURL(path) ?
         new URL(path)
-        : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
+      : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
 
     const defaultQuery = this.defaultQuery();
     if (!isEmptyObj(defaultQuery)) {
@@ -829,9 +825,7 @@ export class Benchify {
     const filesManifestFile = await toFile(
       Buffer.from(JSON.stringify(manifest.files), 'utf-8'),
       'files_manifest.json',
-      {
-        type: 'application/json',
-      },
+      { type: 'application/json' },
     );
 
     // Destructure options to exclude fields we're handling
