@@ -147,6 +147,10 @@ export class StackHandle {
     this._etag = response.etag;
     return response;
   }
+  async waitForDevServerURL(): Promise<string> {
+    const response = await this._client.stacks.waitForDevServerURL(this._id);
+    return response.url;
+  }
 
   /**
    * Permanently destroy the stack and free resources
