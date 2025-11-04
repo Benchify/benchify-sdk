@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.70 (2025-11-04)
+
+Full Changelog: [v0.1.0-alpha.69...v0.1.0-alpha.70](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.69...v0.1.0-alpha.70)
+
+### Chores
+
+* **internal:** grammar fix (it's -&gt; its) ([ef6a154](https://github.com/Benchify/benchify-sdk/commit/ef6a15476aa2477271f57109d3eee2b2ee1c998d))
+* use structured error when code execution tool errors ([d372c12](https://github.com/Benchify/benchify-sdk/commit/d372c12c97d6ce388a5ddbdad7214014bb79197d))
+
 ## 0.1.0-alpha.69 (2025-11-03)
 
 Full Changelog: [v0.1.0-alpha.68...v0.1.0-alpha.69](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.68...v0.1.0-alpha.69)
