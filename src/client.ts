@@ -1012,11 +1012,42 @@ export class Benchify {
         bundle: bundleEnabled,
       });
 
-      // Handle JSON response (legacy format)
-      const responseData = apiResponse.data;
-      const initialDiagnostics = responseData.initial_diagnostics;
-      const finalDiagnostics = responseData.final_diagnostics;
-      const suggestedChanges = responseData.suggested_changes as any;
+    // Check if response is a raw Response object (multipart)
+    if (apiResponse instanceof Response) {
+      const contentType = apiResponse.headers.get('content-type');
+      if (contentType?.includes('multipart/form-data')) {
+        // Parse the multipart response
+        const formData = await apiResponse.formData();
+        const parsedResponse: any = {};
+        
+        // Extract all parts from the FormData
+        for (const [key, value] of formData.entries()) {
+          if (value instanceof Blob) {
+            if (key === 'response') {
+              // Parse the JSON response metadata
+              const text = await value.text();
+              parsedResponse.data = JSON.parse(text);
+            } else if (key === 'files_data' || key === 'bundle_data') {
+              // Convert blob to base64 for tar.zst files
+              const buffer = await value.arrayBuffer();
+              parsedResponse[key] = Buffer.from(buffer).toString('base64');
+            } else if (key === 'files_manifest' || key === 'bundle_manifest') {
+              // Parse JSON manifests
+              const text = await value.text();
+              parsedResponse[key] = JSON.parse(text);
+            }
+          }
+        }
+        
+        // Use the parsed response
+        apiResponse = parsedResponse;
+      }
+    }
+
+    // Extract response metadata JSON
+    const responseMetadata = apiResponse.data;
+    const initialDiagnostics = responseMetadata.initial_diagnostics;
+    const finalDiagnostics = responseMetadata.final_diagnostics;
 
       let resultFiles: FixerOutput<T>;
 
