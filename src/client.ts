@@ -823,12 +823,12 @@ export class Benchify {
     // Default to ALL_FILES if no format specified
     const responseFormat = options?.response_format || ('ALL_FILES' as T);
     const bundleEnabled = options?.bundle || false;
-    const responseEncoding = options?.response_encoding || 'json';
+    const responseEncoding = options?.response_encoding || 'multipart';
 
     // Determine if we should use multipart encoding
     // Use multipart if explicitly requested or if files are large (>10MB total)
     let useMultipart = responseEncoding === 'multipart';
-    
+
     if (!useMultipart) {
       const totalSize = files.reduce((sum, file) => sum + file.contents.length, 0);
       if (totalSize > 10 * 1024 * 1024) {
@@ -837,7 +837,7 @@ export class Benchify {
     }
 
     let apiResponse: API.FixerRunResponse;
-    
+
     if (useMultipart) {
       // Pack files into tar.zst archive
       const { buffer: packedBuffer, manifest } = await packWithManifest(files);
@@ -874,115 +874,184 @@ export class Benchify {
       };
 
       // Call the underlying fixer.run method with new multipart structure
-      apiResponse = await this.fixer.run({
-        files_data: filesDataFile,
-        files_manifest: filesManifestFile,
-        request: JSON.stringify(requestParams),
+      // Use __binaryResponse to get raw Response without automatic parsing
+      const apiPromise = this.fixer.run(
+        {
+          files_data: filesDataFile,
+          files_manifest: filesManifestFile,
+          request: JSON.stringify(requestParams),
+        },
+        { __binaryResponse: true } as any,
+      ) as unknown as Promise<Response>;
+
+      return apiPromise.then(async (rawResponse) => {
+        // Parse multipart FormData response according to new spec
+        // Response structure (multipart/form-data):
+        // - response (File/Blob): JSON with status, diagnostics, etc.
+        // - files_data (File/Blob): tar.zst binary
+        // - files_manifest (File/Blob): JSON array
+        // - bundle_data (File/Blob, optional): tar.zst binary
+        // - bundle_manifest (File/Blob, optional): JSON array
+
+        const contentType = rawResponse.headers.get('content-type');
+
+        if (!contentType?.includes('multipart/form-data')) {
+          // Handle JSON fallback (API may return JSON for DIFF format or legacy responses)
+          if (contentType?.includes('application/json')) {
+            const jsonResponse = await rawResponse.json();
+            const responseData = jsonResponse.data;
+            const initialDiagnostics = responseData.initial_diagnostics;
+            const finalDiagnostics = responseData.final_diagnostics;
+            const suggestedChanges = responseData.suggested_changes;
+
+            // Handle DIFF format from JSON
+            if (responseFormat === 'DIFF') {
+              const diffText = suggestedChanges?.diff || '';
+              return {
+                files: diffText,
+                initial_diagnostics: initialDiagnostics,
+                final_diagnostics: finalDiagnostics,
+              } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
+            }
+
+            // If not DIFF, this is unexpected
+            throw new Error(`Expected multipart/form-data for ${responseFormat} format, got: ${contentType}`);
+          }
+
+          // Unknown content type
+          throw new Error(
+            `Expected multipart/form-data response, got: ${contentType}. Ensure response_encoding is set to 'multipart'`,
+          );
+        }
+
+        // Parse as FormData
+        const formData = await rawResponse.formData();
+
+        // Extract and parse 'response' field (JSON metadata)
+        const responseField = formData.get('response');
+        if (!responseField) {
+          throw new Error('Response missing required "response" field');
+        }
+
+        // Handle both Blob and string types
+        const responseText =
+          responseField instanceof Blob ? await responseField.text() : String(responseField);
+        const responseMetadata = JSON.parse(responseText);
+        const initialDiagnostics = responseMetadata.initial_diagnostics;
+        const finalDiagnostics = responseMetadata.final_diagnostics;
+
+        // Extract and parse 'files_data' field (tar.zst binary)
+        const filesDataBlob = formData.get('files_data');
+        if (!filesDataBlob || !(filesDataBlob instanceof Blob)) {
+          throw new Error('Response missing required "files_data" field');
+        }
+        const filesDataArrayBuffer = await filesDataBlob.arrayBuffer();
+        const filesDataBuffer = Buffer.from(filesDataArrayBuffer);
+        const decodedFiles = await unpackTarZst(filesDataBuffer);
+
+        // Format files based on response_format
+        let files: FixerOutput<T>;
+        switch (responseFormat) {
+          case 'DIFF': {
+            // For DIFF format, tar.zst contains a single file with the diff
+            files = (decodedFiles[0]?.contents || '') as FixerOutput<T>;
+            break;
+          }
+          case 'CHANGED_FILES':
+          case 'ALL_FILES':
+          default: {
+            // For file formats, map to array of {path, contents}
+            files = decodedFiles.map((f) => ({
+              path: f.path,
+              contents:
+                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+            })) as FixerOutput<T>;
+            break;
+          }
+        }
+
+        // Handle optional bundled files
+        let bundledFiles: Array<FixerAPI.File> | undefined;
+        if (bundleEnabled) {
+          const bundleDataBlob = formData.get('bundle_data');
+          if (bundleDataBlob && bundleDataBlob instanceof Blob) {
+            const bundleDataArrayBuffer = await bundleDataBlob.arrayBuffer();
+            const bundleDataBuffer = Buffer.from(bundleDataArrayBuffer);
+            const decodedBundleFiles = await unpackTarZst(bundleDataBuffer);
+            bundledFiles = decodedBundleFiles.map((f) => ({
+              path: f.path,
+              contents:
+                typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+            }));
+          }
+        }
+
+        // Return appropriate format based on bundle flag
+        if (bundleEnabled && bundledFiles) {
+          return {
+            files,
+            bundled_files: bundledFiles,
+            initial_diagnostics: initialDiagnostics,
+            final_diagnostics: finalDiagnostics,
+          } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
+        }
+
+        return {
+          files,
+          initial_diagnostics: initialDiagnostics,
+          final_diagnostics: finalDiagnostics,
+        } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
       });
     } else {
-      // Use JSON encoding for smaller payloads
-      const {
-        response_encoding: _,
-        files_data: __,
-        files_manifest: ___,
-        request: ____,
-        ...restOptions
-      } = options || {};
-
+      // JSON fallback path for when multipart is not used
       apiResponse = await this.fixer.run({
+        ...options,
         files,
         response_format: responseFormat,
         response_encoding: 'json',
         bundle: bundleEnabled,
-        ...restOptions,
       });
-    }
 
-    // Extract response metadata JSON
-    const responseMetadata = apiResponse.data;
-    const initialDiagnostics = responseMetadata.initial_diagnostics;
-    const finalDiagnostics = responseMetadata.final_diagnostics;
+      // Handle JSON response (legacy format)
+      const responseData = apiResponse.data;
+      const initialDiagnostics = responseData.initial_diagnostics;
+      const finalDiagnostics = responseData.final_diagnostics;
+      const suggestedChanges = responseData.suggested_changes as any;
 
-    // Handle response based on encoding
-    let fixedFiles: FixerOutput<T>;
-    let bundledFiles: Array<FixerAPI.File> | undefined;
+      let resultFiles: FixerOutput<T>;
 
-    if (apiResponse.files_data) {
-      // Multipart response with base64-encoded tar.zst
-      const filesDataBuffer = Buffer.from(apiResponse.files_data, 'base64');
-      const decodedFiles = await unpackTarZst(filesDataBuffer);
-
-      // Format files based on response_format
-      switch (responseFormat) {
-        case 'DIFF': {
-          // For DIFF format, tar.zst contains a single file with the diff
-          fixedFiles = (decodedFiles[0]?.contents || '') as FixerOutput<T>;
-          break;
-        }
-        case 'CHANGED_FILES':
-        case 'ALL_FILES':
-        default: {
-          // For file formats, map to array of {path, contents}
-          fixedFiles = decodedFiles.map((f) => ({
-            path: f.path,
-            contents:
-              typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
-          })) as FixerOutput<T>;
-          break;
-        }
+      if (responseFormat === 'DIFF') {
+        resultFiles = (suggestedChanges?.diff || '') as FixerOutput<T>;
+      } else {
+        // ALL_FILES or CHANGED_FILES
+        const filesArray = suggestedChanges?.files || [];
+        resultFiles = filesArray as FixerOutput<T>;
       }
 
-      // Handle optional bundled files in multipart response
-      if (bundleEnabled && apiResponse.bundle_data) {
-        const bundleDataBuffer = Buffer.from(apiResponse.bundle_data, 'base64');
-        const decodedBundleFiles = await unpackTarZst(bundleDataBuffer);
-        bundledFiles = decodedBundleFiles.map((f) => ({
-          path: f.path,
-          contents: typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
-        }));
-      }
-    } else {
-      // JSON response with files directly in the response
-      const suggestedChanges = responseMetadata.suggested_changes;
-      
-      switch (responseFormat) {
-        case 'DIFF': {
-          fixedFiles = (suggestedChanges.diff || '') as FixerOutput<T>;
-          break;
-        }
-        case 'CHANGED_FILES': {
-          fixedFiles = (suggestedChanges.changed_files || []) as FixerOutput<T>;
-          break;
-        }
-        case 'ALL_FILES':
-        default: {
-          fixedFiles = (suggestedChanges.all_files || []) as FixerOutput<T>;
-          break;
-        }
+      // Handle bundled files
+      let bundledFiles: Array<FixerAPI.File> | undefined;
+      if (bundleEnabled && responseData.bundle?.files) {
+        bundledFiles = responseData.bundle.files;
       }
 
-      // Handle bundled files in JSON response
-      if (bundleEnabled && responseMetadata.bundle?.files) {
-        bundledFiles = responseMetadata.bundle.files;
+      // Return appropriate format
+      if (bundleEnabled && bundledFiles) {
+        return {
+          files: resultFiles,
+          bundled_files: bundledFiles,
+          initial_diagnostics: initialDiagnostics,
+          final_diagnostics: finalDiagnostics,
+        } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
       }
-    }
 
-    // Return appropriate format based on bundle flag
-    if (bundleEnabled && bundledFiles) {
       return {
-        files: fixedFiles,
-        bundled_files: bundledFiles,
+        files: resultFiles,
         initial_diagnostics: initialDiagnostics,
         final_diagnostics: finalDiagnostics,
       } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
     }
-
-    return {
-      files: fixedFiles,
-      initial_diagnostics: initialDiagnostics,
-      final_diagnostics: finalDiagnostics,
-    } as B extends true ? FixerBundleOutput<T> : FixerOutputWithDiagnostics<T>;
   }
+
   // Stainless-generated resources (for direct API access)
   stacks: API.Stacks = new API.Stacks(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);

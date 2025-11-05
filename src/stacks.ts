@@ -350,6 +350,13 @@ export class Stacks {
     );
   }
 
+  async waitForDevServerURL(
+    id: string,
+    params?: { interval?: string; timeout?: string },
+  ): Promise<{ url: string }> {
+    return await this._client.stacks.waitForDevServerURL(id, params);
+  }
+
   private _filterFiles(files: StackFile[]): StackFile[] {
     return files.filter((file) => {
       return !DEFAULT_IGNORE_PATTERNS.some((pattern) => minimatch(file.path, pattern));

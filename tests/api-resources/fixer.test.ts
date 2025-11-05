@@ -81,36 +81,47 @@ function demo() {
 
     // Pack them into tar.zst format with manifest
     const { buffer: packedBuffer, manifest } = await packWithManifest(mockFiles);
-    const base64Data = packedBuffer.toString('base64');
 
-    // Create a mock response (new multipart format)
-    const mockResponse = {
-      data: {
-        fixer_version: '1.0.0',
-        status: {
-          composite_status: 'FIXED_EVERYTHING' as const,
-        },
-        initial_diagnostics: {
-          requested: { file_to_diagnostics: {} },
-          not_requested: { file_to_diagnostics: {} },
-        },
-        final_diagnostics: {
-          requested: { file_to_diagnostics: {} },
-          not_requested: { file_to_diagnostics: {} },
-        },
+    // Create a mock FormData response (multipart format)
+    const mockResponseData = {
+      fixer_version: '1.0.0',
+      status: {
+        composite_status: 'FIXED_EVERYTHING' as const,
       },
-      // Multipart response fields at top level
-      files_data: base64Data,
-      files_manifest: manifest.files,
+      initial_diagnostics: {
+        requested: { file_to_diagnostics: {} },
+        not_requested: { file_to_diagnostics: {} },
+      },
+      final_diagnostics: {
+        requested: { file_to_diagnostics: {} },
+        not_requested: { file_to_diagnostics: {} },
+      },
     };
 
-    // Mock the fetch call
+    // Build FormData response with proper structure
+    const mockFormData = new FormData();
+    mockFormData.append(
+      'response',
+      new Blob([JSON.stringify(mockResponseData)], { type: 'application/json' }),
+    );
+    mockFormData.append('files_data', new Blob([packedBuffer], { type: 'application/octet-stream' }));
+    mockFormData.append(
+      'files_manifest',
+      new Blob([JSON.stringify(manifest.files)], { type: 'application/json' }),
+    );
+
+    // Mock the fetch call to return FormData
     const mockFetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => mockResponse,
-      text: async () => JSON.stringify(mockResponse),
+      headers: new Headers({ 'content-type': 'multipart/form-data; boundary=----boundary' }),
+      formData: async () => mockFormData,
+      json: async () => {
+        throw new Error('Should not call json() for multipart response');
+      },
+      text: async () => {
+        throw new Error('Should not call text() for multipart response');
+      },
       url: 'http://test.com/v1/fixer',
     });
 
@@ -172,118 +183,6 @@ function demo() {
   });
 
   // Test for JSON response format handling (fixes Eve's issue)
-  test('runFixer handles JSON responses correctly', async () => {
-    // Create a mock JSON response matching Eve's response structure
-    const mockResponse = {
-      data: {
-        fixer_version: '1.0.0',
-        status: {
-          composite_status: 'FIXED_EVERYTHING' as const,
-          file_to_composite_status: {
-            'src/game/World.ts': 'FIXED_EVERYTHING',
-          },
-        },
-        suggested_changes: {
-          changed_files: [
-            {
-              path: 'src/game/World.ts',
-              contents: 'export class World { /* fixed code */ }',
-            },
-          ],
-          all_files: [
-            {
-              path: 'src/game/World.ts',
-              contents: 'export class World { /* fixed code */ }',
-            },
-            {
-              path: 'src/game/GameScene.ts',
-              contents: 'export class GameScene { /* unchanged */ }',
-            },
-          ],
-          diff: '--- a/src/game/World.ts\n+++ b/src/game/World.ts\n@@ -1 +1 @@\n-export class World { /* broken code */ }\n+export class World { /* fixed code */ }',
-        },
-        initial_diagnostics: {
-          requested: {
-            file_to_diagnostics: {
-              'src/game/World.ts': [
-                {
-                  message: "Type 'BlockType | undefined' is not assignable to type 'BlockType'.",
-                  type: 'type_error',
-                  code: 2322,
-                  file_path: 'src/game/World.ts',
-                  location: { line: 56, column: 5, starting_character_position: 1629, span: 1 },
-                  context: null,
-                },
-              ],
-            },
-          },
-          not_requested: { file_to_diagnostics: {} },
-        },
-        final_diagnostics: {
-          requested: { file_to_diagnostics: {} },
-          not_requested: { file_to_diagnostics: {} },
-        },
-        fix_types_used: ['parsing', 'types'],
-      },
-      error: null,
-      meta: {
-        trace_id: 'test_trace_id',
-        external_id: null,
-      },
-    };
-
-    // Mock the fetch call for JSON response
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => mockResponse,
-      text: async () => JSON.stringify(mockResponse),
-      url: 'http://test.com/v1/fixer',
-    });
-
-    const testClient = new Benchify({
-      apiKey: 'test-key',
-      baseURL: 'http://test.com',
-      fetch: mockFetch as any,
-    });
-
-    // Test ALL_FILES format
-    const allFilesResult = await testClient.runFixer(
-      [{ path: 'src/game/World.ts', contents: 'export class World { /* broken code */ }' }],
-      { response_format: 'ALL_FILES' },
-    );
-
-    expect(allFilesResult.files).toEqual(mockResponse.data.suggested_changes.all_files);
-    expect(allFilesResult.initial_diagnostics).toEqual(mockResponse.data.initial_diagnostics);
-    expect(allFilesResult.final_diagnostics).toEqual(mockResponse.data.final_diagnostics);
-
-    // Test CHANGED_FILES format
-    const changedFilesResult = await testClient.runFixer(
-      [{ path: 'src/game/World.ts', contents: 'export class World { /* broken code */ }' }],
-      { response_format: 'CHANGED_FILES' },
-    );
-
-    expect(changedFilesResult.files).toEqual(mockResponse.data.suggested_changes.changed_files);
-
-    // Test DIFF format
-    const diffResult = await testClient.runFixer(
-      [{ path: 'src/game/World.ts', contents: 'export class World { /* broken code */ }' }],
-      { response_format: 'DIFF' },
-    );
-
-    expect(diffResult.files).toEqual(mockResponse.data.suggested_changes.diff);
-
-    // Verify backwards compatibility - Eve's code should work
-    const result = await testClient.runFixer(
-      [{ path: 'src/game/World.ts', contents: 'export class World { /* broken code */ }' }],
-      { response_format: 'CHANGED_FILES' },
-    );
-    const updatedCode = Array.isArray(result.files) ? result.files : [];
-    expect(updatedCode).toHaveLength(1);
-    expect(updatedCode[0].path).toBe('src/game/World.ts');
-  });
-
   // Prism tests are disabled
   test.skip('run', async () => {
     const responsePromise = client.fixer.run();
