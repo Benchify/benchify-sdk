@@ -162,7 +162,7 @@ export class StackHandle {
     return response.url;
   }
   async executeCommand(command: string): Promise<StackExecuteCommandResponse> {
-    const response = await this._client.stacks.executeCommand(this._id, { command: [command] });
+    const response = await this._client.stacks.executeCommand(this._id, { command: ["sh", "-c", command] });
     return response;
   }
   async getSandboxIP(): Promise<string> {
