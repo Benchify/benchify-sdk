@@ -16,6 +16,8 @@ import get_network_info_stacks from './stacks/get-network-info-stacks';
 import wait_for_dev_server_url_stacks from './stacks/wait-for-dev-server-url-stacks';
 import create_fix_string_literals from './fix-string-literals/create-fix-string-literals';
 import validate_validate_template from './validate-template/validate-validate-template';
+import detect_issues_fix_parsing_and_diagnose from './fix-parsing-and-diagnose/detect-issues-fix-parsing-and-diagnose';
+import create_ai_fallback_fix from './fix/create-ai-fallback-fix';
 
 export const endpoints: Endpoint[] = [];
 
@@ -35,6 +37,8 @@ addEndpoint(get_network_info_stacks);
 addEndpoint(wait_for_dev_server_url_stacks);
 addEndpoint(create_fix_string_literals);
 addEndpoint(validate_validate_template);
+addEndpoint(detect_issues_fix_parsing_and_diagnose);
+addEndpoint(create_ai_fallback_fix);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';
