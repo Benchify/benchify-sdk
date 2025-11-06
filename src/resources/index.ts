@@ -21,13 +21,17 @@ export {
   type StackExecuteCommandResponse,
   type StackGetLogsResponse,
   type StackGetNetworkInfoResponse,
+  type StackReadFileResponse,
   type StackWaitForDevServerURLResponse,
+  type StackWriteFileResponse,
   type StackCreateParams,
   type StackUpdateParams,
   type StackCreateAndRunParams,
   type StackExecuteCommandParams,
   type StackGetLogsParams,
+  type StackReadFileParams,
   type StackWaitForDevServerURLParams,
+  type StackWriteFileParams,
 } from './stacks';
 export {
   ValidateTemplate,

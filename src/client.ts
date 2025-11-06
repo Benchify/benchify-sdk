@@ -39,11 +39,15 @@ import {
   StackGetLogsParams,
   StackGetLogsResponse,
   StackGetNetworkInfoResponse,
+  StackReadFileParams,
+  StackReadFileResponse,
   StackRetrieveResponse,
   StackUpdateParams,
   StackUpdateResponse,
   StackWaitForDevServerURLParams,
   StackWaitForDevServerURLResponse,
+  StackWriteFileParams,
+  StackWriteFileResponse,
   Stacks as StacksAPI,
 } from './resources/stacks';
 import {
@@ -1122,13 +1126,17 @@ export declare namespace Benchify {
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
+    type StackReadFileResponse as StackReadFileResponse,
     type StackWaitForDevServerURLResponse as StackWaitForDevServerURLResponse,
+    type StackWriteFileResponse as StackWriteFileResponse,
     type StackCreateParams as StackCreateParams,
     type StackUpdateParams as StackUpdateParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
+    type StackReadFileParams as StackReadFileParams,
     type StackWaitForDevServerURLParams as StackWaitForDevServerURLParams,
+    type StackWriteFileParams as StackWriteFileParams,
   };
 
   export {
