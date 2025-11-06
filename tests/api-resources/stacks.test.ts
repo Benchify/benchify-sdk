@@ -178,7 +178,7 @@ describe('resource stacks', () => {
     await expect(
       client.stacks.waitForDevServerURL(
         'stk_abc123',
-        { interval: '200', timeout: '60' },
+        { interval: 200, wait_timeout: 60 },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Benchify.NotFoundError);
