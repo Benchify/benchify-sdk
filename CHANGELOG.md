@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.0-alpha.72 (2025-11-06)
+
+Full Changelog: [v0.1.0-alpha.71...v0.1.0-alpha.72](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.71...v0.1.0-alpha.72)
+
+### Features
+
+* **api:** api update ([de04b62](https://github.com/Benchify/benchify-sdk/commit/de04b6262de3ad2a88f3d670b4e710317ed7d57f))
+* **api:** manual updates ([cb398b5](https://github.com/Benchify/benchify-sdk/commit/cb398b5645f241b9a0378d775e9020651cb1e23e))
+* **mcp:** enable optional code execution tool on http mcp servers ([3b2ce72](https://github.com/Benchify/benchify-sdk/commit/3b2ce724a4c3ed325f73f55e5d6c574701ddf1eb))
+
+
+### Chores
+
+* **internal:** codegen related update ([e64e078](https://github.com/Benchify/benchify-sdk/commit/e64e078e5874124bb11423470f2317ae70d255ea))
+* mcp code tool explicit error message when missing a run function ([a3d95f2](https://github.com/Benchify/benchify-sdk/commit/a3d95f254c6a7fdcf5f18413d260e67a1d6f548d))
+* **mcp:** add friendlier MCP code tool errors on incorrect method invocations ([e66c366](https://github.com/Benchify/benchify-sdk/commit/e66c36653ba1c5c0c4bce4ec4cf90e9333ee5b45))
+* **mcp:** add line numbers to code tool errors ([08c574b](https://github.com/Benchify/benchify-sdk/commit/08c574b43844fd2143d44c2c3c3e2df79818ce01))
+
+
+### Documentation
+
+* **mcp:** add a README button for one-click add to Cursor ([7582b3d](https://github.com/Benchify/benchify-sdk/commit/7582b3d5b1cfc260a661189a619754ce5c76e02a))
+
 ## 0.1.0-alpha.71 (2025-11-04)
 
 Full Changelog: [v0.1.0-alpha.70...v0.1.0-alpha.71](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.70...v0.1.0-alpha.71)
