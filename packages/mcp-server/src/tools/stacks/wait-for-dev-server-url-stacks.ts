@@ -27,11 +27,11 @@ export const tool: Tool = {
         description: 'Stack identifier',
       },
       interval: {
-        type: 'string',
-        description: 'Polling interval in ms',
+        type: 'number',
+        description: 'Polling interval in milliseconds',
       },
-      timeout: {
-        type: 'string',
+      wait_timeout: {
+        type: 'number',
         description: 'Timeout in seconds',
       },
       jq_filter: {
