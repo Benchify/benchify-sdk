@@ -3,8 +3,17 @@
 import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
-import { type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
-import { StackExecuteCommandResponse, StackWriteFileResponse, type StackRetrieveResponse, StackReadFileResponse } from './resources/stacks';
+import {
+  type BinaryFileData,
+  packWithManifest,
+  normalizePath
+} from './lib/helpers';
+import {
+  StackExecuteCommandResponse,
+  StackWriteFileResponse,
+  type StackRetrieveResponse,
+  StackReadFileResponse
+} from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
 
@@ -182,7 +191,7 @@ export class StackHandle {
     const ops =
       deletions.length > 0 ?
         JSON.stringify(deletions.map((del) => ({ op: 'remove', path: normalizePath(del.path) })))
-      : undefined;
+        : undefined;
 
     // Idempotency key ensures retries are safe
     const changeSignature = changes
@@ -329,7 +338,7 @@ export class Stacks {
           },
           {},
         )
-      : undefined,
+        : undefined,
     );
   }
 
