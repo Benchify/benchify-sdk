@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
 import { type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
-import { StackExecuteCommandResponse, type StackRetrieveResponse } from './resources/stacks';
+import { StackExecuteCommandResponse, StackWriteFileResponse, type StackRetrieveResponse, StackReadFileResponse } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
 
@@ -158,6 +158,14 @@ export class StackHandle {
   async getSandboxIP(): Promise<string> {
     const response = await this.executeCommand('hostname -i');
     return response.stdout.trim();
+  }
+  async writeFile(path: string, content: string): Promise<StackWriteFileResponse> {
+    const response = await this._client.stacks.writeFile(this._id, { path, content });
+    return response;
+  }
+  async readFile(path: string): Promise<StackReadFileResponse> {
+    const response = await this._client.stacks.readFile(this._id, { path });
+    return response;
   }
 
   /**
