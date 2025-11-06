@@ -54,6 +54,8 @@ const fuse = new Fuse(
     'client.stacks.waitForDevServerURL',
     'client.fixStringLiterals.create',
     'client.validateTemplate.validate',
+    'client.fixParsingAndDiagnose.detectIssues',
+    'client.fix.createAIFallback',
   ],
   { threshold: 1, shouldSort: true },
 );

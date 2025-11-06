@@ -247,3 +247,11 @@ The following tools are available in this MCP server.
 ### Resource `validate_template`:
 
 - `validate_validate_template` (`write`): Validate a template configuration
+
+### Resource `fix_parsing_and_diagnose`:
+
+- `detect_issues_fix_parsing_and_diagnose` (`write`): Fast detection endpoint for quick diagnostic results. Phase 1 of the 3-phase architecture. Returns issues quickly (within 1-3 seconds) and provides metadata about available fixes and time estimates. Does not apply any fixes, only analyzes code.
+
+### Resource `fix`:
+
+- `create_ai_fallback_fix` (`write`): AI-powered fallback for complex issues. Phase 3 of the 3-phase architecture. Handles issues that standard fixers cannot resolve. Uses LLM to understand and fix complex problems. Provides confidence scores and alternative suggestions.

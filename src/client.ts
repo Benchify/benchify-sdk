@@ -16,6 +16,12 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
+import { Fix, FixCreateAIFallbackParams, FixCreateAIFallbackResponse } from './resources/fix';
+import {
+  FixParsingAndDiagnose,
+  FixParsingAndDiagnoseDetectIssuesParams,
+  FixParsingAndDiagnoseDetectIssuesResponse,
+} from './resources/fix-parsing-and-diagnose';
 import {
   FixStringLiteralCreateParams,
   FixStringLiteralCreateResponse,
@@ -751,12 +757,16 @@ export class Benchify {
   stacks: API.Stacks = new API.Stacks(this);
   fixStringLiterals: API.FixStringLiterals = new API.FixStringLiterals(this);
   validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
+  fixParsingAndDiagnose: API.FixParsingAndDiagnose = new API.FixParsingAndDiagnose(this);
+  fix: API.Fix = new API.Fix(this);
 }
 
 Benchify.Fixer = Fixer;
 Benchify.Stacks = Stacks;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
+Benchify.FixParsingAndDiagnose = FixParsingAndDiagnose;
+Benchify.Fix = Fix;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
@@ -791,5 +801,17 @@ export declare namespace Benchify {
     ValidateTemplate as ValidateTemplate,
     type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
     type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
+  };
+
+  export {
+    FixParsingAndDiagnose as FixParsingAndDiagnose,
+    type FixParsingAndDiagnoseDetectIssuesResponse as FixParsingAndDiagnoseDetectIssuesResponse,
+    type FixParsingAndDiagnoseDetectIssuesParams as FixParsingAndDiagnoseDetectIssuesParams,
+  };
+
+  export {
+    Fix as Fix,
+    type FixCreateAIFallbackResponse as FixCreateAIFallbackResponse,
+    type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
 }

@@ -52,3 +52,23 @@ Types:
 Methods:
 
 - <code title="post /v1/validate-template">client.validateTemplate.<a href="./src/resources/validate-template.ts">validate</a>({ ...params }) -> ValidateTemplateValidateResponse</code>
+
+# FixParsingAndDiagnose
+
+Types:
+
+- <code><a href="./src/resources/fix-parsing-and-diagnose.ts">FixParsingAndDiagnoseDetectIssuesResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/fix-parsing-and-diagnose">client.fixParsingAndDiagnose.<a href="./src/resources/fix-parsing-and-diagnose.ts">detectIssues</a>({ ...params }) -> FixParsingAndDiagnoseDetectIssuesResponse</code>
+
+# Fix
+
+Types:
+
+- <code><a href="./src/resources/fix.ts">FixCreateAIFallbackResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/fix/ai-fallback">client.fix.<a href="./src/resources/fix.ts">createAIFallback</a>({ ...params }) -> FixCreateAIFallbackResponse</code>
