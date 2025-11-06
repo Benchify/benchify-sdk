@@ -12,7 +12,7 @@ import {
   StackExecuteCommandResponse,
   StackWriteFileResponse,
   type StackRetrieveResponse,
-  StackReadFileResponse
+  StackReadFileResponse,
 } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
@@ -54,6 +54,7 @@ export interface StackCreateOptions {
     packageManager?: 'npm' | 'yarn' | 'pnpm';
     framework?: 'react' | 'nextjs' | 'vue' | 'nuxt' | 'express' | 'fastify' | 'nest' | 'vite';
   };
+  bundle?: boolean;
 }
 
 /**
