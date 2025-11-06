@@ -60,22 +60,74 @@ export namespace FixParsingAndDiagnoseDetectIssuesResponse {
    */
   export interface Data {
     /**
+     * Files that were changed during detection
+     */
+    changed_files: Array<Data.ChangedFile>;
+
+    /**
+     * Time taken to detect issues in seconds
+     */
+    detection_time: number;
+
+    /**
+     * Number of diagnostic iterations performed
+     */
+    diagnosis_iterations: number;
+
+    /**
      * Diagnostics split into fixable (requested) and other (not_requested) groups
      */
     diagnostics: Data.Diagnostics;
 
     /**
-     * Version of the fixer
+     * Estimated total time to fix all issues in seconds
      */
-    fixer_version: string;
+    estimated_total_fix_time: number;
 
     /**
-     * Statistics about the diagnostics
+     * Number of files that were analyzed
      */
-    statistics: Data.Statistics;
+    files_analyzed: number;
+
+    /**
+     * Available fix types with metadata
+     */
+    fix_types_available: Array<Data.FixTypesAvailable>;
+
+    /**
+     * Number of issues that can be fixed
+     */
+    fixable_issues: number;
+
+    /**
+     * Number of fixes that were applied during detection
+     */
+    fixes_applied: number;
+
+    /**
+     * Total number of issues found
+     */
+    total_issues: number;
+
+    /**
+     * Version of the fixer
+     */
+    fixer_version?: string;
   }
 
   export namespace Data {
+    export interface ChangedFile {
+      /**
+       * Contents of the file
+       */
+      contents: string;
+
+      /**
+       * Path of the file
+       */
+      path: string;
+    }
+
     /**
      * Diagnostics split into fixable (requested) and other (not_requested) groups
      */
@@ -235,29 +287,26 @@ export namespace FixParsingAndDiagnoseDetectIssuesResponse {
       }
     }
 
-    /**
-     * Statistics about the diagnostics
-     */
-    export interface Statistics {
-      /**
-       * Count of diagnostics by severity
-       */
-      by_severity: { [key: string]: number };
-
-      /**
-       * Count of diagnostics by type
-       */
-      by_type: { [key: string]: number };
-
-      /**
-       * Total number of diagnostics found
-       */
-      total_diagnostics: number;
-
+    export interface FixTypesAvailable {
       /**
        * Estimated time to fix in seconds
        */
-      estimated_fix_time_seconds?: number;
+      estimated_time_seconds: number;
+
+      /**
+       * The type of fix available
+       */
+      fix_type: string;
+
+      /**
+       * Number of issues that can be fixed with this type
+       */
+      issue_count: number;
+
+      /**
+       * Priority of this fix type (lower is higher priority)
+       */
+      priority: number;
     }
   }
 

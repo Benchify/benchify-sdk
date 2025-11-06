@@ -75,19 +75,19 @@ export namespace FixCreateAIFallbackResponse {
    */
   export interface Data {
     /**
-     * Per-file AI fix results
+     * Time taken to execute AI fallback in seconds
      */
-    file_results: Array<Data.FileResult>;
+    execution_time: number;
+
+    /**
+     * Per-file AI fix results keyed by file path
+     */
+    file_results: { [key: string]: Data.FileResults };
 
     /**
      * Number of files that were fixed
      */
     files_fixed: number;
-
-    /**
-     * Version of the fixer
-     */
-    fixer_version: string;
 
     /**
      * Total number of issues still remaining
@@ -105,90 +105,42 @@ export namespace FixCreateAIFallbackResponse {
     success: boolean;
 
     /**
-     * Suggested changes from AI fixes
+     * Additional AI suggestions if available
      */
-    suggested_changes: Data.SuggestedChanges;
+    ai_suggestions?: string | null;
+
+    /**
+     * Version of the fixer
+     */
+    fixer_version?: string;
   }
 
   export namespace Data {
-    export interface FileResult {
+    export interface FileResults {
       /**
-       * Confidence score of the fix (0-1)
+       * Array of confidence scores for fixes applied
        */
-      confidence_score: number;
+      confidence_scores: Array<number>;
+
+      /**
+       * The fixed file contents
+       */
+      fixed_content: string;
+
+      /**
+       * Number of fixes applied
+       */
+      fixes_applied: number;
 
       /**
        * Number of issues still remaining
        */
-      issues_remaining: number;
+      remaining_issues: number;
 
       /**
-       * Number of issues resolved
+       * Status of the fix operation (e.g., "FIXED", "NO_ISSUES", "FAILED")
        */
-      issues_resolved: number;
-
-      /**
-       * Path of the file
-       */
-      path: string;
-
-      /**
-       * Whether the AI fix was successful
-       */
-      success: boolean;
-
-      /**
-       * Alternative fix suggestions
-       */
-      alternative_suggestions?: Array<string>;
-    }
-
-    /**
-     * Suggested changes from AI fixes
-     */
-    export interface SuggestedChanges {
-      /**
-       * List of all files with their current contents. Only present when
-       * response_encoding is "json".
-       */
-      all_files?: Array<SuggestedChanges.AllFile> | null;
-
-      /**
-       * List of changed files with their new contents. Only present when
-       * response_encoding is "json".
-       */
-      changed_files?: Array<SuggestedChanges.ChangedFile> | null;
-
-      /**
-       * Unified diff of changes. Only present when response_encoding is "json".
-       */
-      diff?: string | null;
-    }
-
-    export namespace SuggestedChanges {
-      export interface AllFile {
-        /**
-         * Contents of the file
-         */
-        contents: string;
-
-        /**
-         * Path of the file
-         */
-        path: string;
-      }
-
-      export interface ChangedFile {
-        /**
-         * Contents of the file
-         */
-        contents: string;
-
-        /**
-         * Path of the file
-         */
-        path: string;
-      }
+      status: string;
     }
   }
 
