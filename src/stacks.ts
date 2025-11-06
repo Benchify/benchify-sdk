@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import { Benchify } from './client';
 import { type BinaryFileData, packWithManifest, normalizePath } from './lib/helpers';
-import { StackExecuteCommandResponse, StackGetLogsResponse, type StackRetrieveResponse } from './resources/stacks';
+import { StackExecuteCommandResponse, type StackRetrieveResponse } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
 
@@ -156,7 +156,7 @@ export class StackHandle {
     return response;
   }
   async getSandboxIP(): Promise<string> {
-    const response = await this.executeCommand("hostname -i")
+    const response = await this.executeCommand('hostname -i');
     return response.stdout.trim();
   }
 
@@ -360,7 +360,7 @@ export class Stacks {
 
   async waitForDevServerURL(
     id: string,
-    params?: { interval?: string; timeout?: string },
+    params?: { interval?: number; timeout?: number },
   ): Promise<{ url: string }> {
     return await this._client.stacks.waitForDevServerURL(id, params);
   }

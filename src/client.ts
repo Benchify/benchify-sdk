@@ -16,6 +16,12 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
+import { Fix, FixCreateAIFallbackParams, FixCreateAIFallbackResponse } from './resources/fix';
+import {
+  FixParsingAndDiagnose,
+  FixParsingAndDiagnoseDetectIssuesParams,
+  FixParsingAndDiagnoseDetectIssuesResponse,
+} from './resources/fix-parsing-and-diagnose';
 import {
   FixStringLiteralCreateParams,
   FixStringLiteralCreateResponse,
@@ -1012,42 +1018,43 @@ export class Benchify {
         bundle: bundleEnabled,
       });
 
-    // Check if response is a raw Response object (multipart)
-    if (apiResponse instanceof Response) {
-      const contentType = apiResponse.headers.get('content-type');
-      if (contentType?.includes('multipart/form-data')) {
-        // Parse the multipart response
-        const formData = await apiResponse.formData();
-        const parsedResponse: any = {};
-        
-        // Extract all parts from the FormData
-        for (const [key, value] of formData.entries()) {
-          if (value instanceof Blob) {
-            if (key === 'response') {
-              // Parse the JSON response metadata
-              const text = await value.text();
-              parsedResponse.data = JSON.parse(text);
-            } else if (key === 'files_data' || key === 'bundle_data') {
-              // Convert blob to base64 for tar.zst files
-              const buffer = await value.arrayBuffer();
-              parsedResponse[key] = Buffer.from(buffer).toString('base64');
-            } else if (key === 'files_manifest' || key === 'bundle_manifest') {
-              // Parse JSON manifests
-              const text = await value.text();
-              parsedResponse[key] = JSON.parse(text);
+      // Check if response is a raw Response object (multipart)
+      if (apiResponse instanceof Response) {
+        const contentType = apiResponse.headers.get('content-type');
+        if (contentType?.includes('multipart/form-data')) {
+          // Parse the multipart response
+          const formData = await apiResponse.formData();
+          const parsedResponse: any = {};
+
+          // Extract all parts from the FormData
+          for (const [key, value] of formData.entries()) {
+            if (value instanceof Blob) {
+              if (key === 'response') {
+                // Parse the JSON response metadata
+                const text = await value.text();
+                parsedResponse.data = JSON.parse(text);
+              } else if (key === 'files_data' || key === 'bundle_data') {
+                // Convert blob to base64 for tar.zst files
+                const buffer = await value.arrayBuffer();
+                parsedResponse[key] = Buffer.from(buffer).toString('base64');
+              } else if (key === 'files_manifest' || key === 'bundle_manifest') {
+                // Parse JSON manifests
+                const text = await value.text();
+                parsedResponse[key] = JSON.parse(text);
+              }
             }
           }
-        }
-        
-        // Use the parsed response
-        apiResponse = parsedResponse;
-      }
-    }
 
-    // Extract response metadata JSON
-    const responseMetadata = apiResponse.data;
-    const initialDiagnostics = responseMetadata.initial_diagnostics;
-    const finalDiagnostics = responseMetadata.final_diagnostics;
+          // Use the parsed response
+          apiResponse = parsedResponse;
+        }
+      }
+
+      // Extract response metadata JSON
+      const responseData = apiResponse.data;
+      const suggestedChanges = responseData.suggested_changes;
+      const initialDiagnostics = responseData.initial_diagnostics;
+      const finalDiagnostics = responseData.final_diagnostics;
 
       let resultFiles: FixerOutput<T>;
 
@@ -1055,7 +1062,7 @@ export class Benchify {
         resultFiles = (suggestedChanges?.diff || '') as FixerOutput<T>;
       } else {
         // ALL_FILES or CHANGED_FILES
-        const filesArray = suggestedChanges?.files || [];
+        const filesArray = suggestedChanges?.all_files || [];
         resultFiles = filesArray as FixerOutput<T>;
       }
 
@@ -1090,12 +1097,16 @@ export class Benchify {
 
   // User-friendly wrapper for stacks (singular to avoid collision with low-level API)
   stack: Stacks = new Stacks(this);
+  fixParsingAndDiagnose: API.FixParsingAndDiagnose = new API.FixParsingAndDiagnose(this);
+  fix: API.Fix = new API.Fix(this);
 }
 
 Benchify.Fixer = Fixer;
 Benchify.Stacks = StacksAPI;
 Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
+Benchify.FixParsingAndDiagnose = FixParsingAndDiagnose;
+Benchify.Fix = Fix;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
@@ -1130,6 +1141,18 @@ export declare namespace Benchify {
     ValidateTemplate as ValidateTemplate,
     type ValidateTemplateValidateResponse as ValidateTemplateValidateResponse,
     type ValidateTemplateValidateParams as ValidateTemplateValidateParams,
+  };
+
+  export {
+    FixParsingAndDiagnose as FixParsingAndDiagnose,
+    type FixParsingAndDiagnoseDetectIssuesResponse as FixParsingAndDiagnoseDetectIssuesResponse,
+    type FixParsingAndDiagnoseDetectIssuesParams as FixParsingAndDiagnoseDetectIssuesParams,
+  };
+
+  export {
+    Fix as Fix,
+    type FixCreateAIFallbackResponse as FixCreateAIFallbackResponse,
+    type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
 }
 

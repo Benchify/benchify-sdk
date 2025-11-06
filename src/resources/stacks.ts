@@ -570,14 +570,14 @@ export interface StackGetLogsParams {
 
 export interface StackWaitForDevServerURLParams {
   /**
-   * Polling interval in ms
+   * Polling interval in milliseconds
    */
-  interval?: string;
+  interval?: number;
 
   /**
    * Timeout in seconds
    */
-  timeout?: string;
+  wait_timeout?: number;
 }
 
 export declare namespace Stacks {
