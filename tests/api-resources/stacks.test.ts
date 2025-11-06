@@ -161,6 +161,23 @@ describe('resource stacks', () => {
   });
 
   // Prism tests are disabled
+  test.skip('readFile: only required params', async () => {
+    const responsePromise = client.stacks.readFile('stk_abc123', { path: '/workspace/index.html' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('readFile: required and optional params', async () => {
+    const response = await client.stacks.readFile('stk_abc123', { path: '/workspace/index.html' });
+  });
+
+  // Prism tests are disabled
   test.skip('waitForDevServerURL', async () => {
     const responsePromise = client.stacks.waitForDevServerURL('stk_abc123');
     const rawResponse = await responsePromise.asResponse();
@@ -182,5 +199,28 @@ describe('resource stacks', () => {
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Benchify.NotFoundError);
+  });
+
+  // Prism tests are disabled
+  test.skip('writeFile: only required params', async () => {
+    const responsePromise = client.stacks.writeFile('stk_abc123', {
+      content: 'content',
+      path: '/workspace/index.html',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('writeFile: required and optional params', async () => {
+    const response = await client.stacks.writeFile('stk_abc123', {
+      content: 'content',
+      path: '/workspace/index.html',
+    });
   });
 });

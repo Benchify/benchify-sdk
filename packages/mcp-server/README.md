@@ -238,7 +238,9 @@ The following tools are available in this MCP server.
 - `execute_command_stacks` (`write`): Run a command in the sandbox container and get the output
 - `get_logs_stacks` (`read`): Retrieve logs from all services in the stack
 - `get_network_info_stacks` (`read`): Retrieve network details for a stack including URLs and connection info
+- `read_file_stacks` (`read`): Reads file content from inside the sandbox (using exec under the hood)
 - `wait_for_dev_server_url_stacks` (`read`): Poll stack logs until a dev server URL is detected or timeout
+- `write_file_stacks` (`write`): Writes file content to a path inside the sandbox (via mount or exec under the hood)
 
 ### Resource `fix_string_literals`:
 

@@ -172,6 +172,25 @@ export class Stacks extends APIResource {
   }
 
   /**
+   * Reads file content from inside the sandbox (using exec under the hood)
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.readFile(
+   *   'stk_abc123',
+   *   { path: '/workspace/index.html' },
+   * );
+   * ```
+   */
+  readFile(
+    id: string,
+    query: StackReadFileParams,
+    options?: RequestOptions,
+  ): APIPromise<StackReadFileResponse> {
+    return this._client.get(path`/v1/stacks/${id}/read-file`, { query, ...options });
+  }
+
+  /**
    * Poll stack logs until a dev server URL is detected or timeout
    *
    * @example
@@ -187,6 +206,26 @@ export class Stacks extends APIResource {
     options?: RequestOptions,
   ): APIPromise<StackWaitForDevServerURLResponse> {
     return this._client.get(path`/v1/stacks/${id}/wait-url`, { query, ...options });
+  }
+
+  /**
+   * Writes file content to a path inside the sandbox (via mount or exec under the
+   * hood)
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.writeFile(
+   *   'stk_abc123',
+   *   { content: 'content', path: '/workspace/index.html' },
+   * );
+   * ```
+   */
+  writeFile(
+    id: string,
+    body: StackWriteFileParams,
+    options?: RequestOptions,
+  ): APIPromise<StackWriteFileResponse> {
+    return this._client.post(path`/v1/stacks/${id}/write-file`, { body, ...options });
   }
 }
 
@@ -471,8 +510,24 @@ export interface StackGetNetworkInfoResponse {
   service_url: string;
 }
 
+export interface StackReadFileResponse {
+  content: string;
+
+  path: string;
+}
+
 export interface StackWaitForDevServerURLResponse {
   url: string;
+}
+
+export interface StackWriteFileResponse {
+  host_path?: string;
+
+  message?: string;
+
+  method?: string;
+
+  sandbox_path?: string;
 }
 
 export interface StackCreateParams {
@@ -565,6 +620,13 @@ export interface StackGetLogsParams {
   tail?: string;
 }
 
+export interface StackReadFileParams {
+  /**
+   * Absolute path inside the sandbox
+   */
+  path: string;
+}
+
 export interface StackWaitForDevServerURLParams {
   /**
    * Polling interval in milliseconds
@@ -577,6 +639,18 @@ export interface StackWaitForDevServerURLParams {
   wait_timeout?: number;
 }
 
+export interface StackWriteFileParams {
+  /**
+   * File contents
+   */
+  content: string;
+
+  /**
+   * Absolute path inside the sandbox
+   */
+  path: string;
+}
+
 export declare namespace Stacks {
   export {
     type StackCreateResponse as StackCreateResponse,
@@ -586,12 +660,16 @@ export declare namespace Stacks {
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
+    type StackReadFileResponse as StackReadFileResponse,
     type StackWaitForDevServerURLResponse as StackWaitForDevServerURLResponse,
+    type StackWriteFileResponse as StackWriteFileResponse,
     type StackCreateParams as StackCreateParams,
     type StackUpdateParams as StackUpdateParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
+    type StackReadFileParams as StackReadFileParams,
     type StackWaitForDevServerURLParams as StackWaitForDevServerURLParams,
+    type StackWriteFileParams as StackWriteFileParams,
   };
 }
