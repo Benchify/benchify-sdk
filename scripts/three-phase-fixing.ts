@@ -170,7 +170,10 @@ async function test3PhaseChain() {
 
     // Display remaining diagnostics
     const remaining = step2Result.data.remaining_diagnostics.file_to_diagnostics || {};
-    const remainingCount = Object.values(remaining).reduce((sum: number, diags: any) => sum + diags.length, 0);
+    const remainingCount = Object.values(remaining).reduce(
+      (sum: number, diags: any) => sum + diags.length,
+      0,
+    );
     console.log(`📋 Remaining issues: ${remainingCount}`);
     if (remainingCount > 0) {
       Object.entries(remaining).forEach(([filePath, issues]: [string, any]) => {
@@ -281,9 +284,9 @@ async function test3PhaseChain() {
   console.log('✅ Phase 1 (Detection): Found issues and categorized them');
   console.log('✅ Phase 2 (Standard Fixes): Applied deterministic fixes');
   console.log(
-    hasRemainingIssues
-      ? '✅ Phase 3 (AI Fallback): Handled complex issues'
-      : 'ℹ️  Phase 3 (AI Fallback): Skipped (no remaining issues)',
+    hasRemainingIssues ?
+      '✅ Phase 3 (AI Fallback): Handled complex issues'
+    : 'ℹ️  Phase 3 (AI Fallback): Skipped (no remaining issues)',
   );
   console.log('');
   console.log('🎉 All 3 phases completed successfully!');

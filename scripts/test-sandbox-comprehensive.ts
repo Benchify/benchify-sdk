@@ -516,4 +516,3 @@ main().catch((error) => {
   console.error('='.repeat(80));
   process.exit(1);
 });
-
