@@ -180,6 +180,26 @@ describe('resource stacks', () => {
   });
 
   // Prism tests are disabled
+  test.skip('reset: only required params', async () => {
+    const responsePromise = client.stacks.reset('stk_abc123', { tarball_base64: 'tarball_base64' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('reset: required and optional params', async () => {
+    const response = await client.stacks.reset('stk_abc123', {
+      tarball_base64: 'tarball_base64',
+      tarball_filename: 'project.tar.gz',
+    });
+  });
+
+  // Prism tests are disabled
   test.skip('waitForDevServerURL', async () => {
     const responsePromise = client.stacks.waitForDevServerURL('stk_abc123');
     const rawResponse = await responsePromise.asResponse();

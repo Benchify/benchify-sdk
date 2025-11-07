@@ -22,6 +22,7 @@ export {
   type StackGetLogsResponse,
   type StackGetNetworkInfoResponse,
   type StackReadFileResponse,
+  type StackResetResponse,
   type StackWaitForDevServerURLResponse,
   type StackWriteFileResponse,
   type StackCreateParams,
@@ -30,6 +31,7 @@ export {
   type StackExecuteCommandParams,
   type StackGetLogsParams,
   type StackReadFileParams,
+  type StackResetParams,
   type StackWaitForDevServerURLParams,
   type StackWriteFileParams,
 } from './stacks';

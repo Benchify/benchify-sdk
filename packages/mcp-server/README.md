@@ -255,6 +255,7 @@ The following tools are available in this MCP server.
 - `get_logs_stacks` (`read`): Retrieve logs from all services in the stack
 - `get_network_info_stacks` (`read`): Retrieve network details for a stack including URLs and connection info
 - `read_file_stacks` (`read`): Reads file content from inside the sandbox (using exec under the hood)
+- `reset_stacks` (`write`): Clears /workspace and extracts a new tarball into the sandbox. Use tarball_base64 and optional tarball_filename.
 - `wait_for_dev_server_url_stacks` (`read`): Poll stack logs until a dev server URL is detected or timeout
 - `write_file_stacks` (`write`): Writes file content to a path inside the sandbox (via mount or exec under the hood)
 

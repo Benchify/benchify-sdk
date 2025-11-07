@@ -20,6 +20,7 @@ Types:
 - <code><a href="./src/resources/stacks.ts">StackGetLogsResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackGetNetworkInfoResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackReadFileResponse</a></code>
+- <code><a href="./src/resources/stacks.ts">StackResetResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackWaitForDevServerURLResponse</a></code>
 - <code><a href="./src/resources/stacks.ts">StackWriteFileResponse</a></code>
 
@@ -34,6 +35,7 @@ Methods:
 - <code title="get /v1/stacks/{id}/logs">client.stacks.<a href="./src/resources/stacks.ts">getLogs</a>(id, { ...params }) -> StackGetLogsResponse</code>
 - <code title="get /v1/stacks/{id}/network-info">client.stacks.<a href="./src/resources/stacks.ts">getNetworkInfo</a>(id) -> StackGetNetworkInfoResponse</code>
 - <code title="get /v1/stacks/{id}/read-file">client.stacks.<a href="./src/resources/stacks.ts">readFile</a>(id, { ...params }) -> StackReadFileResponse</code>
+- <code title="post /v1/stacks/{id}/reset">client.stacks.<a href="./src/resources/stacks.ts">reset</a>(id, { ...params }) -> StackResetResponse</code>
 - <code title="get /v1/stacks/{id}/wait-url">client.stacks.<a href="./src/resources/stacks.ts">waitForDevServerURL</a>(id, { ...params }) -> StackWaitForDevServerURLResponse</code>
 - <code title="post /v1/stacks/{id}/write-file">client.stacks.<a href="./src/resources/stacks.ts">writeFile</a>(id, { ...params }) -> StackWriteFileResponse</code>
 
