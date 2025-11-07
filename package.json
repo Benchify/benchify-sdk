@@ -1,6 +1,6 @@
 {
   "name": "benchify",
-  "version": "0.1.0-alpha.77",
+  "version": "0.1.0-alpha.78",
   "description": "The official TypeScript library for the Benchify API",
   "author": "Benchify <support@benchify.com>",
   "types": "dist/index.d.ts",
