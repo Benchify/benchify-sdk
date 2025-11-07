@@ -9,6 +9,7 @@ import {
   StackWriteFileResponse,
   type StackRetrieveResponse,
   StackReadFileResponse,
+  StackResetResponse,
 } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
@@ -167,6 +168,10 @@ export class StackHandle {
   }
   async writeFile(path: string, content: string): Promise<StackWriteFileResponse> {
     const response = await this._client.stacks.writeFile(this._id, { path, content });
+    return response;
+  }
+  async resetSandbox(tarballBase64: string, tarballFilename: string): Promise<StackResetResponse> {
+    const response = await this._client.stacks.reset(this._id, { tarball_base64: tarballBase64, tarball_filename: tarballFilename });
     return response;
   }
   async readFile(path: string): Promise<StackReadFileResponse> {
