@@ -50,6 +50,7 @@ const fuse = new Fuse(
     'client.stacks.getLogs',
     'client.stacks.getNetworkInfo',
     'client.stacks.readFile',
+    'client.stacks.reset',
     'client.stacks.retrieve',
     'client.stacks.update',
     'client.stacks.waitForDevServerURL',
