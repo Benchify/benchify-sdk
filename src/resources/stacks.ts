@@ -191,6 +191,21 @@ export class Stacks extends APIResource {
   }
 
   /**
+   * Clears /workspace and extracts a new tarball into the sandbox. Use
+   * tarball_base64 and optional tarball_filename.
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.reset('stk_abc123', {
+   *   tarball_base64: 'tarball_base64',
+   * });
+   * ```
+   */
+  reset(id: string, body: StackResetParams, options?: RequestOptions): APIPromise<StackResetResponse> {
+    return this._client.post(path`/v1/stacks/${id}/reset`, { body, ...options });
+  }
+
+  /**
    * Poll stack logs until a dev server URL is detected or timeout
    *
    * @example
@@ -516,6 +531,12 @@ export interface StackReadFileResponse {
   path: string;
 }
 
+export interface StackResetResponse {
+  message: string;
+
+  id?: string;
+}
+
 export interface StackWaitForDevServerURLResponse {
   url: string;
 }
@@ -627,6 +648,18 @@ export interface StackReadFileParams {
   path: string;
 }
 
+export interface StackResetParams {
+  /**
+   * Base64-encoded tarball content
+   */
+  tarball_base64: string;
+
+  /**
+   * Optional tarball filename
+   */
+  tarball_filename?: string;
+}
+
 export interface StackWaitForDevServerURLParams {
   /**
    * Polling interval in milliseconds
@@ -661,6 +694,7 @@ export declare namespace Stacks {
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
     type StackReadFileResponse as StackReadFileResponse,
+    type StackResetResponse as StackResetResponse,
     type StackWaitForDevServerURLResponse as StackWaitForDevServerURLResponse,
     type StackWriteFileResponse as StackWriteFileResponse,
     type StackCreateParams as StackCreateParams,
@@ -669,6 +703,7 @@ export declare namespace Stacks {
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
     type StackReadFileParams as StackReadFileParams,
+    type StackResetParams as StackResetParams,
     type StackWaitForDevServerURLParams as StackWaitForDevServerURLParams,
     type StackWriteFileParams as StackWriteFileParams,
   };
