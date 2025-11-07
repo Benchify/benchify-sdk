@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.77 (2025-11-07)
+
+Full Changelog: [v0.1.0-alpha.76...v0.1.0-alpha.77](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.76...v0.1.0-alpha.77)
+
+### Features
+
+* **api:** manual updates ([f858b6d](https://github.com/Benchify/benchify-sdk/commit/f858b6d80c3f1a54d575fa8823da60dfbe23f70b))
+
+
+### Documentation
+
+* **mcp:** add a README link to add server to VS Code or Claude Code ([8853992](https://github.com/Benchify/benchify-sdk/commit/8853992f1f0f20d3f694a997f84b480a587494c6))
+
 ## 0.1.0-alpha.76 (2025-11-06)
 
 Full Changelog: [v0.1.0-alpha.75...v0.1.0-alpha.76](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.75...v0.1.0-alpha.76)
