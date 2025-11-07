@@ -58,6 +58,7 @@ const fuse = new Fuse(
     'client.validateTemplate.validate',
     'client.fixParsingAndDiagnose.detectIssues',
     'client.fix.createAIFallback',
+    'client.fix.standard.create',
   ],
   { threshold: 1, shouldSort: true },
 );
