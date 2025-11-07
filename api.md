@@ -71,8 +71,18 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/fix.ts">FixCreateAIFallbackResponse</a></code>
+- <code><a href="./src/resources/fix/fix.ts">FixCreateAIFallbackResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/fix/ai-fallback">client.fix.<a href="./src/resources/fix.ts">createAIFallback</a>({ ...params }) -> FixCreateAIFallbackResponse</code>
+- <code title="post /v1/fix/ai-fallback">client.fix.<a href="./src/resources/fix/fix.ts">createAIFallback</a>({ ...params }) -> FixCreateAIFallbackResponse</code>
+
+## Standard
+
+Types:
+
+- <code><a href="./src/resources/fix/standard.ts">StandardCreateResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/fix-standard">client.fix.standard.<a href="./src/resources/fix/standard.ts">create</a>({ ...params }) -> StandardCreateResponse</code>
