@@ -273,3 +273,7 @@ The following tools are available in this MCP server.
 ### Resource `fix`:
 
 - `create_ai_fallback_fix` (`write`): AI-powered fallback for complex issues. Phase 3 of the 3-phase architecture. Handles issues that standard fixers cannot resolve. Uses LLM to understand and fix complex problems. Provides confidence scores and alternative suggestions.
+
+### Resource `fix.standard`:
+
+- `create_fix_standard` (`write`): Standard fixes endpoint - applies non-parsing fixes. Phase 2 of the 3-phase architecture. Takes the output from Phase 1 (detection) and applies CSS, UI, dependency, and type fixes. The output can be used as input to Phase 3 (AI fallback).
