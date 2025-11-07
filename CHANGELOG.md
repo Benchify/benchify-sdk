@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.78 (2025-11-07)
+
+Full Changelog: [v0.1.0-alpha.77...v0.1.0-alpha.78](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.77...v0.1.0-alpha.78)
+
+### Features
+
+* **api:** manual updates ([135df22](https://github.com/Benchify/benchify-sdk/commit/135df22365c6a3c55f7495f9002450692a10e458))
+
 ## 0.1.0-alpha.77 (2025-11-07)
 
 Full Changelog: [v0.1.0-alpha.76...v0.1.0-alpha.77](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.76...v0.1.0-alpha.77)
