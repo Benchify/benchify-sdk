@@ -1,17 +1,12 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { Fix, type FixCreateAIFallbackResponse, type FixCreateAIFallbackParams } from './fix/fix';
 export {
-  FixParsingAndDiagnose,
-  type FixParsingAndDiagnoseDetectIssuesResponse,
-  type FixParsingAndDiagnoseDetectIssuesParams,
-} from './fix-parsing-and-diagnose';
-export {
-  FixStringLiterals,
-  type FixStringLiteralCreateResponse,
-  type FixStringLiteralCreateParams,
-} from './fix-string-literals';
-export { Fixer, type FixerRunResponse, type FixerRunParams } from './fixer';
+  Bundle,
+  type BundleCreateResponse,
+  type BundleCreateFilesResponse,
+  type BundleCreateParams,
+  type BundleCreateFilesParams,
+} from './bundle';
 export {
   Stacks,
   type StackCreateResponse,
@@ -34,10 +29,4 @@ export {
   type StackResetParams,
   type StackWaitForDevServerURLParams,
   type StackWriteFileParams,
-} from './stacks/stacks';
-export { Test } from './test';
-export {
-  ValidateTemplate,
-  type ValidateTemplateValidateResponse,
-  type ValidateTemplateValidateParams,
-} from './validate-template';
+} from './stacks';

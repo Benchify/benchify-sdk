@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.0-alpha.80 (2025-11-08)
+
+Full Changelog: [v0.1.0-alpha.79...v0.1.0-alpha.80](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.79...v0.1.0-alpha.80)
+
+### Features
+
+* **api:** api update ([89b7cc8](https://github.com/Benchify/benchify-sdk/commit/89b7cc8fc55591fd6162b5af24d4edabbfe597cb))
+* **api:** api update ([2b3e460](https://github.com/Benchify/benchify-sdk/commit/2b3e4602ac9b148c3ede2cf099f0be36dddcd648))
+* **api:** manual updates ([ffe64b7](https://github.com/Benchify/benchify-sdk/commit/ffe64b707a8973e75f777b53911fc90df0f6c75b))
+* **api:** manual updates ([a82cb5d](https://github.com/Benchify/benchify-sdk/commit/a82cb5d5fc8342c7d0b0910137549c7d8db1860c))
+* **api:** manual updates ([29089a2](https://github.com/Benchify/benchify-sdk/commit/29089a21f65a2009194a8aae5401a528d1c864b3))
+
+
+### Chores
+
+* **internal:** codegen related update ([06d9d4b](https://github.com/Benchify/benchify-sdk/commit/06d9d4bd6ee6a010c2fce2ae6075ee52233e90b8))
+
 ## 0.1.0-alpha.79 (2025-11-07)
 
 Full Changelog: [v0.1.0-alpha.78...v0.1.0-alpha.79](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.78...v0.1.0-alpha.79)
