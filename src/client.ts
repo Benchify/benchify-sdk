@@ -51,6 +51,7 @@ import {
   StackWriteFileResponse,
   Stacks as StacksAPI,
 } from './resources/stacks';
+import { Test, TestRetrieveResponse } from './resources/test';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
@@ -1104,6 +1105,7 @@ export class Benchify {
   stack: Stacks = new Stacks(this);
   fixParsingAndDiagnose: API.FixParsingAndDiagnose = new API.FixParsingAndDiagnose(this);
   fix: API.Fix = new API.Fix(this);
+  test: API.Test = new API.Test(this);
 }
 
 Benchify.Fixer = Fixer;
@@ -1112,6 +1114,7 @@ Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
 Benchify.FixParsingAndDiagnose = FixParsingAndDiagnose;
 Benchify.Fix = Fix;
+Benchify.Test = Test;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
@@ -1165,6 +1168,8 @@ export declare namespace Benchify {
     type FixCreateAIFallbackResponse as FixCreateAIFallbackResponse,
     type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
+
+  export { Test as Test, type TestRetrieveResponse as TestRetrieveResponse };
 }
 
 export interface Benchify {

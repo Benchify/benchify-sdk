@@ -60,6 +60,7 @@ const fuse = new Fuse(
     'client.fixParsingAndDiagnose.detectIssues',
     'client.fix.createAIFallback',
     'client.fix.standard.create',
+    'client.test.retrieve',
   ],
   { threshold: 1, shouldSort: true },
 );

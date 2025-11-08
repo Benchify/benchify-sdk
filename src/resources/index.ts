@@ -35,6 +35,7 @@ export {
   type StackWaitForDevServerURLParams,
   type StackWriteFileParams,
 } from './stacks';
+export { Test, type TestRetrieveResponse } from './test';
 export {
   ValidateTemplate,
   type ValidateTemplateValidateResponse,
