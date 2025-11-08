@@ -259,6 +259,11 @@ The following tools are available in this MCP server.
 - `wait_for_dev_server_url_stacks` (`read`): Poll stack logs until a dev server URL is detected or timeout
 - `write_file_stacks` (`write`): Writes file content to a path inside the sandbox (via mount or exec under the hood)
 
+### Resource `stacks.bundle`:
+
+- `create_stacks_bundle` (`write`): Accepts a base64 tarball and forwards to the external Sandbox Manager /sandbox/bundle endpoint.
+- `create_files_stacks_bundle` (`write`): Accepts a JSON array of {path, content}, packs into a tar.zst, and forwards to the Sandbox Manager /sandbox/bundle endpoint.
+
 ### Resource `fix_string_literals`:
 
 - `create_fix_string_literals` (`write`): Fix string literal issues in TypeScript files.

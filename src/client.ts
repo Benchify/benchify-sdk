@@ -50,7 +50,7 @@ import {
   StackWriteFileParams,
   StackWriteFileResponse,
   Stacks as StacksAPI,
-} from './resources/stacks';
+} from './resources/stacks/stacks';
 import { Test } from './resources/test';
 import {
   ValidateTemplate,
