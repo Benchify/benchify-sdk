@@ -42,9 +42,9 @@ export class Fix extends APIResource {
    *       ],
    *     },
    *   },
-   *   template_path: 'benchify/default-template',
    *   include_context: true,
    *   max_attempts: 3,
+   *   template_path: 'benchify/default-template',
    * });
    * ```
    */
@@ -196,11 +196,6 @@ export interface FixCreateAIFallbackParams {
   remaining_diagnostics: FixCreateAIFallbackParams.RemainingDiagnostics;
 
   /**
-   * Full path to the template
-   */
-  template_path: string;
-
-  /**
    * Unique identifier for the event
    */
   event_id?: string;
@@ -219,6 +214,12 @@ export interface FixCreateAIFallbackParams {
    * Meta information for the request
    */
   meta?: FixCreateAIFallbackParams.Meta | null;
+
+  /**
+   * Template path for project context (defaults to benchify/default-template if not
+   * provided)
+   */
+  template_path?: string;
 }
 
 export namespace FixCreateAIFallbackParams {
