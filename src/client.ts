@@ -27,6 +27,13 @@ import {
   FixStringLiterals,
 } from './resources/fix-string-literals';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
+import { Test } from './resources/test';
+import {
+  ValidateTemplate,
+  ValidateTemplateValidateParams,
+  ValidateTemplateValidateResponse,
+} from './resources/validate-template';
+import { Fix, FixCreateAIFallbackParams, FixCreateAIFallbackResponse } from './resources/fix/fix';
 import {
   StackCreateAndRunParams,
   StackCreateAndRunResponse,
@@ -49,14 +56,7 @@ import {
   StackWriteFileParams,
   StackWriteFileResponse,
   Stacks,
-} from './resources/stacks';
-import { Test } from './resources/test';
-import {
-  ValidateTemplate,
-  ValidateTemplateValidateParams,
-  ValidateTemplateValidateResponse,
-} from './resources/validate-template';
-import { Fix, FixCreateAIFallbackParams, FixCreateAIFallbackResponse } from './resources/fix/fix';
+} from './resources/stacks/stacks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
