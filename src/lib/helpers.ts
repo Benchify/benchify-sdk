@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import { minimatch } from 'minimatch';
 import * as tar from 'tar-stream';
 import * as zstd from '@mongodb-js/zstd';
-import type Benchify from '../client';
+import { Benchify } from '../client';
 
 export interface FileData {
   path: string;
