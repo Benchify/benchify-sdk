@@ -22,7 +22,6 @@ import validate_validate_template from './validate-template/validate-validate-te
 import detect_issues_fix_parsing_and_diagnose from './fix-parsing-and-diagnose/detect-issues-fix-parsing-and-diagnose';
 import create_ai_fallback_fix from './fix/create-ai-fallback-fix';
 import create_fix_standard from './fix/standard/create-fix-standard';
-import retrieve_test from './test/retrieve-test';
 
 export const endpoints: Endpoint[] = [];
 
@@ -48,7 +47,6 @@ addEndpoint(validate_validate_template);
 addEndpoint(detect_issues_fix_parsing_and_diagnose);
 addEndpoint(create_ai_fallback_fix);
 addEndpoint(create_fix_standard);
-addEndpoint(retrieve_test);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';
