@@ -278,7 +278,3 @@ The following tools are available in this MCP server.
 ### Resource `fix.standard`:
 
 - `create_fix_standard` (`write`): Standard fixes endpoint - applies non-parsing fixes. Phase 2 of the 3-phase architecture. Takes the output from Phase 1 (detection) and applies CSS, UI, dependency, and type fixes. The output can be used as input to Phase 3 (AI fallback).
-
-### Resource `test`:
-
-- `retrieve_test` (`read`): Simple test endpoint that returns hello

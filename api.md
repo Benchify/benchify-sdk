@@ -90,11 +90,3 @@ Methods:
 - <code title="post /v1/fix-standard">client.fix.standard.<a href="./src/resources/fix/standard.ts">create</a>({ ...params }) -> StandardCreateResponse</code>
 
 # Test
-
-Types:
-
-- <code><a href="./src/resources/test.ts">TestRetrieveResponse</a></code>
-
-Methods:
-
-- <code title="get /v1/test">client.test.<a href="./src/resources/test.ts">retrieve</a>() -> TestRetrieveResponse</code>

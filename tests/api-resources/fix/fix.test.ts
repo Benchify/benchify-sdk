@@ -15,6 +15,7 @@ describe('resource fix', () => {
         { contents: 'export function complexFunction() { /* complex logic */ }', path: 'src/complex.ts' },
       ],
       remaining_diagnostics: {},
+      template_path: 'benchify/default-template',
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -45,11 +46,11 @@ describe('resource fix', () => {
           ],
         },
       },
+      template_path: 'benchify/default-template',
       event_id: '',
       include_context: true,
       max_attempts: 3,
       meta: { external_id: 'external_id' },
-      template_path: 'benchify/default-template',
     });
   });
 });

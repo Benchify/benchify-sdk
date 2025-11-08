@@ -51,7 +51,7 @@ import {
   StackWriteFileResponse,
   Stacks as StacksAPI,
 } from './resources/stacks';
-import { Test, TestRetrieveResponse } from './resources/test';
+import { Test } from './resources/test';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
@@ -1169,7 +1169,7 @@ export declare namespace Benchify {
     type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
 
-  export { Test as Test, type TestRetrieveResponse as TestRetrieveResponse };
+  export { Test as Test };
 }
 
 export interface Benchify {
