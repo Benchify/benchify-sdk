@@ -395,7 +395,7 @@ export async function bundleAndExtract(
   let responsePath: string;
 
   if (dir) {
-    const files = await collectFiles({ basePath: dir, patterns: patterns ?? ['**/*'], ignore: ignore ?? DEFAULT_IGNORE });
+    const files = await collectFiles({ basePath: dir, patterns: patterns ?? ['**/*'] , ignore: ignore ?? DEFAULT_IGNORE });
     const resp = await client.stacks.bundle.createFiles({
       entrypoint,
       files: files.map((f) => ({ path: f.path, content: f.contents })),
