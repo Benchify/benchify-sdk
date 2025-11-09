@@ -97,5 +97,3 @@ describe('bundleAndExtract wrapper', () => {
     ).rejects.toThrow(/exactly one of "dir" or "tarballPath"/i);
   });
 });
-
-
