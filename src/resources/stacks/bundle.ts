@@ -3,8 +3,6 @@
 import { APIResource } from '../../core/resource';
 import { APIPromise } from '../../core/api-promise';
 import { RequestOptions } from '../../internal/request-options';
-import {  } from '../../lib/helpers';
-
 export class Bundle extends APIResource {
   /**
    * Accepts a base64 tarball and forwards to the external Sandbox Manager
@@ -42,7 +40,6 @@ export class Bundle extends APIResource {
   ): APIPromise<BundleCreateFilesResponse> {
     return this._client.post('/v1/stacks/bundle/files', { body, ...options });
   }
-
 }
 
 export interface BundleCreateResponse {
@@ -72,7 +69,6 @@ export interface BundleCreateFilesParams {
    * Files to bundle
    */
   files: Array<BundleCreateFilesParams.File>;
-
   tarball_filename?: string;
 }
 

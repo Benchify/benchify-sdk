@@ -171,7 +171,10 @@ export class StackHandle {
     return response;
   }
   async resetSandbox(tarballBase64: string, tarballFilename: string): Promise<StackResetResponse> {
-    const response = await this._client.stacks.reset(this._id, { tarball_base64: tarballBase64, tarball_filename: tarballFilename });
+    const response = await this._client.stacks.reset(this._id, {
+      tarball_base64: tarballBase64,
+      tarball_filename: tarballFilename,
+    });
     return response;
   }
   async readFile(path: string): Promise<StackReadFileResponse> {
