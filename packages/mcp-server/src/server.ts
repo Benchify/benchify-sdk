@@ -34,7 +34,7 @@ export const newMcpServer = () =>
   new McpServer(
     {
       name: 'benchify_api',
-      version: '0.1.0-alpha.81',
+      version: '0.1.0-alpha.82',
     },
     { capabilities: { tools: {}, logging: {} } },
   );
