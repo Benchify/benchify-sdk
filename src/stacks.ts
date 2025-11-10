@@ -10,6 +10,7 @@ import {
   type StackRetrieveResponse,
   StackReadFileResponse,
   StackResetResponse,
+  StackGetLogsResponse,
 } from './resources/stacks';
 import { APIError, ConflictError } from './core/error';
 import { toFile, type Uploadable } from './core/uploads';
@@ -160,6 +161,10 @@ export class StackHandle {
   }
   async executeCommand(command: string): Promise<StackExecuteCommandResponse> {
     const response = await this._client.stacks.executeCommand(this._id, { command: ['sh', '-c', command] });
+    return response;
+  }
+  async getLogs(): Promise<StackGetLogsResponse> {
+    const response = await this._client.stacks.getLogs(this._id);
     return response;
   }
   async getSandboxIP(): Promise<string> {
