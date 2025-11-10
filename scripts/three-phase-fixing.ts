@@ -26,9 +26,7 @@ if (!API_KEY || !BASE_URL) {
   console.log('  - BENCHIFY_BASE_URL: Your local API URL (e.g., http://localhost:8082)');
   console.log('');
   console.log('Example:');
-  console.log(
-    '  BENCHIFY_API_KEY=your-key BENCHIFY_BASE_URL=http://localhost:8082 npm run test:three-phase',
-  );
+  console.log('  BENCHIFY_API_KEY=your-key BENCHIFY_BASE_URL=http://localhost:8082 npm run test:three-phase');
   process.exit(0);
 }
 
