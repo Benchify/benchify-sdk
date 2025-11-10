@@ -369,6 +369,148 @@ const client = new Benchify({
 });
 ```
 
+## Bundle and extract
+
+This guide shows how to use the high-level helper to bundle your project and extract the result with the Benchify SDK.
+
+### What it does
+- Takes either:
+  - a local directory of files, or
+  - a pre-built tarball file,
+- Calls the appropriate bundle endpoint,
+- Decodes the base64 response (tar.zst by default; gzip and raw tar are also handled),
+- Extracts the files into the output directory you specify.
+
+### Import
+```ts
+import Benchify from 'benchify';
+import { bundleAndExtract } from 'benchify/helpers';
+```
+
+### Directory → bundle → extract
+```ts
+const client = new Benchify({ apiKey: process.env.BENCHIFY_API_KEY! });
+
+const result = await bundleAndExtract(client, {
+  // Required: path inside the bundle you want the service to use
+  entrypoint: 'index.html',
+
+  // Provide a local directory to bundle
+  dir: '/absolute/path/to/your/app',
+
+  // Where the SDK will extract returned files
+  outputDir: '/tmp/benchify-out',
+
+  // Optional: filename hint on the server side
+  tarballFilename: 'project.tar.zst',
+
+  // Optional include/ignore globs. If omitted, all files are included
+  // except those in the default ignore list (e.g. node_modules/**).
+  // patterns: ['**/*'],
+  // ignore: ['node_modules/**', 'dist/**'],
+});
+
+console.log('Extracted to:', result.outputDir);
+console.log('Written files:', result.writtenPaths);
+```
+
+### Tarball → bundle → extract
+```ts
+const client = new Benchify({ apiKey: process.env.BENCHIFY_API_KEY! });
+
+const result = await bundleAndExtract(client, {
+  entrypoint: 'index.html',
+
+  // Provide a pre-built tarball (tar.zst, gzip, or raw tar)
+  tarballPath: '/absolute/path/to/bundle.tar.zst',
+
+  // Output destination on your machine
+  outputDir: '/tmp/benchify-out',
+
+  // Optional server-side filename hint
+  tarballFilename: 'bundle.tar.zst',
+});
+
+console.log('Extracted to:', result.outputDir);
+```
+
+### Bundling
+If you already have a packaged application as a tarball, you can send it directly. The helper supports:
+- Zstandard-compressed tarballs (.tar.zst) — preferred
+- Gzip-compressed tarballs (.tar.gz, .tgz)
+- Raw tar archives (.tar)
+
+```ts
+import Benchify from 'benchify';
+import { bundleAndExtract } from 'benchify/helpers';
+
+const client = new Benchify({ apiKey: process.env.BENCHIFY_API_KEY! });
+
+await bundleAndExtract(client, {
+  entrypoint: 'index.html',
+  tarballPath: '/absolute/path/to/app.tar.zst', // .tar.zst, .tar.gz, .tgz, or .tar
+  outputDir: '/tmp/benchify-out',
+  // Optional: server-side filename hint
+  tarballFilename: 'app.tar.zst',
+});
+```
+
+Create a tar.zst from a directory (recommended for size/perf):
+```bash
+tar -C /path/to/app -cf - . | zstd -19 -o app.tar.zst
+```
+
+Or a gzip tarball:
+```bash
+tar -C /path/to/app -czf app.tar.gz .
+```
+
+### Parameters
+- entrypoint (string, required): Path inside the bundle to serve as the entry (e.g., `index.html`).
+- outputDir (string, required): Local directory to write extracted files.
+- dir (string, optional): Local source directory. Mutually exclusive with `tarballPath`.
+- tarballPath (string, optional): Path to a pre-built tarball. Mutually exclusive with `dir`.
+- tarballFilename (string, optional): Hint for the service about the uploaded file name.
+- patterns (string[], optional): Glob patterns to include when using `dir`. Defaults to all files.
+- ignore (string[], optional): Glob patterns to exclude when using `dir`. Defaults to a sensible ignore list (e.g., `node_modules/**`, `dist/**`, etc.).
+
+### Return value
+```ts
+type BundleAndExtractResult = {
+  outputDir: string;     // absolute output directory path
+  writtenPaths: string[]; // absolute file paths written to disk
+  responsePath: string;  // path returned by the service (e.g., '/workspace')
+};
+```
+
+### Behavior and compatibility notes
+- Base64 handling: The response `content` is base64-encoded; the helper decodes it automatically.
+- Compression auto-detection: The helper detects zstd (default), gzip, and raw tar before extraction.
+- Input validation: You must provide exactly one of `dir` or `tarballPath`; otherwise an error is thrown.
+- API alignment: The helper uses:
+  - Files flow: `POST /v1/stacks/bundle/files` with `{ entrypoint, files: [{ path, content }], tarball_filename? }`.
+  - Tarball flow: `POST /v1/stacks/bundle` with `{ entrypoint, tarball_base64, tarball_filename? }`.
+
+### Minimal example
+```ts
+import Benchify from 'benchify';
+import { bundleAndExtract } from 'benchify/helpers';
+
+async function main() {
+  const client = new Benchify({ apiKey: process.env.BENCHIFY_API_KEY! });
+  await bundleAndExtract(client, {
+    entrypoint: 'index.html',
+    dir: '/path/to/app',
+    outputDir: '/tmp/benchify-out',
+  });
+}
+
+main().catch(console.error);
+```
+
+
+
+
 ## Frequently Asked Questions
 
 ## Semantic versioning
