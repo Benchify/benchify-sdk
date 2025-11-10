@@ -27,7 +27,6 @@ import {
   FixStringLiterals,
 } from './resources/fix-string-literals';
 import { Fixer, FixerRunParams, FixerRunResponse } from './resources/fixer';
-import { Test } from './resources/test';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
@@ -766,7 +765,6 @@ export class Benchify {
   validateTemplate: API.ValidateTemplate = new API.ValidateTemplate(this);
   fixParsingAndDiagnose: API.FixParsingAndDiagnose = new API.FixParsingAndDiagnose(this);
   fix: API.Fix = new API.Fix(this);
-  test: API.Test = new API.Test(this);
 }
 
 Benchify.Fixer = Fixer;
@@ -775,7 +773,6 @@ Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
 Benchify.FixParsingAndDiagnose = FixParsingAndDiagnose;
 Benchify.Fix = Fix;
-Benchify.Test = Test;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
@@ -829,6 +826,4 @@ export declare namespace Benchify {
     type FixCreateAIFallbackResponse as FixCreateAIFallbackResponse,
     type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
-
-  export { Test as Test };
 }

@@ -100,5 +100,3 @@ Types:
 Methods:
 
 - <code title="post /v1/fix-standard">client.fix.standard.<a href="./src/resources/fix/standard.ts">create</a>({ ...params }) -> StandardCreateResponse</code>
-
-# Test
