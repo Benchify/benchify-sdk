@@ -48,7 +48,6 @@ describe('resource standard', () => {
         },
       },
       bundle: true,
-      continuation_event_id: 'continuation_event_id',
       event_id: '',
       fix_types: ['css', 'ui', 'dependency', 'types'],
       meta: { external_id: 'external_id' },
