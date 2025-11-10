@@ -85,6 +85,11 @@ export namespace FixParsingAndDiagnoseDetectIssuesResponse {
     estimated_total_fix_time: number;
 
     /**
+     * Event ID for tracking this operation across steps
+     */
+    event_id: string;
+
+    /**
      * Number of files that were analyzed
      */
     files_analyzed: number;

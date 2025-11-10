@@ -196,6 +196,11 @@ export interface FixCreateAIFallbackParams {
   remaining_diagnostics: FixCreateAIFallbackParams.RemainingDiagnostics;
 
   /**
+   * Event ID from Step 1 to continue with the same temp directory
+   */
+  continuation_event_id?: string;
+
+  /**
    * Unique identifier for the event
    */
   event_id?: string;
