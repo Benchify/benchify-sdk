@@ -1033,18 +1033,19 @@ export class Benchify {
 
           // Extract all parts from the FormData
           for (const [key, value] of formData.entries()) {
-            if (value instanceof Blob) {
+            if (typeof value !== 'string') {
+              const blob = value as Blob;
               if (key === 'response') {
                 // Parse the JSON response metadata
-                const text = await value.text();
+                const text = await blob.text();
                 parsedResponse.data = JSON.parse(text);
               } else if (key === 'files_data' || key === 'bundle_data') {
                 // Convert blob to base64 for tar.zst files
-                const buffer = await value.arrayBuffer();
+                const buffer = await blob.arrayBuffer();
                 parsedResponse[key] = Buffer.from(buffer).toString('base64');
               } else if (key === 'files_manifest' || key === 'bundle_manifest') {
                 // Parse JSON manifests
-                const text = await value.text();
+                const text = await blob.text();
                 parsedResponse[key] = JSON.parse(text);
               }
             }

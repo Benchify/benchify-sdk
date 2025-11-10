@@ -27,7 +27,7 @@ if (!API_KEY || !BASE_URL) {
   console.log('');
   console.log('Example:');
   console.log(
-    '  BENCHIFY_API_KEY=your-key BENCHIFY_BASE_URL=http://localhost:8082 npm run tsn scripts/test-new-endpoints.ts',
+    '  BENCHIFY_API_KEY=your-key BENCHIFY_BASE_URL=http://localhost:8082 npm run test:three-phase',
   );
   process.exit(0);
 }
@@ -49,7 +49,7 @@ async function test3PhaseChain() {
     baseURL: baseUrl,
   });
 
-  const eventId = `test_3phase_${Date.now()}`;
+  let eventId: string | undefined = undefined;
   const files = TestFixParsingFiles;
 
   // ============================================================================
@@ -66,8 +66,9 @@ async function test3PhaseChain() {
     step1Result = await client.fixParsingAndDiagnose.detectIssues({
       files: files,
       template_path: 'benchify/default-template',
-      event_id: eventId,
     });
+
+    eventId = step1Result.data.event_id;
 
     const duration = Date.now() - startTime;
     console.log(`✅ Phase 1 completed (${duration}ms)`);
