@@ -1,6 +1,6 @@
 {
   "name": "benchify",
-  "version": "0.1.0-alpha.81",
+  "version": "0.1.0-alpha.82",
   "description": "The official TypeScript library for the Benchify API",
   "author": "Benchify <support@benchify.com>",
   "types": "dist/index.d.ts",
@@ -19,6 +19,7 @@
   "scripts": {
     "test": "./scripts/test",
     "test:local": "ts-node -r tsconfig-paths/register scripts/test-local.ts",
+    "test:three-phase": "ts-node -r tsconfig-paths/register scripts/three-phase-fixing.ts",
     "build": "./scripts/build",
     "prepublishOnly": "echo 'to publish, run yarn build && (cd dist; yarn publish)' && exit 1",
     "format": "./scripts/format",

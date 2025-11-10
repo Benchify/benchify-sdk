@@ -314,7 +314,12 @@ export async function packWithManifest(
  */
 export async function unpackTarZst(bundleBuffer: Buffer): Promise<BinaryFileData[]> {
   // Detect archive format and obtain a tar buffer
-  const isZstd = bundleBuffer.length >= 4 && bundleBuffer[0] === 0x28 && bundleBuffer[1] === 0xb5 && bundleBuffer[2] === 0x2f && bundleBuffer[3] === 0xfd; // Zstandard magic 28 B5 2F FD
+  const isZstd =
+    bundleBuffer.length >= 4 &&
+    bundleBuffer[0] === 0x28 &&
+    bundleBuffer[1] === 0xb5 &&
+    bundleBuffer[2] === 0x2f &&
+    bundleBuffer[3] === 0xfd; // Zstandard magic 28 B5 2F FD
   const isGzip = bundleBuffer.length >= 2 && bundleBuffer[0] === 0x1f && bundleBuffer[1] === 0x8b; // GZip magic 1F 8B
 
   let tarBuffer: Buffer;

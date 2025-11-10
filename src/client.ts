@@ -51,7 +51,6 @@ import {
   StackWriteFileResponse,
   Stacks as StacksAPI,
 } from './resources/stacks/stacks';
-import { Test } from './resources/test';
 import {
   ValidateTemplate,
   ValidateTemplateValidateParams,
@@ -1034,18 +1033,19 @@ export class Benchify {
 
           // Extract all parts from the FormData
           for (const [key, value] of formData.entries()) {
-            if (value instanceof Blob) {
+            if (typeof value !== 'string') {
+              const blob = value as Blob;
               if (key === 'response') {
                 // Parse the JSON response metadata
-                const text = await value.text();
+                const text = await blob.text();
                 parsedResponse.data = JSON.parse(text);
               } else if (key === 'files_data' || key === 'bundle_data') {
                 // Convert blob to base64 for tar.zst files
-                const buffer = await value.arrayBuffer();
+                const buffer = await blob.arrayBuffer();
                 parsedResponse[key] = Buffer.from(buffer).toString('base64');
               } else if (key === 'files_manifest' || key === 'bundle_manifest') {
                 // Parse JSON manifests
-                const text = await value.text();
+                const text = await blob.text();
                 parsedResponse[key] = JSON.parse(text);
               }
             }
@@ -1105,7 +1105,6 @@ export class Benchify {
   stack: Stacks = new Stacks(this);
   fixParsingAndDiagnose: API.FixParsingAndDiagnose = new API.FixParsingAndDiagnose(this);
   fix: API.Fix = new API.Fix(this);
-  test: API.Test = new API.Test(this);
 }
 
 Benchify.Fixer = Fixer;
@@ -1114,7 +1113,6 @@ Benchify.FixStringLiterals = FixStringLiterals;
 Benchify.ValidateTemplate = ValidateTemplate;
 Benchify.FixParsingAndDiagnose = FixParsingAndDiagnose;
 Benchify.Fix = Fix;
-Benchify.Test = Test;
 
 export declare namespace Benchify {
   export type RequestOptions = Opts.RequestOptions;
@@ -1168,8 +1166,6 @@ export declare namespace Benchify {
     type FixCreateAIFallbackResponse as FixCreateAIFallbackResponse,
     type FixCreateAIFallbackParams as FixCreateAIFallbackParams,
   };
-
-  export { Test as Test };
 }
 
 export interface Benchify {
