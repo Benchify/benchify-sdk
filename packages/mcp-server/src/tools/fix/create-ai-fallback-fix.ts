@@ -51,10 +51,6 @@ export const tool: Tool = {
           },
         },
       },
-      continuation_event_id: {
-        type: 'string',
-        description: 'Event ID from Step 1 to continue with the same temp directory',
-      },
       event_id: {
         type: 'string',
         description: 'Unique identifier for the event',

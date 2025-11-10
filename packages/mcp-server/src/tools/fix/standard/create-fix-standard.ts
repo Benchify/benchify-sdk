@@ -55,10 +55,6 @@ export const tool: Tool = {
         type: 'boolean',
         description: 'Whether to bundle the project after fixes',
       },
-      continuation_event_id: {
-        type: 'string',
-        description: 'Event ID from Step 1 to continue with the same temp directory',
-      },
       event_id: {
         type: 'string',
         description: 'Unique identifier for tracking',

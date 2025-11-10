@@ -45,7 +45,6 @@ describe('resource fix', () => {
           ],
         },
       },
-      continuation_event_id: 'continuation_event_id',
       event_id: '',
       include_context: true,
       max_attempts: 3,
