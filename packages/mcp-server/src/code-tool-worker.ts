@@ -43,6 +43,7 @@ function getRunFunctionNode(
 const fuse = new Fuse(
   [
     'client.fixer.run',
+    'client.stacks.bundleMultipart',
     'client.stacks.create',
     'client.stacks.createAndRun',
     'client.stacks.destroy',

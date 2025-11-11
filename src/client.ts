@@ -34,6 +34,8 @@ import {
 } from './resources/validate-template';
 import { Fix, FixCreateAIFallbackParams, FixCreateAIFallbackResponse } from './resources/fix/fix';
 import {
+  StackBundleMultipartParams,
+  StackBundleMultipartResponse,
   StackCreateAndRunParams,
   StackCreateAndRunResponse,
   StackCreateParams,
@@ -784,6 +786,7 @@ export declare namespace Benchify {
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
     type StackUpdateResponse as StackUpdateResponse,
+    type StackBundleMultipartResponse as StackBundleMultipartResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
@@ -794,6 +797,7 @@ export declare namespace Benchify {
     type StackWriteFileResponse as StackWriteFileResponse,
     type StackCreateParams as StackCreateParams,
     type StackUpdateParams as StackUpdateParams,
+    type StackBundleMultipartParams as StackBundleMultipartParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,

@@ -100,6 +100,29 @@ export class Stacks extends APIResource {
   }
 
   /**
+   * Accepts multipart/form-data containing a JSON string manifest (must include
+   * entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and
+   * returns base64 bundle.
+   *
+   * @example
+   * ```ts
+   * const response = await client.stacks.bundleMultipart({
+   *   manifest: '{"entrypoint":"src/index.ts"}',
+   *   tarball: fs.createReadStream('path/to/file'),
+   * });
+   * ```
+   */
+  bundleMultipart(
+    body: StackBundleMultipartParams,
+    options?: RequestOptions,
+  ): APIPromise<StackBundleMultipartResponse> {
+    return this._client.post(
+      '/v1/stacks/bundle-multipart',
+      multipartFormRequestOptions({ body, ...options }, this._client),
+    );
+  }
+
+  /**
    * Create a simple container sandbox with a custom image and command
    *
    * @example
@@ -446,6 +469,12 @@ export interface StackUpdateResponse {
   warnings?: Array<string>;
 }
 
+export interface StackBundleMultipartResponse {
+  content: string;
+
+  path: string;
+}
+
 export interface StackCreateAndRunResponse {
   id: string;
 
@@ -615,6 +644,18 @@ export interface StackUpdateParams {
   'base-etag'?: string;
 }
 
+export interface StackBundleMultipartParams {
+  /**
+   * JSON string containing bundler manifest (must include entrypoint)
+   */
+  manifest: string;
+
+  /**
+   * Tar.zst project archive
+   */
+  tarball: Uploadable;
+}
+
 export interface StackCreateAndRunParams {
   /**
    * Command to run
@@ -701,6 +742,7 @@ export declare namespace Stacks {
     type StackCreateResponse as StackCreateResponse,
     type StackRetrieveResponse as StackRetrieveResponse,
     type StackUpdateResponse as StackUpdateResponse,
+    type StackBundleMultipartResponse as StackBundleMultipartResponse,
     type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
@@ -711,6 +753,7 @@ export declare namespace Stacks {
     type StackWriteFileResponse as StackWriteFileResponse,
     type StackCreateParams as StackCreateParams,
     type StackUpdateParams as StackUpdateParams,
+    type StackBundleMultipartParams as StackBundleMultipartParams,
     type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
