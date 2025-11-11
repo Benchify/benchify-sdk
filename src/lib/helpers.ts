@@ -464,37 +464,7 @@ export async function bundleAndExtract(
   return { outputDir: absOutputDir, writtenPaths, responsePath };
 }
 
-export interface BundleProjectParams {
-  /**
-   * Files to include in the bundle
-   */
-  files: Array<{ path: string; contents: string }>;
-  /**
-   * Directory to write the unbundled response files into
-  */
- outputDir: string;
- /**
-  * Entrypoint path inside the bundle (e.g., index.html)
-  */
- entrypoint?: string;
-  /**
-   * Optional server-side filename hint for the tarball
-   */
-  tarballFilename?: string;
-  /**
-   * If true, set host_code=true in the manifest and return the hosted URL
-   */
-  return_url?: boolean;
-  /**
-   * Optional deterministic build time for tar headers
-   */
-  buildTime?: number;
-}
-
 export interface BundleProjectResult {
-  outputDir: string;
-  writtenPaths: string[];
-  responsePath: string;
   url?: string;
   files: Array<{ path: string; contents: string }>;
 }
@@ -509,13 +479,19 @@ export interface BundleProjectResult {
  */
 export async function BundleProject(
   client: Benchify,
-  params: BundleProjectParams,
+  files: Array<{ path: string; contents: string }>,
+  entrypoint?: string,
+  return_url?: boolean,
 ): Promise<BundleProjectResult> {
-  const { files, entrypoint, outputDir, tarballFilename, return_url, buildTime } = params;
-
+  if (!entrypoint) {
+    entrypoint = 'index.html';
+  }
+  if (!return_url) {
+    return_url = false;
+  }
+  let tarballFilename = 'project.tar.zst';
   // 1) Pack files and create manifest
-  const packOptions = buildTime != null ? { buildTime } : undefined;
-  const { buffer: packedBuffer, manifest } = await packWithManifest(files, packOptions);
+  const { buffer: packedBuffer, manifest } = await packWithManifest(files);
 
   // 2) Extend manifest per endpoint requirements
   const manifestToSend: any = {
@@ -525,7 +501,7 @@ export async function BundleProject(
   };
 
   // 3) Convert packed buffer to File for multipart upload
-  const tarballFile = await toFile(packedBuffer, tarballFilename ?? 'project.tar.zst', {
+  const tarballFile = await toFile(packedBuffer, tarballFilename, {
     type: 'application/octet-stream',
   });
 
@@ -536,8 +512,6 @@ export async function BundleProject(
   });
 
   // 5) Unpack response bundle (base64-encoded tar.zst/gzip/tar)
-  const writtenPaths: string[] = [];
-  const absOutputDir = path.resolve(outputDir);
   let filesOut: Array<{ path: string; contents: string }> = [];
 
   if (resp.content && resp.content.length > 0) {
@@ -547,31 +521,12 @@ export async function BundleProject(
       path: f.path,
       contents: typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
     }));
-    for (const file of unpackedFiles) {
-      const targetPath = path.join(absOutputDir, file.path);
-      const targetDir = path.dirname(targetPath);
-      fs.mkdirSync(targetDir, { recursive: true });
-      const contentBuffer = Buffer.isBuffer(file.contents) ? file.contents : Buffer.from(file.contents);
-      fs.writeFileSync(targetPath, contentBuffer);
-      if (file.mode) {
-        try {
-          fs.chmodSync(targetPath, parseInt(file.mode, 8));
-        } catch {
-          // ignore chmod errors
-        }
-      }
-      writtenPaths.push(targetPath);
-    }
   }
-
+  //placeholder
+  let hostedUrl = null;
   const result: BundleProjectResult = {
-    outputDir: absOutputDir,
-    writtenPaths,
-    responsePath: resp.path,
     files: filesOut,
+    url: hostedUrl ?? '',
   };
-  if (return_url) {
-    (result as any).url = resp.path;
-  }
   return result;
 }
