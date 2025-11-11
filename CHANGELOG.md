@@ -1,5 +1,73 @@
 # Changelog
 
+## 0.1.0-alpha.85 (2025-11-11)
+
+Full Changelog: [v0.1.0-alpha.84...v0.1.0-alpha.85](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.84...v0.1.0-alpha.85)
+
+### Features
+
+* **api:** api update ([2c46312](https://github.com/Benchify/benchify-sdk/commit/2c4631270ae88f7d2cc0c8b15b062b21b0b6a32e))
+* **api:** api update ([5e2d507](https://github.com/Benchify/benchify-sdk/commit/5e2d50773571cf030e7909d5af28d9cf06565136))
+* **api:** api update ([89b7cc8](https://github.com/Benchify/benchify-sdk/commit/89b7cc8fc55591fd6162b5af24d4edabbfe597cb))
+* **api:** api update ([2b3e460](https://github.com/Benchify/benchify-sdk/commit/2b3e4602ac9b148c3ede2cf099f0be36dddcd648))
+* **api:** api update ([658c2c1](https://github.com/Benchify/benchify-sdk/commit/658c2c1c05923b07f18e362caa1f10b224bc07b5))
+* **api:** api update ([de04b62](https://github.com/Benchify/benchify-sdk/commit/de04b6262de3ad2a88f3d670b4e710317ed7d57f))
+* **api:** api update ([27417c6](https://github.com/Benchify/benchify-sdk/commit/27417c6fb7b474aff5c1b1b224171132ed12abe7))
+* **api:** api update ([50ed3fc](https://github.com/Benchify/benchify-sdk/commit/50ed3fc5474638cd1f317a414cbd19bb408ce79b))
+* **api:** api update ([ff764b6](https://github.com/Benchify/benchify-sdk/commit/ff764b65e819ae80a1e4f39ebba921ec61f99569))
+* **api:** api update ([edd3966](https://github.com/Benchify/benchify-sdk/commit/edd396680461f65ec471f41e1773cc535aaf41b1))
+* **api:** api update ([400a003](https://github.com/Benchify/benchify-sdk/commit/400a0031d37a7f37c68282f0c5429765c96a1782))
+* **api:** api update ([f8f5d41](https://github.com/Benchify/benchify-sdk/commit/f8f5d41e23b4f18b0756b3bd41622db8d7a00848))
+* **api:** api update ([29f1dd2](https://github.com/Benchify/benchify-sdk/commit/29f1dd2a525b70e15a48db2ddf28cf38a085ee71))
+* **api:** api update ([bdc776e](https://github.com/Benchify/benchify-sdk/commit/bdc776ef5a631c32309990cebfcaaed7b6c1f259))
+* **api:** api update ([d299ba2](https://github.com/Benchify/benchify-sdk/commit/d299ba218cd878c90b5ba6fec2c8c9addc33eb78))
+* **api:** api update ([d66e70e](https://github.com/Benchify/benchify-sdk/commit/d66e70ea88a0a9f8a35f61b2b02727a69c34dcb9))
+* **api:** api update ([b9476e0](https://github.com/Benchify/benchify-sdk/commit/b9476e0afafcbeaf78c61df71fb0e370e424bdf3))
+* **api:** manual updates ([2765e6c](https://github.com/Benchify/benchify-sdk/commit/2765e6ce3d7cabc6f2e8359782c275a6c2cedd87))
+* **api:** manual updates ([f8000c9](https://github.com/Benchify/benchify-sdk/commit/f8000c92c5ea9ba519a6d671070b1a6e27c0994d))
+* **api:** manual updates ([082cff3](https://github.com/Benchify/benchify-sdk/commit/082cff33cfc7dfc1d8b6a05e9d79f3df122c309d))
+* **api:** manual updates ([ffe64b7](https://github.com/Benchify/benchify-sdk/commit/ffe64b707a8973e75f777b53911fc90df0f6c75b))
+* **api:** manual updates ([a82cb5d](https://github.com/Benchify/benchify-sdk/commit/a82cb5d5fc8342c7d0b0910137549c7d8db1860c))
+* **api:** manual updates ([29089a2](https://github.com/Benchify/benchify-sdk/commit/29089a21f65a2009194a8aae5401a528d1c864b3))
+* **api:** manual updates ([356c0a7](https://github.com/Benchify/benchify-sdk/commit/356c0a7d13d7ab8739cc1ab48870d5fe77adc1b4))
+* **api:** manual updates ([f858b6d](https://github.com/Benchify/benchify-sdk/commit/f858b6d80c3f1a54d575fa8823da60dfbe23f70b))
+* **api:** manual updates ([4733d25](https://github.com/Benchify/benchify-sdk/commit/4733d25f358c8510886767f4d10fbe9157b3d47e))
+* **api:** manual updates ([cb398b5](https://github.com/Benchify/benchify-sdk/commit/cb398b5645f241b9a0378d775e9020651cb1e23e))
+* **api:** manual updates ([084cf1a](https://github.com/Benchify/benchify-sdk/commit/084cf1ae1d5ca03f1136847d785aadf673cbe869))
+* **api:** manual updates ([27498e6](https://github.com/Benchify/benchify-sdk/commit/27498e6bf449f54935d95d254a501ea1a08518b2))
+* **api:** manual updates ([d045a46](https://github.com/Benchify/benchify-sdk/commit/d045a46f59b760079436c8a4f3fa05d206774ed1))
+* **api:** manual updates ([195e673](https://github.com/Benchify/benchify-sdk/commit/195e673c58cf647736d15e5f5ce060ad40c3f132))
+* **api:** manual updates ([d0d24f7](https://github.com/Benchify/benchify-sdk/commit/d0d24f7d27ac859bdc41a076b3b749ed3b4936b5))
+* **api:** manual updates ([4a5f6df](https://github.com/Benchify/benchify-sdk/commit/4a5f6df82ee5a6041d515c8a09457f2281368d1b))
+* **api:** manual updates ([436c4e6](https://github.com/Benchify/benchify-sdk/commit/436c4e6c6dc8a74ae39c0d89a9b700964ecbedac))
+* **api:** manual updates ([25fb6d3](https://github.com/Benchify/benchify-sdk/commit/25fb6d3d905d3102d7d1aa8c7d94e8237c7657cb))
+* **api:** manual updates ([bfca3ce](https://github.com/Benchify/benchify-sdk/commit/bfca3ceedd1b81a8c0b2c0fe371bb583939650e2))
+* **api:** manual updates ([2eadf6b](https://github.com/Benchify/benchify-sdk/commit/2eadf6babe798866bf84b7e08b1b6bfd2fae9186))
+* **mcp:** enable optional code execution tool on http mcp servers ([3b2ce72](https://github.com/Benchify/benchify-sdk/commit/3b2ce724a4c3ed325f73f55e5d6c574701ddf1eb))
+
+
+### Bug Fixes
+
+* **mcpb:** pin @anthropic-ai/mcpb version ([80365b0](https://github.com/Benchify/benchify-sdk/commit/80365b0e373acf5086cbc2aeddd9487c03244d9e))
+
+
+### Chores
+
+* **internal:** codegen related update ([06d9d4b](https://github.com/Benchify/benchify-sdk/commit/06d9d4bd6ee6a010c2fce2ae6075ee52233e90b8))
+* **internal:** codegen related update ([e64e078](https://github.com/Benchify/benchify-sdk/commit/e64e078e5874124bb11423470f2317ae70d255ea))
+* **internal:** grammar fix (it's -&gt; its) ([ef6a154](https://github.com/Benchify/benchify-sdk/commit/ef6a15476aa2477271f57109d3eee2b2ee1c998d))
+* mcp code tool explicit error message when missing a run function ([a3d95f2](https://github.com/Benchify/benchify-sdk/commit/a3d95f254c6a7fdcf5f18413d260e67a1d6f548d))
+* **mcp:** add friendlier MCP code tool errors on incorrect method invocations ([e66c366](https://github.com/Benchify/benchify-sdk/commit/e66c36653ba1c5c0c4bce4ec4cf90e9333ee5b45))
+* **mcp:** add line numbers to code tool errors ([08c574b](https://github.com/Benchify/benchify-sdk/commit/08c574b43844fd2143d44c2c3c3e2df79818ce01))
+* **mcp:** clarify http auth error ([2b5e440](https://github.com/Benchify/benchify-sdk/commit/2b5e440a3ea5c43390dd817db4973c8b73a9e8c2))
+* use structured error when code execution tool errors ([d372c12](https://github.com/Benchify/benchify-sdk/commit/d372c12c97d6ce388a5ddbdad7214014bb79197d))
+
+
+### Documentation
+
+* **mcp:** add a README button for one-click add to Cursor ([7582b3d](https://github.com/Benchify/benchify-sdk/commit/7582b3d5b1cfc260a661189a619754ce5c76e02a))
+* **mcp:** add a README link to add server to VS Code or Claude Code ([8853992](https://github.com/Benchify/benchify-sdk/commit/8853992f1f0f20d3f694a997f84b480a587494c6))
+
 ## 0.1.0-alpha.84 (2025-11-11)
 
 Full Changelog: [v0.1.0-alpha.83...v0.1.0-alpha.84](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.83...v0.1.0-alpha.84)
