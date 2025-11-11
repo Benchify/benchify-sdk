@@ -14,6 +14,5 @@ export {
   type Manifest,
   type BundleAndExtractParams,
   type BundleAndExtractResult,
-  type BundleProjectParams,
   type BundleProjectResult,
 } from './lib/helpers';
