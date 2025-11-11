@@ -25,7 +25,7 @@ For clients with a configuration JSON, it might look something like this:
   "mcpServers": {
     "benchify_api": {
       "command": "npx",
-      "args": ["-y", "benchify-mcp", "--client=claude", "--tools=all"],
+      "args": ["-y", "benchify-mcp", "--client=claude", "--tools=dynamic"],
       "env": {
         "BENCHIFY_API_KEY": "My API Key"
       }
@@ -249,6 +249,7 @@ The following tools are available in this MCP server.
 - `create_stacks` (`write`): Create a new stack environment using manifest + bundle format. Upload a JSON manifest with file metadata and a tar.zst bundle containing your project files. For multi-service stacks, automatically detects and orchestrates multiple services.
 - `retrieve_stacks` (`read`): Retrieve current status and information about a stack and its services
 - `update_stacks` (`write`): Update stack files using manifest + bundle format and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
+- `bundle_multipart_stacks` (`write`): Accepts multipart/form-data containing a JSON string manifest (must include entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and returns base64 bundle.
 - `create_and_run_stacks` (`write`): Create a simple container sandbox with a custom image and command
 - `destroy_stacks` (`write`): Permanently destroy a stack and all its services, cleaning up resources
 - `execute_command_stacks` (`write`): Run a command in the sandbox container and get the output
