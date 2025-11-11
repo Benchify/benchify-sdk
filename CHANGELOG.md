@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.84 (2025-11-11)
+
+Full Changelog: [v0.1.0-alpha.83...v0.1.0-alpha.84](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.83...v0.1.0-alpha.84)
+
+### Features
+
+* **api:** manual updates ([2765e6c](https://github.com/Benchify/benchify-sdk/commit/2765e6ce3d7cabc6f2e8359782c275a6c2cedd87))
+
+
+### Chores
+
+* **mcp:** clarify http auth error ([2b5e440](https://github.com/Benchify/benchify-sdk/commit/2b5e440a3ea5c43390dd817db4973c8b73a9e8c2))
+
 ## 0.1.0-alpha.83 (2025-11-10)
 
 Full Changelog: [v0.1.0-alpha.82...v0.1.0-alpha.83](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.82...v0.1.0-alpha.83)
