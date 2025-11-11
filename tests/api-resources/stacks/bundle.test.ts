@@ -9,27 +9,6 @@ const client = new Benchify({
 
 describe('resource bundle', () => {
   // Prism tests are disabled
-  test.skip('create: only required params', async () => {
-    const responsePromise = client.stacks.bundle.create({ entrypoint: 'x', tarball_base64: 'x' });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // Prism tests are disabled
-  test.skip('create: required and optional params', async () => {
-    const response = await client.stacks.bundle.create({
-      entrypoint: 'x',
-      tarball_base64: 'x',
-      tarball_filename: 'tarball_filename',
-    });
-  });
-
-  // Prism tests are disabled
   test.skip('createFiles: only required params', async () => {
     const responsePromise = client.stacks.bundle.createFiles({
       entrypoint: 'x',

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'bundle_multipart_stacks',
   description:
-    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nAccepts multipart/form-data containing a JSON string manifest (must include entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and returns base64 bundle.\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/stack_bundle_multipart_response',\n  $defs: {\n    stack_bundle_multipart_response: {\n      type: 'object',\n      properties: {\n        content: {\n          type: 'string'\n        },\n        path: {\n          type: 'string'\n        }\n      },\n      required: [        'content',\n        'path'\n      ]\n    }\n  }\n}\n```",
+    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nAccepts multipart/form-data containing a JSON string manifest (must include entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and returns base64 bundle (path + content).\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/stack_bundle_multipart_response',\n  $defs: {\n    stack_bundle_multipart_response: {\n      type: 'object',\n      properties: {\n        content: {\n          type: 'string'\n        },\n        path: {\n          type: 'string'\n        }\n      },\n      required: [        'content',\n        'path'\n      ]\n    }\n  }\n}\n```",
   inputSchema: {
     type: 'object',
     properties: {
