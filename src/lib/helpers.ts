@@ -6,6 +6,7 @@ import * as tar from 'tar-stream';
 import * as zstd from '@mongodb-js/zstd';
 import { Benchify } from '../client';
 import zlib from 'zlib';
+import { toFile } from '../core/uploads';
 
 export interface FileData {
   path: string;
@@ -461,4 +462,116 @@ export async function bundleAndExtract(
   }
 
   return { outputDir: absOutputDir, writtenPaths, responsePath };
+}
+
+export interface BundleProjectParams {
+  /**
+   * Files to include in the bundle
+   */
+  files: Array<{ path: string; contents: string }>;
+  /**
+   * Directory to write the unbundled response files into
+  */
+ outputDir: string;
+ /**
+  * Entrypoint path inside the bundle (e.g., index.html)
+  */
+ entrypoint?: string;
+  /**
+   * Optional server-side filename hint for the tarball
+   */
+  tarballFilename?: string;
+  /**
+   * If true, set host_code=true in the manifest and return the hosted URL
+   */
+  return_url?: boolean;
+  /**
+   * Optional deterministic build time for tar headers
+   */
+  buildTime?: number;
+}
+
+export interface BundleProjectResult {
+  outputDir: string;
+  writtenPaths: string[];
+  responsePath: string;
+  url?: string;
+  files: Array<{ path: string; contents: string }>;
+}
+
+/**
+ * Bundle wrapper:
+ * - Packs Files into tar.zst and generates manifest
+ * - Adds required entrypoint and optional host_code to manifest
+ * - Uploads via multipart/form-data to /v1/stacks/bundle-multipart
+ * - Decodes returned base64 bundle and extracts into outputDir
+ * - If return_url=true, also returns the hosted URL (from response.path)
+ */
+export async function BundleProject(
+  client: Benchify,
+  params: BundleProjectParams,
+): Promise<BundleProjectResult> {
+  const { files, entrypoint, outputDir, tarballFilename, return_url, buildTime } = params;
+
+  // 1) Pack files and create manifest
+  const packOptions = buildTime != null ? { buildTime } : undefined;
+  const { buffer: packedBuffer, manifest } = await packWithManifest(files, packOptions);
+
+  // 2) Extend manifest per endpoint requirements
+  const manifestToSend: any = {
+    ...manifest,
+    entrypoint,
+    ...(return_url ? { host_code: true } : {}),
+  };
+
+  // 3) Convert packed buffer to File for multipart upload
+  const tarballFile = await toFile(packedBuffer, tarballFilename ?? 'project.tar.zst', {
+    type: 'application/octet-stream',
+  });
+
+  // 4) Call multipart endpoint
+  const resp = await client.stacks.bundleMultipart({
+    manifest: JSON.stringify(manifestToSend),
+    tarball: tarballFile,
+  });
+
+  // 5) Unpack response bundle (base64-encoded tar.zst/gzip/tar)
+  const writtenPaths: string[] = [];
+  const absOutputDir = path.resolve(outputDir);
+  let filesOut: Array<{ path: string; contents: string }> = [];
+
+  if (resp.content && resp.content.length > 0) {
+    const bundleBuffer = Buffer.from(resp.content, 'base64');
+    const unpackedFiles = await unpackTarZst(bundleBuffer);
+    filesOut = unpackedFiles.map((f) => ({
+      path: f.path,
+      contents: typeof f.contents === 'string' ? f.contents : Buffer.from(f.contents).toString('utf-8'),
+    }));
+    for (const file of unpackedFiles) {
+      const targetPath = path.join(absOutputDir, file.path);
+      const targetDir = path.dirname(targetPath);
+      fs.mkdirSync(targetDir, { recursive: true });
+      const contentBuffer = Buffer.isBuffer(file.contents) ? file.contents : Buffer.from(file.contents);
+      fs.writeFileSync(targetPath, contentBuffer);
+      if (file.mode) {
+        try {
+          fs.chmodSync(targetPath, parseInt(file.mode, 8));
+        } catch {
+          // ignore chmod errors
+        }
+      }
+      writtenPaths.push(targetPath);
+    }
+  }
+
+  const result: BundleProjectResult = {
+    outputDir: absOutputDir,
+    writtenPaths,
+    responsePath: resp.path,
+    files: filesOut,
+  };
+  if (return_url) {
+    (result as any).url = resp.path;
+  }
+  return result;
 }
