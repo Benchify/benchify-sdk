@@ -45,12 +45,10 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/stacks/bundle.ts">BundleCreateResponse</a></code>
 - <code><a href="./src/resources/stacks/bundle.ts">BundleCreateFilesResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/stacks/bundle">client.stacks.bundle.<a href="./src/resources/stacks/bundle.ts">create</a>({ ...params }) -> BundleCreateResponse</code>
 - <code title="post /v1/stacks/bundle/files">client.stacks.bundle.<a href="./src/resources/stacks/bundle.ts">createFiles</a>({ ...params }) -> BundleCreateFilesResponse</code>
 
 # FixStringLiterals

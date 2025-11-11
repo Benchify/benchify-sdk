@@ -56,7 +56,6 @@ const fuse = new Fuse(
     'client.stacks.update',
     'client.stacks.waitForDevServerURL',
     'client.stacks.writeFile',
-    'client.stacks.bundle.create',
     'client.stacks.bundle.createFiles',
     'client.fixStringLiterals.create',
     'client.validateTemplate.validate',

@@ -1,12 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export {
-  Bundle,
-  type BundleCreateResponse,
-  type BundleCreateFilesResponse,
-  type BundleCreateParams,
-  type BundleCreateFilesParams,
-} from './bundle';
+export { Bundle, type BundleCreateFilesResponse, type BundleCreateFilesParams } from './bundle';
 export {
   Stacks,
   type StackCreateResponse,
