@@ -416,7 +416,7 @@ export async function BundleProject(
     ...manifest,
     entrypoint,
     ...(return_url ? { host_code: true } : {}),
-    ...(minify ? { minify: true } : {}),
+    minify,
   };
 
   // 3) Convert packed buffer to File for multipart upload
