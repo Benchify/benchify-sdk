@@ -427,6 +427,11 @@ export interface StackRetrieveResponse {
    * When stack became ready (ISO 8601)
    */
   readyAt?: string;
+
+  /**
+   * Stack URL (benchify.app domain)
+   */
+  url?: string;
 }
 
 /**

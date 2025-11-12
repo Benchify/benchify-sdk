@@ -487,6 +487,11 @@ export namespace FixerRunParams {
    */
   export interface Meta {
     /**
+     * Unique trace identifier for the request
+     */
+    trace_id: string;
+
+    /**
      * Customer tracking identifier
      */
     external_id?: string | null;

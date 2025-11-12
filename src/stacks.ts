@@ -156,8 +156,23 @@ export class StackHandle {
     return response;
   }
   async waitForDevServerURL(): Promise<string> {
-    const response = await this._client.stacks.waitForDevServerURL(this._id);
-    return response.url;
+    // Poll the status endpoint until we get a URL with the benchify.app domain
+    const maxAttempts = 60;
+    const pollInterval = 1000; // 1 second
+    
+    for (let i = 0; i < maxAttempts; i++) {
+      const status = await this.status();
+      
+      // Check if we have a URL and it's ready
+      if (status.url && status.phase === 'running') {
+        return status.url;
+      }
+      
+      // Wait before next poll
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+    }
+    
+    throw new Error('Timeout waiting for dev server URL after 60 seconds');
   }
   async executeCommand(command: string): Promise<StackExecuteCommandResponse> {
     const response = await this._client.stacks.executeCommand(this._id, { command: ['sh', '-c', command] });

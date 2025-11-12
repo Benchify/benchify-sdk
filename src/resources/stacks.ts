@@ -364,39 +364,44 @@ export namespace StackCreateResponse {
  */
 export interface StackRetrieveResponse {
   /**
-   * Stack identifier
-   */
-  id: string;
-
-  /**
    * ETag for caching
    */
   etag: string;
 
   /**
-   * Stack lifecycle phases
+   * Stack identifier
+   */
+  id: string;
+
+  /**
+   * Current phase
    */
   phase: 'starting' | 'building' | 'deploying' | 'running' | 'failed' | 'stopped';
 
   /**
    * Last error message (if failed)
    */
-  lastError?: string;
+  lastError?: string | null;
 
   /**
-   * Recent log entries (truncated for size)
+   * Last N log lines
    */
-  lastLogs?: Array<string>;
+  lastLogs?: Array<string> | null;
 
   /**
-   * Active ports (if running)
+   * Active service ports
    */
-  ports?: Array<number>;
+  ports?: Array<number> | null;
 
   /**
-   * When stack became ready (ISO 8601)
+   * Timestamp when sandbox became ready
    */
-  readyAt?: string;
+  readyAt?: string | null;
+
+  /**
+   * Stack URL (benchify.app domain)
+   */
+  url?: string | null;
 }
 
 /**
