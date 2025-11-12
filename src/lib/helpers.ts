@@ -389,6 +389,7 @@ export interface BundleProjectResult {
  * - Uploads via multipart/form-data to /v1/stacks/bundle-multipart
  * - Decodes returned base64 bundle and extracts into outputDir
  * - If return_url=true, also returns the hosted URL (from response.path)
+ * - If minify=true, the manifest will be minified
  */
 export async function BundleProject(
   client: Benchify,
