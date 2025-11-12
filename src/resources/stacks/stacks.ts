@@ -2,13 +2,7 @@
 
 import { APIResource } from '../../core/resource';
 import * as BundleAPI from './bundle';
-import {
-  Bundle,
-  BundleCreateFilesParams,
-  BundleCreateFilesResponse,
-  BundleCreateParams,
-  BundleCreateResponse,
-} from './bundle';
+import { Bundle, BundleCreateFilesParams, BundleCreateFilesResponse } from './bundle';
 import { APIPromise } from '../../core/api-promise';
 import { type Uploadable } from '../../core/uploads';
 import { buildHeaders } from '../../internal/headers';
@@ -102,7 +96,7 @@ export class Stacks extends APIResource {
   /**
    * Accepts multipart/form-data containing a JSON string manifest (must include
    * entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and
-   * returns base64 bundle.
+   * returns base64 bundle (path + content).
    *
    * @example
    * ```ts
@@ -765,9 +759,7 @@ export declare namespace Stacks {
 
   export {
     Bundle as Bundle,
-    type BundleCreateResponse as BundleCreateResponse,
     type BundleCreateFilesResponse as BundleCreateFilesResponse,
-    type BundleCreateParams as BundleCreateParams,
     type BundleCreateFilesParams as BundleCreateFilesParams,
   };
 }
