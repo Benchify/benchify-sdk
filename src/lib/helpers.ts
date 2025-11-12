@@ -395,12 +395,16 @@ export async function BundleProject(
   files: Array<{ path: string; contents: string }>,
   entrypoint?: string,
   return_url?: boolean,
+  minify?: boolean,
 ): Promise<BundleProjectResult> {
   if (!entrypoint) {
     entrypoint = 'index.html';
   }
   if (!return_url) {
     return_url = false;
+  }
+  if (typeof minify === 'undefined') {
+    minify = true;
   }
   let tarballFilename = 'project.tar.zst';
   // 1) Pack files and create manifest
@@ -411,6 +415,7 @@ export async function BundleProject(
     ...manifest,
     entrypoint,
     ...(return_url ? { host_code: true } : {}),
+    ...(minify ? { minify: true } : {}),
   };
 
   // 3) Convert packed buffer to File for multipart upload
