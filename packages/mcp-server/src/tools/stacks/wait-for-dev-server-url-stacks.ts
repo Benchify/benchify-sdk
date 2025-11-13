@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { maybeFilter } from 'benchify-mcp/filtering';
-import { Metadata, asTextContentResult } from 'benchify-mcp/tools/types';
+import { isJqError, maybeFilter } from 'benchify-mcp/filtering';
+import { Metadata, asErrorResult, asTextContentResult } from 'benchify-mcp/tools/types';
 
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import Benchify from 'benchify';
@@ -50,7 +50,16 @@ export const tool: Tool = {
 
 export const handler = async (client: Benchify, args: Record<string, unknown> | undefined) => {
   const { id, jq_filter, ...body } = args as any;
-  return asTextContentResult(await maybeFilter(jq_filter, await client.stacks.waitForDevServerURL(id, body)));
+  try {
+    return asTextContentResult(
+      await maybeFilter(jq_filter, await client.stacks.waitForDevServerURL(id, body)),
+    );
+  } catch (error) {
+    if (isJqError(error)) {
+      return asErrorResult(error.message);
+    }
+    throw error;
+  }
 };
 
 export default { metadata, tool, handler };
