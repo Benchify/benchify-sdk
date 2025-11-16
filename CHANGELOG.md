@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.90 (2025-11-16)
+
+Full Changelog: [v0.1.0-alpha.89...v0.1.0-alpha.90](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.89...v0.1.0-alpha.90)
+
+### Bug Fixes
+
+* **mcp:** return tool execution error on jq failure ([ddd62c9](https://github.com/Benchify/benchify-sdk/commit/ddd62c972e87995aa2793903816cd0fc5060165b))
+
+
+### Chores
+
+* **mcp:** upgrade jq-web ([4652161](https://github.com/Benchify/benchify-sdk/commit/4652161bc9923232c43f8f61ef10719495dd17f5))
+
 ## 0.1.0-alpha.89 (2025-11-13)
 
 Full Changelog: [v0.1.0-alpha.88...v0.1.0-alpha.89](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.88...v0.1.0-alpha.89)
