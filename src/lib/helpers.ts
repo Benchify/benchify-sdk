@@ -407,6 +407,8 @@ export async function BundleProject(
   if (typeof minify === 'undefined') {
     minify = true;
   }
+
+  
   let tarballFilename = 'project.tar.zst';
   // 1) Pack files and create manifest
   const { buffer: packedBuffer, manifest } = await packWithManifest(files);
@@ -418,6 +420,11 @@ export async function BundleProject(
     ...(return_url ? { host_code: true } : {}),
     minify,
   };
+
+  // Ensure the entrypoint exists in the provided files
+  if (!files.some((f) => f.path === entrypoint)) {
+    throw new Error(`Entrypoint "${entrypoint}" not found in provided files.`);
+  }
 
   // 3) Convert packed buffer to File for multipart upload
   const tarballFile = await toFile(packedBuffer, tarballFilename, {
