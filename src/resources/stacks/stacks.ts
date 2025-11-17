@@ -2,7 +2,7 @@
 
 import { APIResource } from '../../core/resource';
 import * as BundleAPI from './bundle';
-import { Bundle, BundleCreateFilesParams, BundleCreateFilesResponse } from './bundle';
+import { Bundle } from './bundle';
 import { APIPromise } from '../../core/api-promise';
 import { type Uploadable } from '../../core/uploads';
 import { buildHeaders } from '../../internal/headers';
@@ -114,24 +114,6 @@ export class Stacks extends APIResource {
       '/v1/stacks/bundle-multipart',
       multipartFormRequestOptions({ body, ...options }, this._client),
     );
-  }
-
-  /**
-   * Create a simple container sandbox with a custom image and command
-   *
-   * @example
-   * ```ts
-   * const response = await client.stacks.createAndRun({
-   *   command: ['sleep', '3600'],
-   *   image: 'curlimages/curl:latest',
-   * });
-   * ```
-   */
-  createAndRun(
-    body: StackCreateAndRunParams,
-    options?: RequestOptions,
-  ): APIPromise<StackCreateAndRunResponse> {
-    return this._client.post('/v1/stacks/create-and-run', { body, ...options });
   }
 
   /**
@@ -467,16 +449,24 @@ export interface StackBundleMultipartResponse {
   content: string;
 
   path: string;
+
+  manifest?: StackBundleMultipartResponse.Manifest;
 }
 
-export interface StackCreateAndRunResponse {
-  id: string;
+export namespace StackBundleMultipartResponse {
+  export interface Manifest {
+    files: Array<Manifest.File>;
 
-  command: Array<string>;
+    url?: string;
+  }
 
-  image: string;
+  export namespace Manifest {
+    export interface File {
+      contents: string;
 
-  status: string;
+      path: string;
+    }
+  }
 }
 
 export interface StackExecuteCommandResponse {
@@ -650,28 +640,6 @@ export interface StackBundleMultipartParams {
   tarball: Uploadable;
 }
 
-export interface StackCreateAndRunParams {
-  /**
-   * Command to run
-   */
-  command: Array<string>;
-
-  /**
-   * Docker image to use
-   */
-  image: string;
-
-  /**
-   * Time to live in seconds
-   */
-  ttl_seconds?: number;
-
-  /**
-   * Wait for container to be ready
-   */
-  wait?: boolean;
-}
-
 export interface StackExecuteCommandParams {
   /**
    * Command to execute as array
@@ -737,7 +705,6 @@ export declare namespace Stacks {
     type StackRetrieveResponse as StackRetrieveResponse,
     type StackUpdateResponse as StackUpdateResponse,
     type StackBundleMultipartResponse as StackBundleMultipartResponse,
-    type StackCreateAndRunResponse as StackCreateAndRunResponse,
     type StackExecuteCommandResponse as StackExecuteCommandResponse,
     type StackGetLogsResponse as StackGetLogsResponse,
     type StackGetNetworkInfoResponse as StackGetNetworkInfoResponse,
@@ -748,7 +715,6 @@ export declare namespace Stacks {
     type StackCreateParams as StackCreateParams,
     type StackUpdateParams as StackUpdateParams,
     type StackBundleMultipartParams as StackBundleMultipartParams,
-    type StackCreateAndRunParams as StackCreateAndRunParams,
     type StackExecuteCommandParams as StackExecuteCommandParams,
     type StackGetLogsParams as StackGetLogsParams,
     type StackReadFileParams as StackReadFileParams,
@@ -757,9 +723,5 @@ export declare namespace Stacks {
     type StackWriteFileParams as StackWriteFileParams,
   };
 
-  export {
-    Bundle as Bundle,
-    type BundleCreateFilesResponse as BundleCreateFilesResponse,
-    type BundleCreateFilesParams as BundleCreateFilesParams,
-  };
+  export { Bundle as Bundle };
 }
