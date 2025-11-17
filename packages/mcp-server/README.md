@@ -250,7 +250,6 @@ The following tools are available in this MCP server.
 - `retrieve_stacks` (`read`): Retrieve current status and information about a stack and its services
 - `update_stacks` (`write`): Update stack files using manifest + bundle format and/or individual operations. For multi-service stacks, changes are routed to appropriate services.
 - `bundle_multipart_stacks` (`write`): Accepts multipart/form-data containing a JSON string manifest (must include entrypoint) and a tarball file, forwards to /sandbox/bundle-multipart, and returns base64 bundle (path + content).
-- `create_and_run_stacks` (`write`): Create a simple container sandbox with a custom image and command
 - `destroy_stacks` (`write`): Permanently destroy a stack and all its services, cleaning up resources
 - `execute_command_stacks` (`write`): Run a command in the sandbox container and get the output
 - `get_logs_stacks` (`read`): Retrieve logs from all services in the stack
@@ -259,10 +258,6 @@ The following tools are available in this MCP server.
 - `reset_stacks` (`write`): Clears /workspace and extracts a new tarball into the sandbox. Use tarball_base64 and optional tarball_filename.
 - `wait_for_dev_server_url_stacks` (`read`): Poll stack logs until a dev server URL is detected or timeout
 - `write_file_stacks` (`write`): Writes file content to a path inside the sandbox (via mount or exec under the hood)
-
-### Resource `stacks.bundle`:
-
-- `create_files_stacks_bundle` (`write`): Accepts a JSON array of {path, content}, packs into a tar.zst, and forwards to the Sandbox Manager /sandbox/bundle endpoint.
 
 ### Resource `fix_string_literals`:
 
