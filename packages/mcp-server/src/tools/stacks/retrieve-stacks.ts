@@ -45,7 +45,7 @@ export const handler = async (client: Benchify, args: Record<string, unknown> | 
   try {
     return asTextContentResult(await maybeFilter(jq_filter, await client.stacks.retrieve(id)));
   } catch (error) {
-    if (isJqError(error)) {
+    if (error instanceof Benchify.APIError || isJqError(error)) {
       return asErrorResult(error.message);
     }
     throw error;
