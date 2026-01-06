@@ -54,7 +54,7 @@ If you use Claude Code, you can install the MCP server by running the command be
 environment variables in Claude Code's `.claude.json`, which can be found in your home directory.
 
 ```
-claude mcp add --transport stdio benchify_api --env BENCHIFY_API_KEY="Your BENCHIFY_API_KEY here." -- npx -y benchify-mcp
+claude mcp add benchify_mcp_api --env BENCHIFY_API_KEY="Your BENCHIFY_API_KEY here." -- npx -y benchify-mcp
 ```
 
 ## Code Mode
