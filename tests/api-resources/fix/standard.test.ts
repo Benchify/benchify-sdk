@@ -38,7 +38,12 @@ describe('resource standard', () => {
           'src/styles.css': [
             {
               file_path: 'src/styles.css',
-              location: { column: 14, line: 1, span: 5, starting_character_position: 13 },
+              location: {
+                column: 14,
+                line: 1,
+                span: 5,
+                starting_character_position: 13,
+              },
               message: 'Unknown property widht',
               type: 'css',
               code: 0,

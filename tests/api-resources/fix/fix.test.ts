@@ -36,7 +36,12 @@ describe('resource fix', () => {
           'src/complex.ts': [
             {
               file_path: 'src/complex.ts',
-              location: { column: 1, line: 1, span: 10, starting_character_position: 0 },
+              location: {
+                column: 1,
+                line: 1,
+                span: 10,
+                starting_character_position: 0,
+              },
               message: 'Complex type inference issue',
               type: 'types',
               code: 2000,
