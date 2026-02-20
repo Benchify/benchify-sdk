@@ -16,7 +16,6 @@ Types:
 - <code><a href="./src/resources/stacks/stacks.ts">StackRetrieveResponse</a></code>
 - <code><a href="./src/resources/stacks/stacks.ts">StackUpdateResponse</a></code>
 - <code><a href="./src/resources/stacks/stacks.ts">StackBundleMultipartResponse</a></code>
-- <code><a href="./src/resources/stacks/stacks.ts">StackCreateAndRunResponse</a></code>
 - <code><a href="./src/resources/stacks/stacks.ts">StackExecuteCommandResponse</a></code>
 - <code><a href="./src/resources/stacks/stacks.ts">StackGetLogsResponse</a></code>
 - <code><a href="./src/resources/stacks/stacks.ts">StackGetNetworkInfoResponse</a></code>
@@ -31,7 +30,6 @@ Methods:
 - <code title="get /v1/stacks/{id}">client.stacks.<a href="./src/resources/stacks/stacks.ts">retrieve</a>(id) -> StackRetrieveResponse</code>
 - <code title="post /v1/stacks/{id}/patch">client.stacks.<a href="./src/resources/stacks/stacks.ts">update</a>(id, { ...params }) -> StackUpdateResponse</code>
 - <code title="post /v1/stacks/bundle-multipart">client.stacks.<a href="./src/resources/stacks/stacks.ts">bundleMultipart</a>({ ...params }) -> StackBundleMultipartResponse</code>
-- <code title="post /v1/stacks/create-and-run">client.stacks.<a href="./src/resources/stacks/stacks.ts">createAndRun</a>({ ...params }) -> StackCreateAndRunResponse</code>
 - <code title="delete /v1/stacks/{id}">client.stacks.<a href="./src/resources/stacks/stacks.ts">destroy</a>(id) -> void</code>
 - <code title="post /v1/stacks/{id}/exec">client.stacks.<a href="./src/resources/stacks/stacks.ts">executeCommand</a>(id, { ...params }) -> StackExecuteCommandResponse</code>
 - <code title="get /v1/stacks/{id}/logs">client.stacks.<a href="./src/resources/stacks/stacks.ts">getLogs</a>(id, { ...params }) -> StackGetLogsResponse</code>
@@ -42,14 +40,6 @@ Methods:
 - <code title="post /v1/stacks/{id}/write-file">client.stacks.<a href="./src/resources/stacks/stacks.ts">writeFile</a>(id, { ...params }) -> StackWriteFileResponse</code>
 
 ## Bundle
-
-Types:
-
-- <code><a href="./src/resources/stacks/bundle.ts">BundleCreateFilesResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/stacks/bundle/files">client.stacks.bundle.<a href="./src/resources/stacks/bundle.ts">createFiles</a>({ ...params }) -> BundleCreateFilesResponse</code>
 
 # FixStringLiterals
 

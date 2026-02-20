@@ -1,13 +1,37 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { dirname } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import Benchify, { ClientOptions } from 'benchify';
-import { ContentBlock, Endpoint, Metadata, ToolCallResult } from './tools/types';
-
+import {
+  McpRequestContext,
+  McpTool,
+  Metadata,
+  ToolCallResult,
+  asErrorResult,
+  asTextContentResult,
+} from './types';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { readEnv } from './util';
+import { WorkerInput, WorkerOutput } from './code-tool-types';
+import { SdkMethod } from './methods';
 
-import { WorkerInput, WorkerError, WorkerSuccess } from './code-tool-types';
+const prompt = `Runs JavaScript code to interact with the Benchify API.
+
+You are a skilled programmer writing code to interface with the service.
+Define an async function named "run" that takes a single parameter of an initialized SDK client and it will be run.
+For example:
+
+\`\`\`
+async function run(client) {
+  const response = await client.fixer.run();
+
+  console.log(response.data);
+}
+\`\`\`
+
+You will be returned anything that your function returns, plus the results of any console.log statements.
+Do not add try-catch blocks for single API calls. The tool will handle errors for you.
+Do not add comments unless necessary for generating better code.
+Code will run in a container, and cannot interact with the network outside of the given SDK client.
+Variables will not persist between calls, so make sure to return or log any data you might need later.`;
 
 /**
  * A tool that runs code against a copy of the SDK.
@@ -18,129 +42,94 @@ import { WorkerInput, WorkerError, WorkerSuccess } from './code-tool-types';
  *
  * @param endpoints - The endpoints to include in the list.
  */
-export async function codeTool(): Promise<Endpoint> {
+export function codeTool({ blockedMethods }: { blockedMethods: SdkMethod[] | undefined }): McpTool {
   const metadata: Metadata = { resource: 'all', operation: 'write', tags: [] };
   const tool: Tool = {
     name: 'execute',
-    description:
-      'Runs JavaScript code to interact with the API.\n\nYou are a skilled programmer writing code to interface with the service.\nDefine an async function named "run" that takes a single parameter of an initialized client named "client", and it will be run.\nWrite code within this template:\n\n```\nasync function run(client) {\n  // Fill this out\n}\n```\n\nYou will be returned anything that your function returns, plus the results of any console.log statements.\nIf any code triggers an error, the tool will return an error response, so you do not need to add error handling unless you want to output something more helpful than the raw error.\nIt is not necessary to add comments to code, unless by adding those comments you believe that you can generate better code.\nThis code will run in a container, and you will not be able to use fetch or otherwise interact with the network calls other than through the client you are given.\nAny variables you define won\'t live between successive uses of this call, so make sure to return or log any data you might need later.',
-    inputSchema: { type: 'object', properties: { code: { type: 'string' } } },
-  };
-
-  // Import dynamically to avoid failing at import time in cases where the environment is not well-supported.
-  const { newDenoHTTPWorker } = await import('@valtown/deno-http-worker');
-  const { workerPath } = await import('./code-tool-paths.cjs');
-
-  const handler = async (client: Benchify, args: unknown): Promise<ToolCallResult> => {
-    const baseURLHostname = new URL(client.baseURL).hostname;
-    const { code } = args as { code: string };
-
-    const worker = await newDenoHTTPWorker(pathToFileURL(workerPath), {
-      runFlags: [
-        `--node-modules-dir=manual`,
-        `--allow-read=code-tool-worker.mjs,${workerPath.replace(/([\/\\]node_modules)[\/\\].+$/, '$1')}/`,
-        `--allow-net=${baseURLHostname}`,
-        // Allow environment variables because instantiating the client will try to read from them,
-        // even though they are not set.
-        '--allow-env',
-      ],
-      printOutput: true,
-      spawnOptions: {
-        cwd: dirname(workerPath),
+    description: prompt,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        code: {
+          type: 'string',
+          description: 'Code to execute.',
+        },
+        intent: {
+          type: 'string',
+          description: 'Task you are trying to perform. Used for improving the service.',
+        },
       },
+      required: ['code'],
+    },
+  };
+  const handler = async ({
+    reqContext,
+    args,
+  }: {
+    reqContext: McpRequestContext;
+    args: any;
+  }): Promise<ToolCallResult> => {
+    const code = args.code as string;
+    const intent = args.intent as string | undefined;
+    const client = reqContext.client;
+
+    // Do very basic blocking of code that includes forbidden method names.
+    //
+    // WARNING: This is not secure against obfuscation and other evasion methods. If
+    // stronger security blocks are required, then these should be enforced in the downstream
+    // API (e.g., by having users call the MCP server with API keys with limited permissions).
+    if (blockedMethods) {
+      const blockedMatches = blockedMethods.filter((method) => code.includes(method.fullyQualifiedName));
+      if (blockedMatches.length > 0) {
+        return asErrorResult(
+          `The following methods have been blocked by the MCP server and cannot be used in code execution: ${blockedMatches
+            .map((m) => m.fullyQualifiedName)
+            .join(', ')}`,
+        );
+      }
+    }
+
+    const codeModeEndpoint =
+      readEnv('CODE_MODE_ENDPOINT_URL') ?? 'https://api.stainless.com/api/ai/code-tool';
+
+    // Setting a Stainless API key authenticates requests to the code tool endpoint.
+    const res = await fetch(codeModeEndpoint, {
+      method: 'POST',
+      headers: {
+        ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey }),
+        'Content-Type': 'application/json',
+        client_envs: JSON.stringify({
+          BENCHIFY_API_KEY: readEnv('BENCHIFY_API_KEY') ?? client.apiKey ?? undefined,
+          BENCHIFY_BASE_URL: readEnv('BENCHIFY_BASE_URL') ?? client.baseURL ?? undefined,
+        }),
+      },
+      body: JSON.stringify({
+        project_name: 'benchify',
+        code,
+        intent,
+        client_opts: {},
+      } satisfies WorkerInput),
     });
 
-    try {
-      const resp = await new Promise<Response>((resolve, reject) => {
-        worker.addEventListener('exit', (exitCode) => {
-          reject(new Error(`Worker exited with code ${exitCode}`));
-        });
-
-        const opts: ClientOptions = {
-          baseURL: client.baseURL,
-          apiKey: client.apiKey,
-          defaultHeaders: {
-            'X-Stainless-MCP': 'true',
-          },
-        };
-
-        const req = worker.request(
-          'http://localhost',
-          {
-            headers: {
-              'content-type': 'application/json',
-            },
-            method: 'POST',
-          },
-          (resp) => {
-            const body: Uint8Array[] = [];
-            resp.on('error', (err) => {
-              reject(err);
-            });
-            resp.on('data', (chunk) => {
-              body.push(chunk);
-            });
-            resp.on('end', () => {
-              resolve(
-                new Response(Buffer.concat(body).toString(), {
-                  status: resp.statusCode ?? 200,
-                  headers: resp.headers as any,
-                }),
-              );
-            });
-          },
-        );
-
-        const body = JSON.stringify({
-          opts,
-          code,
-        } satisfies WorkerInput);
-
-        req.write(body, (err) => {
-          if (err != null) {
-            reject(err);
-          }
-        });
-
-        req.end();
-      });
-
-      if (resp.status === 200) {
-        const { result, logLines, errLines } = (await resp.json()) as WorkerSuccess;
-        const returnOutput: ContentBlock | null =
-          result == null ? null : (
-            {
-              type: 'text',
-              text: typeof result === 'string' ? result : JSON.stringify(result),
-            }
-          );
-        const logOutput: ContentBlock | null =
-          logLines.length === 0 ?
-            null
-          : {
-              type: 'text',
-              text: logLines.join('\n'),
-            };
-        const errOutput: ContentBlock | null =
-          errLines.length === 0 ?
-            null
-          : {
-              type: 'text',
-              text: 'Error output:\n' + errLines.join('\n'),
-            };
-        return {
-          content: [returnOutput, logOutput, errOutput].filter((block) => block !== null),
-        };
-      } else {
-        const { message } = (await resp.json()) as WorkerError;
-        return {
-          content: message == null ? [] : [{ type: 'text', text: message }],
-          isError: true,
-        };
-      }
-    } finally {
-      worker.terminate();
+    if (!res.ok) {
+      throw new Error(
+        `${res.status}: ${
+          res.statusText
+        } error when trying to contact Code Tool server. Details: ${await res.text()}`,
+      );
     }
+
+    const { is_error, result, log_lines, err_lines } = (await res.json()) as WorkerOutput;
+    const hasLogs = log_lines.length > 0 || err_lines.length > 0;
+    const output = {
+      result,
+      ...(log_lines.length > 0 && { log_lines }),
+      ...(err_lines.length > 0 && { err_lines }),
+    };
+    if (is_error) {
+      return asErrorResult(typeof result === 'string' && !hasLogs ? result : JSON.stringify(output, null, 2));
+    }
+    return asTextContentResult(output);
   };
 
   return { metadata, tool, handler };

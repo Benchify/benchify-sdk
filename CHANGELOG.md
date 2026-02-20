@@ -1,5 +1,85 @@
 # Changelog
 
+## 0.1.0-alpha.91 (2026-02-20)
+
+Full Changelog: [v0.1.0-alpha.90...v0.1.0-alpha.91](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.90...v0.1.0-alpha.91)
+
+### ⚠ BREAKING CHANGES
+
+* **mcp:** remove deprecated tool schemes
+* **mcp:** **Migration:** To migrate, simply modify the command used to invoke the MCP server. Currently, the only supported tool scheme is code mode. Now, starting the server with just `node /path/to/mcp/server` or `npx package-name` will invoke code tools: changing your command to one of these is likely all you will need to do.
+
+### Features
+
+* **api:** api update ([f4116bf](https://github.com/Benchify/benchify-sdk/commit/f4116bf4b93a99cd685e817a2fd085596d57a010))
+* **mcp:** add detail field to docs search tool ([9064c37](https://github.com/Benchify/benchify-sdk/commit/9064c37400d66c1dd352941938384a6307247f62))
+* **mcp:** add initial server instructions ([832102c](https://github.com/Benchify/benchify-sdk/commit/832102cc683b314620ba38e2edbaf01eaf4d4876))
+* **mcp:** add typescript check to code execution tool ([de942dc](https://github.com/Benchify/benchify-sdk/commit/de942dc86a13c568997f7352a353b3218850f295))
+* **mcp:** handle code mode calls in the Stainless API ([e15c484](https://github.com/Benchify/benchify-sdk/commit/e15c484bb9c7ef6a8a494bbdb00081b98ac52417))
+* **mcp:** return logs on code tool errors ([1187f76](https://github.com/Benchify/benchify-sdk/commit/1187f763d527fec63ed7eb743fb0a1f2d96a8f54))
+
+
+### Bug Fixes
+
+* **client:** avoid memory leak with abort signals ([2e35540](https://github.com/Benchify/benchify-sdk/commit/2e3554042e8f26d185b022bb1f9fc7cf4facdcd4))
+* **client:** avoid removing abort listener too early ([7ff45ed](https://github.com/Benchify/benchify-sdk/commit/7ff45ed1ecd8fca71716c89757e9a01eb46b0c6c))
+* **docs:** fix mcp installation instructions for remote servers ([9b2e108](https://github.com/Benchify/benchify-sdk/commit/9b2e108b521809753d5bb7402a951be0210dbae5))
+* **mcp:** add client instantiation options to code tool ([b052e0b](https://github.com/Benchify/benchify-sdk/commit/b052e0b8265935fa51bece2f052126e96ee813b6))
+* **mcp:** allow falling back for required env variables ([524641d](https://github.com/Benchify/benchify-sdk/commit/524641dab00e90ee420217f09ce5a1cb8b71a280))
+* **mcp:** correct code tool API endpoint ([9e12fb3](https://github.com/Benchify/benchify-sdk/commit/9e12fb3e5cba9c4d6abcd4880da895b8b491164c))
+* **mcp:** correct code tool api output types ([5c96523](https://github.com/Benchify/benchify-sdk/commit/5c96523e2fed2231d5cfe6eb1db45afd0443295b))
+* **mcp:** fix options parsing ([d45d8a6](https://github.com/Benchify/benchify-sdk/commit/d45d8a6eef2f2c25c9781572a4bb2e10010db332))
+* **mcp:** initialize SDK lazily to avoid failing the connection on init errors ([39a16bb](https://github.com/Benchify/benchify-sdk/commit/39a16bb347bab0d7e8be930060643724b1e3c448))
+* **mcp:** pass base url to code tool ([e450db3](https://github.com/Benchify/benchify-sdk/commit/e450db31ba78bdbe332d1dfb3ccbc50201926f66))
+* **mcp:** return correct lines on typescript errors ([4d4edce](https://github.com/Benchify/benchify-sdk/commit/4d4edce15cdb5b662754e312c9fae443ca20cb23))
+* **mcp:** return tool execution error on api error ([8b8fb95](https://github.com/Benchify/benchify-sdk/commit/8b8fb95b2b5221d763cf9560262e09be100ed392))
+* **mcp:** update code tool prompt ([0936959](https://github.com/Benchify/benchify-sdk/commit/093695983282f8bc2ab81ba5f78076ab830d4bd9))
+
+
+### Chores
+
+* break long lines in snippets into multiline ([12d2c48](https://github.com/Benchify/benchify-sdk/commit/12d2c481fe9ee9de849c9618928a4a8dd91e1e4a))
+* **ci:** upgrade `actions/github-script` ([7af0da9](https://github.com/Benchify/benchify-sdk/commit/7af0da987322f3610deec60487e19a1b12052c66))
+* **client:** do not parse responses with empty content-length ([010790c](https://github.com/Benchify/benchify-sdk/commit/010790cf28f6241688fd5fa4e1d6d79a05818527))
+* **client:** fix logger property type ([f0412a5](https://github.com/Benchify/benchify-sdk/commit/f0412a57780af4abf4e035944a2b8224b32f903f))
+* **client:** restructure abort controller binding ([ea6a6c8](https://github.com/Benchify/benchify-sdk/commit/ea6a6c8c826fa73715caa048fd735097caa70899))
+* **internal/client:** fix form-urlencoded requests ([9c495aa](https://github.com/Benchify/benchify-sdk/commit/9c495aa872723e68ad4bb05f9d68dab1265fee60))
+* **internal:** add health check to MCP server when running in HTTP mode ([bdffba3](https://github.com/Benchify/benchify-sdk/commit/bdffba32f1c6df915db2b1661374c5531c7aeb56))
+* **internal:** allow basic filtering of methods allowed for MCP code mode ([d11f4a4](https://github.com/Benchify/benchify-sdk/commit/d11f4a4f2e7c165b004dee98b8d7913e227d3cc1))
+* **internal:** allow setting x-stainless-api-key header on mcp server requests ([484a4bb](https://github.com/Benchify/benchify-sdk/commit/484a4bbd6415365cad3ea720871d303fbc4db14a))
+* **internal:** always generate MCP server dockerfiles and upgrade associated dependencies ([fe53398](https://github.com/Benchify/benchify-sdk/commit/fe533988a105e2e554c5aa0ebc10156b2951ed69))
+* **internal:** avoid type checking errors with ts-reset ([5cb7168](https://github.com/Benchify/benchify-sdk/commit/5cb7168e1c6c743e9cf9b831867b86074c12ff43))
+* **internal:** cache fetch instruction calls in MCP server ([aa56a21](https://github.com/Benchify/benchify-sdk/commit/aa56a21bb9ca55ea3180772a97ee6681db0d9413))
+* **internal:** codegen related update ([64c36b1](https://github.com/Benchify/benchify-sdk/commit/64c36b1f8de864ac7a65c0fb068437d7ace5bcad))
+* **internal:** codegen related update ([2e7158b](https://github.com/Benchify/benchify-sdk/commit/2e7158b2910d37a099291b2ec80eb04618dd5b5b))
+* **internal:** codegen related update ([428d03a](https://github.com/Benchify/benchify-sdk/commit/428d03a17874e88a113c814efdc149e86e177073))
+* **internal:** codegen related update ([f0c2b28](https://github.com/Benchify/benchify-sdk/commit/f0c2b287b8611355c7a965ccfcc0627a791240b5))
+* **internal:** codegen related update ([c2de5f6](https://github.com/Benchify/benchify-sdk/commit/c2de5f63d4bc49554acb698af4e445498cc3915e))
+* **internal:** codegen related update ([6dbc150](https://github.com/Benchify/benchify-sdk/commit/6dbc1500be8f710ce01dd018dc3a05e1f1b25275))
+* **internal:** codegen related update ([d783183](https://github.com/Benchify/benchify-sdk/commit/d783183608d0c701ee75cafb049ad709ac69f404))
+* **internal:** codegen related update ([8b096ab](https://github.com/Benchify/benchify-sdk/commit/8b096ab18c43de7e0686c20e0bf0c5ccc686ef3e))
+* **internal:** improve layout of generated MCP server files ([ad92a7a](https://github.com/Benchify/benchify-sdk/commit/ad92a7ac7d380d8dcdc8864d1f9d6b4c2c1d282f))
+* **internal:** refactor flag parsing for MCP servers and add debug flag ([b0d204f](https://github.com/Benchify/benchify-sdk/commit/b0d204f7d1bbf686438cc177d6fa4510b17a137e))
+* **internal:** remove mock server code ([eb6f439](https://github.com/Benchify/benchify-sdk/commit/eb6f439d09fe8e6e58937b2ae1c8c179b68df2fe))
+* **internal:** support oauth authorization code flow for MCP servers ([ddd84ca](https://github.com/Benchify/benchify-sdk/commit/ddd84caec23bf18eeea80334dec94ce0fd7aecca))
+* **internal:** update `actions/checkout` version ([6c27af3](https://github.com/Benchify/benchify-sdk/commit/6c27af3bc0672b43cbe1b6e091813e1db087b7dd))
+* **internal:** update lock file ([d0717d7](https://github.com/Benchify/benchify-sdk/commit/d0717d7e3feb9e1efe2e9503d1a557bd31a8685f))
+* **internal:** upgrade babel, qs, js-yaml ([40b4fe3](https://github.com/Benchify/benchify-sdk/commit/40b4fe34454c948a80e97ce04da5373bd69cf863))
+* **internal:** upgrade eslint ([4d52d23](https://github.com/Benchify/benchify-sdk/commit/4d52d232d1cf8fd47275abf5373dfce5274f3d9d))
+* **mcp:** add intent param to execute tool ([7aabc9a](https://github.com/Benchify/benchify-sdk/commit/7aabc9a655c00dae45af2f0b1b2ffa8da9a01553))
+* **mcp:** forward STAINLESS_API_KEY to docs search endpoint ([be10e19](https://github.com/Benchify/benchify-sdk/commit/be10e19664a23b01d79f3a1d17bda6291a320a92))
+* **mcp:** pass intent param to execute handler ([45a84ae](https://github.com/Benchify/benchify-sdk/commit/45a84ae31d24e9ab702d6bafac04e439b59ee9c5))
+* **mcp:** remove deprecated tool schemes ([47aadd0](https://github.com/Benchify/benchify-sdk/commit/47aadd0ae670dd4db41ec34b73379210d4a7239b))
+* **mcp:** up tsconfig lib version to es2022 ([2b5894d](https://github.com/Benchify/benchify-sdk/commit/2b5894dc84141e2e1d66cf94b26544a4856c38e9))
+* **mcp:** update lockfile ([4bb1c8d](https://github.com/Benchify/benchify-sdk/commit/4bb1c8d468792fa233cd14f6e5226e1d302b68f0))
+* **mcp:** upgrade dependencies ([ef3dda1](https://github.com/Benchify/benchify-sdk/commit/ef3dda1552d32a29367ea44d004033f594871802))
+* use latest @modelcontextprotocol/sdk ([85d26f7](https://github.com/Benchify/benchify-sdk/commit/85d26f7811ab96451cfc23dca2898b3295d18a7c))
+
+
+### Documentation
+
+* prominently feature MCP server setup in root SDK readmes ([5136be8](https://github.com/Benchify/benchify-sdk/commit/5136be8dcb6af8a1550a6ee9a455aebe05c76d59))
+
 ## 0.1.0-alpha.90 (2025-11-16)
 
 Full Changelog: [v0.1.0-alpha.89...v0.1.0-alpha.90](https://github.com/Benchify/benchify-sdk/compare/v0.1.0-alpha.89...v0.1.0-alpha.90)
