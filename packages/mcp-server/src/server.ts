@@ -20,7 +20,7 @@ export const newMcpServer = async (stainlessApiKey: string | undefined) =>
   new McpServer(
     {
       name: 'benchify_api',
-      version: '0.1.0-alpha.90',
+      version: '0.1.0-alpha.91',
     },
     {
       instructions: await getInstructions(stainlessApiKey),
