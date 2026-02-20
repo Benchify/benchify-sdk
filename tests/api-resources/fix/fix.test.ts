@@ -8,7 +8,7 @@ const client = new Benchify({
 });
 
 describe('resource fix', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('createAIFallback: only required params', async () => {
     const responsePromise = client.fix.createAIFallback({
       files: [
@@ -25,7 +25,7 @@ describe('resource fix', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('createAIFallback: required and optional params', async () => {
     const response = await client.fix.createAIFallback({
       files: [

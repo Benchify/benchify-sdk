@@ -8,7 +8,7 @@ const client = new Benchify({
 });
 
 describe('resource validateTemplate', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('validate', async () => {
     const responsePromise = client.validateTemplate.validate();
     const rawResponse = await responsePromise.asResponse();
@@ -20,7 +20,7 @@ describe('resource validateTemplate', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('validate: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(

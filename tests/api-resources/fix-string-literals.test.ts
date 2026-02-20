@@ -8,7 +8,7 @@ const client = new Benchify({
 });
 
 describe('resource fixStringLiterals', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.fixStringLiterals.create({ file: { contents: 'contents', path: 'path' } });
     const rawResponse = await responsePromise.asResponse();
@@ -20,7 +20,7 @@ describe('resource fixStringLiterals', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.fixStringLiterals.create({
       file: { contents: 'contents', path: 'path' },

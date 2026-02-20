@@ -8,7 +8,7 @@ const client = new Benchify({
 });
 
 describe('resource fixer', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('run', async () => {
     const responsePromise = client.fixer.run();
     const rawResponse = await responsePromise.asResponse();
@@ -20,7 +20,7 @@ describe('resource fixer', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('run: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(

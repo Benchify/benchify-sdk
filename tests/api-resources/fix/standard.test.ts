@@ -8,7 +8,7 @@ const client = new Benchify({
 });
 
 describe('resource standard', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.fix.standard.create({
       files: [
@@ -26,7 +26,7 @@ describe('resource standard', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.fix.standard.create({
       files: [
