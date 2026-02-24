@@ -60,7 +60,7 @@ $ yarn link benchify
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global benchify
+$ pnpm link --global benchify
 ```
 
 ## Running tests
